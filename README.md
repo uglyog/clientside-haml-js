@@ -7,20 +7,15 @@ side HAML http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports al
 
 # To use it
 
-* Include the haml.js in your page.
-```html
-&lt;script type="text/javascript" src="js/haml.js"&gt;&lt;/script&gt
-```
+* Include the haml.js in your page: ```html <script type="text/javascript" src="js/haml.js"></script>```
 
 * The HAML templates will have to be added to the body of the web page in a script tag, and have a unique ID.
-```html
-<script type="text/haml-template" id="simple">
-%h1
-  %div
-    %p
-      %span
-</script>
-```
+    <script type="text/haml-template" id="simple">
+    %h1
+      %div
+        %p
+          %span
+    </script>
 
 * To compile the haml template into a Javascript function, call the haml.compileHaml function, providing it with the ID of the template.
 ```javascript
