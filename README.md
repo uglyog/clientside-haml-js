@@ -7,44 +7,41 @@ side HAML http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports al
 
 # To use it
 
-* Include the haml.js in your page: `<script type="text/javascript" src="js/haml.js"></script>`
+* Include the haml.js in your page: 
+`<script type="text/javascript" src="js/haml.js"></script>`
 
 * The HAML templates will have to be added to the body of the web page in a script tag, and have a unique ID.
 `<script type="text/haml-template" id="simple">`<br/>
-```%h1```
-```   %div```
-```     %p```
-```       %span```
-```</script>```
+`%h1`<br/>
+`   %div`<br/>
+`     %p`<br/>
+`       %span`<br/>
+`</script>`<br/>
 
 * To compile the haml template into a Javascript function, call the haml.compileHaml function, providing it with the ID of the template.
 `haml.compileHaml('simple')`
 
 This will produce the following Javascript function:
-```function anonymous(context) {```
-```  with(context) {```
-```    var html = "";```
-```    html += "<h1>\n  <div>\n    <p>\n    </p>\n    <span>\n    </span>\n  </div>\n</h1>\n";```
-```    return html;```
-```  }```
-``````
-``` }```
+`function anonymous(context) {`<br/>
+`  with(context) {`<br/>
+`    var html = "";`<br/>
+`    html += "<h1>\n  <div>\n    <p>\n    </p>\n    <span>\n    </span>\n  </div>\n</h1>\n";`<br/>
+`    return html;`<br/>
+`  }`<br/>
+`  `<br/>
+` }`<br/>
 
 
 * The function can be called, and it takes one parameter: a context object.
-```
-   var fn = haml.compileHaml('simple');
-   var html = fn({});
-```
+`var fn = haml.compileHaml('simple');`<br/>
+`var html = fn({});`<br/>
 
 This will produce the following HTML:
-```
-    <h1>
-      <div>
-        <p>
-        </p>
-        <span>
-        </span>
-      </div>
-    </h1>
-```
+`    <h1>`<br/>
+`      <div>`<br/>
+`        <p>`<br/>
+`        </p>`<br/>
+`        <span>`<br/>
+`        </span>`<br/>
+`      </div>`<br/>
+`    </h1>`<br/>
