@@ -25,30 +25,36 @@ side HAML http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports al
 ```
 
 * To compile the haml template into a Javascript function, call the haml.compileHaml function, providing it with the ID of the template.
-`haml.compileHaml('simple')`
+```javascript
+    haml.compileHaml('simple')
+```
 
 This will produce the following Javascript function:
-`function anonymous(context) {`<br/>
-&nbsp;&nbsp;`with(context) {`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;`var html = "";`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;`html += "<h1>\n  <div>\n    <p>\n    </p>\n    <span>\n    </span>\n  </div>\n</h1>\n";`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;`return html;`<br/>
-&nbsp;&nbsp;`}`<br/>
-&nbsp;&nbsp;``<br/>
-` }`<br/>
-
+```javascript
+    function anonymous(context) {
+      with(context) {
+        var html = "";
+        html += "<h1>\n  <div>\n    <p>\n    </p>\n    <span>\n    </span>\n  </div>\n</h1>\n";
+        return html;
+      }
+    }
+```
 
 * The function can be called, and it takes one parameter: a context object.
 
-`var fn = haml.compileHaml('simple');`<br/>
-`var html = fn({});`<br/>
+```javascript
+    var fn = haml.compileHaml('simple');
+    var html = fn({});
+```
 
 This will produce the following HTML:
-`<h1>`<br/>
-&nbsp;&nbsp;`<div>`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;`<p>`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;`</p>`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`<span>`<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`</span>`<br/>
-&nbsp;&nbsp;`</div>`<br/>
-`</h1>`<br/>
+```html
+    <h1>
+      <div>
+        <p>
+        </p>
+        <span>
+        </span>
+      </div>
+    </h1>
+```
