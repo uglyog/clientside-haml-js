@@ -25,11 +25,13 @@ side HAML http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports al
 ```
 
 * To compile the haml template into a Javascript function, call the haml.compileHaml function, providing it with the ID of the template.
+
 ```javascript
     haml.compileHaml('simple')
 ```
 
 This will produce the following Javascript function:
+
 ```javascript
     function anonymous(context) {
       with(context) {
@@ -48,6 +50,7 @@ This will produce the following Javascript function:
 ```
 
 This will produce the following HTML:
+
 ```html
     <h1>
       <div>
