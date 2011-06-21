@@ -32,10 +32,13 @@ This will produce the following Javascript function:
 
 
 * The function can be called, and it takes one parameter: a context object.
-    var fn = haml.compileHaml('simple');
-    var html = fn({});
+```
+   var fn = haml.compileHaml('simple');
+   var html = fn({});
+```
 
 This will produce the following HTML:
+```
     <h1>
       <div>
         <p>
@@ -44,3 +47,4 @@ This will produce the following HTML:
         </span>
       </div>
     </h1>
+```
