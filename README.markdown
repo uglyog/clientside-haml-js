@@ -9,7 +9,9 @@ side HAML http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports al
 
 * Include the haml.js in your page:
 
-```<script type="text/javascript" src="js/haml.js"></script>```
+```javascript
+    <script type="text/javascript" src="js/haml.js"></script>
+```
 
 * The HAML templates will have to be added to the body of the web page in a script tag, and have a unique ID.
 
