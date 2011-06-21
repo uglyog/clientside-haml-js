@@ -10,25 +10,25 @@ side HAML http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports al
 * Include the haml.js in your page: `<script type="text/javascript" src="js/haml.js"></script>`
 
 * The HAML templates will have to be added to the body of the web page in a script tag, and have a unique ID.
-```<script type="text/haml-template" id="simple">
-```%h1
-```   %div
-```     %p
-```       %span
-```</script>
+```<script type="text/haml-template" id="simple">```
+```%h1```
+```   %div```
+```     %p```
+```       %span```
+```</script>```
 
 * To compile the haml template into a Javascript function, call the haml.compileHaml function, providing it with the ID of the template.
-    haml.compileHaml('simple')
+`haml.compileHaml('simple')`
 
 This will produce the following Javascript function:
-    function anonymous(context) {
-      with(context) {
-        var html = "";
-        html += "<h1>\n  <div>\n    <p>\n    </p>\n    <span>\n    </span>\n  </div>\n</h1>\n";
-        return html;
-      }
-
-    }
+```function anonymous(context) {```
+```  with(context) {```
+```    var html = "";```
+```    html += "<h1>\n  <div>\n    <p>\n    </p>\n    <span>\n    </span>\n  </div>\n</h1>\n";```
+```    return html;```
+```  }```
+``````
+``` }```
 
 
 * The function can be called, and it takes one parameter: a context object.
