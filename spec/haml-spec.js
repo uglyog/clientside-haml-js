@@ -1,0 +1,335 @@
+/*global haml */
+
+describe('haml', function () {
+
+  beforeEach(function () {
+    haml.cache = {};
+  });
+
+  describe('empty template', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="empty"></script>');
+    });
+
+    it('should return an empty string', function () {
+      expect(haml.compileHaml('empty').call(null, {})).toEqual('');
+    });
+  });
+
+  describe('simple template', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="simple">\n' +
+        '%h1\n' +
+        '  %div\n' +
+        '    %p\n' +
+        '    %span</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('simple').call(null, {});
+      expect(html).toEqual(
+        '<h1>\n' +
+        '  <div>\n' +
+        '    <p>\n' +
+        '    </p>\n' +
+        '    <span>\n' +
+        '    </span>\n' +
+        '  </div>\n' +
+        '</h1>\n');
+    });
+
+  });
+
+  describe('invalid template', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="invalid">%h1\n' +
+        '  %h2\n' +
+        '    %h3{%h3 %h4}\n' +
+        '      %h4\n' +
+        '        %h5</script>' +
+        '<script type="text/template" id="invalid2">%h1\n' +
+        '  %h2\n' +
+        '    %h3{id: "test", class: "test-class"\n' +
+        '      %h4\n' +
+        '        %h5</script>');
+      this.addMatchers({
+        toThrowContaining: function (expected) {
+          var result = false;
+          var exception;
+          if (typeof this.actual !== 'function') {
+            throw new Error('Actual is not a function');
+          }
+          try {
+            this.actual();
+          } catch (e) {
+            exception = e;
+          }
+          if (exception) {
+            result = exception.indexOf(expected) >= 0;
+          }
+
+          var not = this.isNot ? "not " : "";
+
+          this.message = function () {
+            if (exception) {
+              return ["Expected function " + not + "to throw something with ", expected, ", but it threw", exception].join(' ');
+            } else {
+              return "Expected function to throw an exception.";
+            }
+          };
+
+          return result;
+        }
+      });
+    });
+
+    it('should provide a meaningful message', function () {
+      expect(function () {
+        haml.compileHaml('invalid').call(null, {});
+      }).toThrowContaining('at line 3 and character 16:\n' +
+          '    %h3{%h3 %h4}\n' +
+          '---------------^');
+      expect(function () {
+        haml.compileHaml('invalid2');
+      }).toThrowContaining('at line 3 and character 8:\n' +
+        '    %h3{id: "test", class: "test-class"\n' +
+        '-------^');
+    });
+
+  });
+
+  describe('simple template with text', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="simple">\n' +
+        '%h1\n' +
+        '  %div\n' +
+        '    %p This is some text\n' +
+        '      This is some text\n' +
+        '    This is some div text\n' +
+        '    \\%span\n' +
+        '    %span %h1 %h1 %h1</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('simple').call(null, {});
+      expect(html).toEqual(
+        '<h1>\n' +
+          '  <div>\n' +
+          '    <p>\n' +
+          '      This is some text\n' +
+          '      This is some text\n' +
+          '    </p>\n' +
+          '    This is some div text\n' +
+          '    %span\n' +
+          '    <span>\n' +
+          '      %h1 %h1 %h1\n' +
+          '    </span>\n' +
+          '  </div>\n' +
+          '</h1>\n');
+    });
+
+  });
+
+  describe('template with {} attributes', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="attributes">\n' +
+        '%h1\n' +
+        '  %div{id: "test"}\n' +
+        '    %p{id: \'test2\', ' +
+        '        class: "blah", name: null, test: false, checked: false, selected: true} This is some text\n' +
+        '      This is some text\n' +
+        '    This is some div text\n' +
+        '    %div{id: [\'test\', 1], class: [model.name, "class2"]}\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('attributes').call(null, { model: { name: 'class1' } });
+      expect(html).toEqual(
+        '<h1>\n' +
+        '  <div id="test">\n' +
+        '    <p id="test2" class="blah" selected="selected">\n' +
+        '      This is some text\n' +
+        '      This is some text\n' +
+        '    </p>\n' +
+        '    This is some div text\n' +
+        '    <div id="test-1" class="class1 class2">\n' +
+        '    </div>\n' +
+        '  </div>\n' +
+        '</h1>\n');
+    });
+
+  });
+
+  describe('template with () attributes', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="attributes">\n' +
+        '%h1\n' +
+        '  %div(id = "test")\n' +
+        '    %p(id=test2 class="blah" selected="selected") This is some text\n' +
+        '      This is some text\n' +
+        '    This is some div text\n' +
+        '    %div(id=test){id: 1, class: [model.name, "class2"]}\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('attributes').call(null, { model: { name: 'class1' } });
+      expect(html).toEqual(
+        '<h1>\n' +
+        '  <div id="test">\n' +
+        '    <p id="test2" class="blah" selected="selected">\n' +
+        '      This is some text\n' +
+        '      This is some text\n' +
+        '    </p>\n' +
+        '    This is some div text\n' +
+        '    <div id="test-1" class="class1 class2">\n' +
+        '    </div>\n' +
+        '  </div>\n' +
+        '</h1>\n');
+    });
+
+  });
+
+  describe('template with id and class selectors', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="attributes">\n' +
+        '%h1\n' +
+        '  #test.test\n' +
+        '    %p#test.blah{id: 2, class: "test"} This is some text\n' +
+        '      This is some text\n' +
+        '    This is some div text\n' +
+        '    .class1.class2/\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('attributes').call(null, {});
+      expect(html).toEqual(
+        '<h1>\n' +
+        '  <div id="test" class="test">\n' +
+        '    <p id="test-2" class="blah test">\n' +
+        '      This is some text\n' +
+        '      This is some text\n' +
+        '    </p>\n' +
+        '    This is some div text\n' +
+        '    <div class="class1 class2"/>\n' +
+        '  </div>\n' +
+        '</h1>\n');
+    });
+
+  });
+
+  describe('template with unescaped HTML', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="unescaped">\n' +
+        '!%h1\n' +
+        '!  #test.test\n' +
+        '!    %p#test.blah{id: 2, class: "test"} This is some text\n' +
+        '!      This is some text\n' +
+        '!    This is some <div> text\n' +
+        '!    <div class="class1 class2"></div>\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('unescaped').call(null, {});
+      expect(html).toEqual(
+        '%h1\n' +
+        '  #test.test\n' +
+        '    %p#test.blah{id: 2, class: "test"} This is some text\n' +
+        '      This is some text\n' +
+        '    This is some <div> text\n' +
+        '    <div class="class1 class2"></div>\n');
+    });
+
+  });
+
+//  describe('comparison tests', function () {
+//    beforeEach(function () {
+//      setFixtures('<script id="jst" type="text/template">\n' +
+//        '<div class="sort-area">\n' +
+//        '    <span class="shine-pointer-pagination"></span>\n' +
+//        '    <div class="corner-left-top-border"></div>\n' +
+//        '    <div class="sort-area-middle-top">\n' +
+//        '      <div class="sort-by">\n' +
+//        '        <span class="quiet">Sort by: </span>\n' +
+//        '        <select>\n' +
+//        '          <option value="date">Date</option>\n' +
+//        '        </select>\n' +
+//        '      </div>\n' +
+//        '      <div class="pagecount light"></div>\n' +
+//        '      <div id="paginator-top"></div>\n' +
+//        '    </div>\n' +
+//        '    <div class="corner-right-top-border"></div>\n' +
+//        '</div>\n' +
+//        '<div class="results-container clear">\n' +
+//        '    <ul class="list-wrapper"></ul>\n' +
+//        '</div>\n' +
+//        '<div class="sort-area-bottom">\n' +
+//        '    <div class="corner-left-bottom-border"></div>\n' +
+//        '    <div class="sort-area-middle-bottom">\n' +
+//        '      <div class="sort-by">\n' +
+//        '        <span class="quiet">Sort by: </span> <select>\n' +
+//        '        <option value="sydney">Date</option>\n' +
+//        '      </div>\n' +
+//        '      <div class="pagecount light"></div>\n' +
+//        '      <div id="paginator-bottom"></div>\n' +
+//        '    </div>\n' +
+//        '    <div class="corner-right-bottom-border"></div>\n' +
+//        '</div>\n' +
+//        '</script>\n' +
+//        '\n' +
+//        '<script type="text/template" id="haml">\n' +
+//        '.sort-area\n' +
+//        '  %span.shine-pointer-pagination\n' +
+//        '  .corner-left-top-border\n' +
+//        '  .sort-area-middle-top\n' +
+//        '    .sort-by\n' +
+//        '      %span.quiet Sort by: \n' +
+//        '      %select\n' +
+//        '        %option{value: "date"} Date\n' +
+//        '    .pagecount.light\n' +
+//        '    #paginator-top\n' +
+//        '  .corner-right-top-border\n' +
+//        '.results-container.clear\n' +
+//        '  %ul.list-wrapper\n' +
+//        '.sort-area-bottom\n' +
+//        '  .corner-left-bottom-border\n' +
+//        '  .sort-area-middle-bottom\n' +
+//        '    .sort-by\n' +
+//        '      %span.quiet Sort by: \n' +
+//        '      %select\n' +
+//        '        %option{value: "sydney"} Date\n' +
+//        '    .pagecount.light\n' +
+//        '    #paginator-bottom\n' +
+//        '  .corner-right-bottom-border\n' +
+//        '</script>');
+//    });
+//
+//    it('should render the same html as JST', function () {
+//      var d1 = new Date();
+//      var jst = $.tmpl($("#jst").html());
+//      var d2 = new Date();
+//      var hamlHtml = haml.compileHaml('haml').call(null, {});
+//      var d3 = new Date();
+//      var jstTime = d2.getMilliseconds() - d1.getMilliseconds();
+//      var hamlTime = d3.getMilliseconds() - d2.getMilliseconds();
+////      console.log('JST: ' + jstTime);
+////      console.log('HAML: ' + hamlTime);
+//
+//      var jstDiv = $('<div>').append(jst);
+//
+//      expect(hamlHtml).toEqual(jstDiv.html());
+//    });
+//  });
+
+});
