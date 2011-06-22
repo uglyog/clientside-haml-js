@@ -235,8 +235,8 @@ describe('haml', function () {
         '  !#test.test\n' +
         '    !%p#test.blah{id: 2, class: "test"} This is some text\n' +
         '      !This is some text\n' +
-        '    !This is some <div> text\n' +
-        '    !<div class="class1 class2"></div>\n' +
+        '!    This is some <div> text\n' +
+        '!    <div class="class1 class2"></div>\n' +
         '</script>');
     });
 
