@@ -259,11 +259,11 @@ describe('haml', function () {
     beforeEach(function () {
       setFixtures('<script type="text/template" id="evaluation">\n' +
         '.box.error\n' +
-        '  %span' +
+        '  %span\n' +
         '    = errorTitle\n' +
         '  .clear\n' +
         '    %span= errorHeading\n' +
-        '    = var label = "Calculation: "; label + (1 + 2 * 3)\n' +
+        '    = var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
         '    = ["hi", "there", "reader!"]\n' +
         '</script>');
     });

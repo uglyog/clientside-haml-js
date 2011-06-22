@@ -77,3 +77,8 @@ but with Javascript code instead of Ruby.
 
 As with the ruby implementation, HTML style attributes are also supported. However, these are evaluated at compile time
 and not runtime as the ruby HAML does.
+
+## Unescaped Lines
+
+Any line starting with an exclamation (ignoring whitespace), is skipped over by the parser and copied as is to the
+output buffer. This allows lines which make cause parsing issues to be included in the output.
