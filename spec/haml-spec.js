@@ -255,7 +255,6 @@ describe('haml', function () {
 
   });
 
-
   describe('template with Javascript evaluation', function () {
 
     beforeEach(function () {
@@ -267,13 +266,15 @@ describe('haml', function () {
         '    %span= errorHeading\n' +
         '    = var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
         '    = ["hi", "there", "reader!"]\n' +
+        '    = evilScript \n' +
         '</script>');
     });
 
     it('should render the correct html', function () {
       var html = haml.compileHaml('evaluation').call(null, {
           errorTitle: "Error Title",
-          errorHeading: "Error Heading <div>div text</div>"
+          errorHeading: "Error Heading <div>div text</div>",
+          evilScript: '<script>alert("I\'m evil!");</script>'
         });
       expect(html).toEqual(
         '<div class="box error">\n' +
@@ -286,6 +287,7 @@ describe('haml', function () {
         '    </span>\n' +
         '    Calculation: 7\n' +
         '    hi,there,reader!\n' +
+        '    &lt;script&gt;alert(&quot;I&apos;m evil!&quot;);&lt;/script&gt;\n' +
         '  </div>\n' +
         '</div>\n');
     });
