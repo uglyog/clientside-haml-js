@@ -4,7 +4,8 @@ The clientside-haml-js is a compiler written in Javascript that compiles text te
 functions that generate HTML. It has been inspired by the server side haml Javascript project
 https://github.com/creationix/haml-js, and has been written to be feature compatible with Ruby server side HAML
 http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports all major browsers (IE 7+, Firefox 3.6+,
-Chrome 10+, Safari), have minimal dependencies (only underscore.js and underscore.string.js).
+Chrome 10+, Safari), have minimal dependencies (only [https://github.com/edtsech/underscore.string][underscore.js]
+and [https://github.com/edtsech/underscore.string][underscore.string.js]).
 
 # To use it
 

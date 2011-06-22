@@ -68,7 +68,7 @@ describe('haml', function () {
             exception = e;
           }
           if (exception) {
-            result = exception.indexOf(expected) >= 0;
+            result = exception.toString().indexOf(expected) >= 0;
           }
 
           var not = this.isNot ? "not " : "";
