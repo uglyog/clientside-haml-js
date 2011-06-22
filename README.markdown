@@ -1,9 +1,10 @@
 # Client-side HAML compiler in Javascript
 
-The clientside-haml-js is a compiler written in Javascript that compiles text templates in HAML format into Javascript functions that generate HTML. It 
-has been inspired by the server side haml Javascript project https://github.com/creationix/haml-js, and has been written to be feature compatible with Ruby server 
-side HAML http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have minimal dependancies
-(only JQuery) and be fast.
+The clientside-haml-js is a compiler written in Javascript that compiles text templates in HAML format into Javascript
+functions that generate HTML. It has been inspired by the server side haml Javascript project
+https://github.com/creationix/haml-js, and has been written to be feature compatible with Ruby server side HAML
+http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports all major browsers (IE 7+, Firefox 3.6+,
+Chrome 10+, Safari), have minimal dependencies (only underscore.js and underscore.string.js).
 
 # To use it
 
@@ -61,3 +62,17 @@ This will produce the following HTML:
       </div>
     </h1>
 ```
+
+# Client-side HAML Flavour
+
+Although I tried keep the implementation as close to the Ruby one as possible, there are some differences.
+
+## Element Attributes with {}
+
+Elements with {} attributes are evaluated at runtime as Javascript code. This is similar to the ruby implementation,
+but with Javascript code instead of Ruby.
+
+## Element Attributes with ()
+
+As with the ruby implementation, HTML style attributes are also supported. However, these are evaluated at compile time
+and not runtime as the ruby HAML does.

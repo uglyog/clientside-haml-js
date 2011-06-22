@@ -253,83 +253,39 @@ describe('haml', function () {
 
   });
 
-//  describe('comparison tests', function () {
-//    beforeEach(function () {
-//      setFixtures('<script id="jst" type="text/template">\n' +
-//        '<div class="sort-area">\n' +
-//        '    <span class="shine-pointer-pagination"></span>\n' +
-//        '    <div class="corner-left-top-border"></div>\n' +
-//        '    <div class="sort-area-middle-top">\n' +
-//        '      <div class="sort-by">\n' +
-//        '        <span class="quiet">Sort by: </span>\n' +
-//        '        <select>\n' +
-//        '          <option value="date">Date</option>\n' +
-//        '        </select>\n' +
-//        '      </div>\n' +
-//        '      <div class="pagecount light"></div>\n' +
-//        '      <div id="paginator-top"></div>\n' +
-//        '    </div>\n' +
-//        '    <div class="corner-right-top-border"></div>\n' +
-//        '</div>\n' +
-//        '<div class="results-container clear">\n' +
-//        '    <ul class="list-wrapper"></ul>\n' +
-//        '</div>\n' +
-//        '<div class="sort-area-bottom">\n' +
-//        '    <div class="corner-left-bottom-border"></div>\n' +
-//        '    <div class="sort-area-middle-bottom">\n' +
-//        '      <div class="sort-by">\n' +
-//        '        <span class="quiet">Sort by: </span> <select>\n' +
-//        '        <option value="sydney">Date</option>\n' +
-//        '      </div>\n' +
-//        '      <div class="pagecount light"></div>\n' +
-//        '      <div id="paginator-bottom"></div>\n' +
-//        '    </div>\n' +
-//        '    <div class="corner-right-bottom-border"></div>\n' +
-//        '</div>\n' +
-//        '</script>\n' +
-//        '\n' +
-//        '<script type="text/template" id="haml">\n' +
-//        '.sort-area\n' +
-//        '  %span.shine-pointer-pagination\n' +
-//        '  .corner-left-top-border\n' +
-//        '  .sort-area-middle-top\n' +
-//        '    .sort-by\n' +
-//        '      %span.quiet Sort by: \n' +
-//        '      %select\n' +
-//        '        %option{value: "date"} Date\n' +
-//        '    .pagecount.light\n' +
-//        '    #paginator-top\n' +
-//        '  .corner-right-top-border\n' +
-//        '.results-container.clear\n' +
-//        '  %ul.list-wrapper\n' +
-//        '.sort-area-bottom\n' +
-//        '  .corner-left-bottom-border\n' +
-//        '  .sort-area-middle-bottom\n' +
-//        '    .sort-by\n' +
-//        '      %span.quiet Sort by: \n' +
-//        '      %select\n' +
-//        '        %option{value: "sydney"} Date\n' +
-//        '    .pagecount.light\n' +
-//        '    #paginator-bottom\n' +
-//        '  .corner-right-bottom-border\n' +
-//        '</script>');
-//    });
-//
-//    it('should render the same html as JST', function () {
-//      var d1 = new Date();
-//      var jst = $.tmpl($("#jst").html());
-//      var d2 = new Date();
-//      var hamlHtml = haml.compileHaml('haml').call(null, {});
-//      var d3 = new Date();
-//      var jstTime = d2.getMilliseconds() - d1.getMilliseconds();
-//      var hamlTime = d3.getMilliseconds() - d2.getMilliseconds();
-////      console.log('JST: ' + jstTime);
-////      console.log('HAML: ' + hamlTime);
-//
-//      var jstDiv = $('<div>').append(jst);
-//
-//      expect(hamlHtml).toEqual(jstDiv.html());
-//    });
-//  });
+
+  describe('template with Javascript evaluation', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="evaluation">\n' +
+        '.box.error\n' +
+        '  %span' +
+        '    = errorTitle\n' +
+        '  .clear\n' +
+        '    %span= errorHeading\n' +
+        '    = var label = "Calculation: "; label + (1 + 2 * 3)\n' +
+        '    = ["hi", "there", "reader!"]\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('evaluation').call(null, {
+          errorTitle: "Error Title",
+          errorHeading: "Error Heading <div>div text</div>"
+        });
+      expect(html).toEqual(
+        '<div class="box error">\n' +
+        '  <span>\n' +
+        '    Error Title\n' +
+        '  </span>\n' +
+        '  <div class="clear">\n' +
+        '    <span>Error Heading &lt;div&gt;div text&lt;/div&gt;</span>\n' +
+        '    Calculation: 7\n' +
+        '    hi,there,reader\n' +
+        '  </div>\n' +
+        '</div>');
+    });
+
+  });
 
 });
