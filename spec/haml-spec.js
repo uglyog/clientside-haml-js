@@ -109,7 +109,7 @@ describe('haml', function () {
         '  %div\n' +
         '    %p This is some text\n' +
         '      This is some text\n' +
-        '    This is some div text\n' +
+        '    This is some <div> text\n' +
         '    \\%span\n' +
         '    %span %h1 %h1 %h1</script>');
     });
@@ -123,7 +123,7 @@ describe('haml', function () {
           '      This is some text\n' +
           '      This is some text\n' +
           '    </p>\n' +
-          '    This is some div text\n' +
+          '    This is some &lt;div&gt; text\n' +
           '    %span\n' +
           '    <span>\n' +
           '      %h1 %h1 %h1\n' +
@@ -231,24 +231,26 @@ describe('haml', function () {
 
     beforeEach(function () {
       setFixtures('<script type="text/template" id="unescaped">\n' +
-        '!%h1\n' +
-        '!  #test.test\n' +
-        '!    %p#test.blah{id: 2, class: "test"} This is some text\n' +
-        '!      This is some text\n' +
-        '!    This is some <div> text\n' +
-        '!    <div class="class1 class2"></div>\n' +
+        '%h1 !<div>\n' +
+        '  !#test.test\n' +
+        '    !%p#test.blah{id: 2, class: "test"} This is some text\n' +
+        '      !This is some text\n' +
+        '    !This is some <div> text\n' +
+        '    !<div class="class1 class2"></div>\n' +
         '</script>');
     });
 
     it('should render the correct html', function () {
       var html = haml.compileHaml('unescaped').call(null, {});
       expect(html).toEqual(
-        '%h1\n' +
+        '<h1>\n' +
+        '  <div>\n' +
         '  #test.test\n' +
         '    %p#test.blah{id: 2, class: "test"} This is some text\n' +
         '      This is some text\n' +
         '    This is some <div> text\n' +
-        '    <div class="class1 class2"></div>\n');
+        '    <div class="class1 class2"></div>\n' +
+        '</h1>\n');
     });
 
   });
@@ -279,11 +281,13 @@ describe('haml', function () {
         '    Error Title\n' +
         '  </span>\n' +
         '  <div class="clear">\n' +
-        '    <span>Error Heading &lt;div&gt;div text&lt;/div&gt;</span>\n' +
+        '    <span>\n' +
+        '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' +
+        '    </span>\n' +
         '    Calculation: 7\n' +
-        '    hi,there,reader\n' +
+        '    hi,there,reader!\n' +
         '  </div>\n' +
-        '</div>');
+        '</div>\n');
     });
 
   });
