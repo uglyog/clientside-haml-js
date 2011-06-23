@@ -294,4 +294,28 @@ describe('haml', function () {
 
   });
 
+  describe('template with Javascript code lines', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="evaluation">\n' +
+        '.main\n' +
+        '  - var foo = "hello";\n' +
+        '  - foo += " world";\n' +
+        '  %span\n' +
+        '    = foo\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('evaluation').call(null, {});
+      expect(html).toEqual(
+        '<div class="main">\n' +
+        '  <span>\n' +
+        '    hello world\n' +
+        '  </span>\n' +
+        '</div>\n');
+    });
+
+  });
+
 });
