@@ -358,4 +358,28 @@ describe('haml', function () {
 
   });
 
+  describe('template with comments', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="comments">\n' +
+        '.main\n' +
+        '-#  %span\n' +
+        '-#    = errorTitle\n' +
+        '-#  .clear\n' +
+        '-#    %span= errorHeading\n' +
+        '-#    = var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
+        '-#    = ["hi", "there", "reader!"]\n' +
+        '-#    = evilScript \n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('comments').call(null, {});
+      expect(html).toEqual(
+        '<div class="main">\n' +
+        '</div>\n');
+    });
+
+  });
+
 });
