@@ -227,6 +227,74 @@ describe('haml', function () {
 
   });
 
+  describe('template with self-closing tags', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="self-closing-tags">\n' +
+        '%div\n' +
+        '  meta, img, link, script, br, and hr\n' +
+        '  %meta\n' +
+        '  %meta/\n' +
+        '  %meta\n' +
+        '    meta\n' +
+        '  %img\n' +
+        '  %img/\n' +
+        '  %img\n' +
+        '    img\n' +
+        '  %link\n' +
+        '  %link/\n' +
+        '  %link\n' +
+        '    link\n' +
+        '  %br\n' +
+        '  %br/\n' +
+        '  %br\n' +
+        '    br/\n' +
+        '  %hr\n' +
+        '  %hr/\n' +
+        '  %hr\n' +
+        '    hr\n' +
+        '  %div/\n' +
+        '  %p/\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('self-closing-tags').call(null, {});
+      expect(html).toEqual(
+        '<div>\n' +
+        '  meta, img, link, script, br, and hr\n' +
+        '  <meta/>\n' +
+        '  <meta/>\n' +
+        '  <meta>\n' +
+        '    meta\n' +
+        '  </meta>\n' +
+        '  <img/>\n' +
+        '  <img/>\n' +
+        '  <img>\n' +
+        '    img\n' +
+        '  </img>\n' +
+        '  <link/>\n' +
+        '  <link/>\n' +
+        '  <link>\n' +
+        '    link\n' +
+        '  </link>\n' +
+        '  <br/>\n' +
+        '  <br/>\n' +
+        '  <br>\n' +
+        '    br/\n' +
+        '  </br>\n' +
+        '  <hr/>\n' +
+        '  <hr/>\n' +
+        '  <hr>\n' +
+        '    hr\n' +
+        '  </hr>\n' +
+        '  <div/>\n' +
+        '  <p/>\n' +
+        '</div>\n');
+    });
+
+  });
+
   describe('template with unescaped HTML', function () {
 
     beforeEach(function () {
