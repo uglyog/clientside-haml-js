@@ -4,8 +4,8 @@ The clientside-haml-js is a compiler written in Javascript that compiles text te
 functions that generate HTML. It has been inspired by the server side haml Javascript project
 https://github.com/creationix/haml-js, and has been written to be feature compatible with Ruby server side HAML
 http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports all major browsers (IE 7+, Firefox 3.6+,
-Chrome 10+, Safari), have minimal dependencies (only [https://github.com/edtsech/underscore.string][underscore.js]
-and [https://github.com/edtsech/underscore.string][underscore.string.js]).
+Chrome 10+, Safari), have minimal dependencies (only [underscore.js][https://github.com/edtsech/underscore.string]
+and [underscore.string.js][https://github.com/edtsech/underscore.string]).
 
 # To use it
 
@@ -154,6 +154,116 @@ output buffer. This allows lines which may cause parsing issues to be included i
             This is some <div> text
             <div class="class1 class2"></div>
         </h1>
+```
+
+## Embedded Javascript
+
+There are 3 ways you can embed javascript in your template, with {} attributes (see above), = expressions and - lines
+
+### Assigning an expression to a tag
+
+Adding an equals (=) to the end of a tag or at the start of a line allows a javascript expression to be evaluated
+and the result escaped and added to the contents of the tag. So for the following template
+
+```haml
+        .box.error
+          %span
+            = errorTitle
+          .clear
+            %span= errorHeading
+            = var label = "Calculation: "; return label + (1 + 2 * 3)
+            = ["hi", "there", "reader!"]
+            = evilScript
+```
+
+and calling
+
+```javascript
+      var html = haml.compileHaml('evaluation').call(null, {
+          errorTitle: "Error Title",
+          errorHeading: "Error Heading <div>div text</div>",
+          evilScript: '<script>alert("I\'m evil!");</script>'
+        });
+```
+
+should render
+
+```html
+        <div class="box error">
+          <span>
+            Error Title
+          </span>
+          <div class="clear">
+            <span>
+              Error Heading &lt;div&gt;div text&lt;/div&gt;
+            </span>
+            Calculation: 7
+            hi,there,reader!
+            &lt;script&gt;alert(&quot;I&apos;m evil!&quot;);&lt;/script&gt;
+          </div>
+        </div>
+```
+
+### Adding javascript code to the template
+
+Any line starting with a minus (-) will be copied to the generated javascript function. Make sure you get your
+brackets and braces closed in the correct places!
+
+```haml
+        .main
+          - var foo = "hello";
+          - foo += " world";
+          %span
+            = foo
+```
+
+```html
+        <div class="main">
+          <span>
+            hello world
+          </span>
+        </div>
+```
+
+With loops:
+
+```haml
+        .main
+          - _(["Option 1", "Option 2", "Option 3"]).each(function (option) {
+            %span= option
+          - });
+          - for (var i = 0; i < 5; i++) {
+            %p= i
+          - }
+```
+
+```html
+        <div class="main">
+            <span>
+              Option 1
+            </span>
+            <span>
+              Option 2
+            </span>
+            <span>
+              Option 3
+            </span>
+            <p>
+              0
+            </p>
+            <p>
+              1
+            </p>
+            <p>
+              2
+            </p>
+            <p>
+              3
+            </p>
+            <p>
+              4
+            </p>
+        </div>
 ```
 
 ## Jasmine Test
