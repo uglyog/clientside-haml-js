@@ -66,19 +66,95 @@ This will produce the following HTML:
 
 # Client-side HAML Flavour
 
-Although I tried keep the implementation as close to the Ruby one as possible, there are some differences.
+Although I tried keep the implementation as close to the Ruby one as possible, there are some differences. Also,
+currently not all features are implemented.
 
 ## Element Attributes with {}
 
 Elements with {} attributes are evaluated at runtime as Javascript code. This is similar to the ruby implementation,
-but with Javascript code instead of Ruby.
+but with Javascript code instead of Ruby. Values that result to null or false are excluded, and 'checked', 'selected' and
+'disabled' attributes are handled as boolean values. Ids will be joined by dashes (-) and classes by spaces.
+The following template
+
+```haml
+        %h1
+          %div{id: "test"}
+            %p{id: \'test2\', ' +
+                class: "blah", name: null, test: false, checked: false, selected: true} This is some text
+              This is some text
+            This is some div text
+            %div{id: [\'test\', 1], class: [model.name, "class2"]}
+```
+
+should generate
+
+```html
+        <h1>
+          <div id="test">
+            <p id="test2" class="blah" selected="selected">
+              This is some text
+              This is some text
+            </p>
+            This is some div text
+            <div id="test-1" class="class1 class2">
+            </div>
+          </div>
+        </h1>
+```
 
 ## Element Attributes with ()
 
 As with the ruby implementation, HTML style attributes are also supported. However, these are evaluated at compile time
-and not runtime as the ruby HAML does.
+and not runtime as the ruby HAML does. This allows the template writer decide which attributes are pre-compiled and
+which are evaluated at run-time.
+
+```haml
+        %h1
+          %div(id = "test")
+            %p(id=test2 class="blah" selected="selected") This is some text
+              This is some text
+            This is some div text
+            %div(id=test){id: 1, class: [model.name, "class2"]}
+```
+
+```html
+        <h1>
+          <div id="test">
+            <p id="test2" class="blah" selected="selected">
+             This is some text
+              This is some text
+            </p>
+            This is some div text
+            <div id="test-1" class="class1 class2">
+            </div>
+          </div>
+        </h1>
+```
 
 ## Unescaped Lines
 
 Any line starting with an exclamation is skipped over by the parser and copied as is to the
 output buffer. This allows lines which may cause parsing issues to be included in the output.
+
+```haml
+        %h1 !<div>
+          !#test.test
+            !%p#test.blah{id: 2, class: "test"} This is some text
+              !This is some text
+        !    This is some <div> text
+        !    <div class="class1 class2"></div>
+```
+
+```html
+        <h1>
+          <div>
+          #test.test
+            %p#test.blah{id: 2, class: "test"} This is some text
+              This is some text
+            This is some <div> text
+            <div class="class1 class2"></div>
+        </h1>
+```
+
+## Jasmine Test
+For more information on what is implemented, have a look at the jasmine test in the spec folder.
