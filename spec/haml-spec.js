@@ -312,6 +312,13 @@ describe('haml', function () {
         '  - for (var i = 0; i < 5; i++) {\n' +
         '    %p= i\n' +
         '  - }\n' +
+        '</script>' +
+        '<script type="text/template" id="evaluation-using-context">\n' +
+        '.main\n' +
+        '  - var foo = model.foo;\n' +
+        '  - foo += " world";\n' +
+        '  %span\n' +
+        '    = foo\n' +
         '</script>');
     });
 
@@ -353,6 +360,17 @@ describe('haml', function () {
         '    <p>\n' +
         '      4\n' +
         '    </p>\n' +
+        '</div>\n');
+    });
+
+    it('should provide access to the context within inline javascript', function () {
+      var model = { foo: "hello"};
+      var html = haml.compileHaml('evaluation-using-context').call(null, {model: model});
+      expect(html).toEqual(
+        '<div class="main">\n' +
+        '  <span>\n' +
+        '    hello world\n' +
+        '  </span>\n' +
         '</div>\n');
     });
 
