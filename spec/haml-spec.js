@@ -493,7 +493,7 @@ describe('haml', function () {
         '-#    = var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
         '-#    = ["hi", "there", "reader!"]\n' +
         '-#    = evilScript \n' +
-        '  /[if IE]\n' +
+        '  /[if IE]  \n' +
         '    %a(href = "http://www.mozilla.com/en-US/firefox/" )\n' +
         '      %h1 Get Firefox\n' +
         '</script>');
@@ -509,7 +509,7 @@ describe('haml', function () {
         '      An error&apos;s a terrible thing\n' +
         '    </span>\n' +
         '  -->\n' +
-        '  <!--[if IE]>\n' +
+        '  <!--[if IE]  >\n' +
         '    <a href="http://www.mozilla.com/en-US/firefox/">\n' +
         '      <h1>\n' +
         '        Get Firefox\n' +
