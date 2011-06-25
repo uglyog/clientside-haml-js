@@ -464,8 +464,10 @@ describe('haml', function () {
     beforeEach(function () {
       setFixtures('<script type="text/template" id="comments">\n' +
         '.main\n' +
-        '-#  %span\n' +
-        '-#    = errorTitle\n' +
+        '  / This is a comment\n' +
+        '  /\n' +
+        '    %span\n' +
+        '      = errorTitle\n' +
         '-#  .clear\n' +
         '-#    %span= errorHeading\n' +
         '-#    = var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
@@ -475,9 +477,15 @@ describe('haml', function () {
     });
 
     it('should render the correct html', function () {
-      var html = haml.compileHaml('comments').call(null, {});
+      var html = haml.compileHaml('comments').call(null, {errorTitle:"An error's a terrible thing"});
       expect(html).toEqual(
         '<div class="main">\n' +
+        '  <!-- This is a comment  -->\n' +
+        '  <!--\n' +
+        '    <span>\n' +
+        '      An error&apos;s a terrible thing\n' +
+        '    </span>\n' +
+        '  -->\n' +
         '</div>\n');
     });
 
