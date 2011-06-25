@@ -123,7 +123,7 @@ describe('haml', function () {
           '      This is some text\n' +
           '      This is some text\n' +
           '    </p>\n' +
-          '    This is some &lt;div&gt; text\n' +
+          '    This is some <div> text\n' +
           '    %span\n' +
           '    <span>\n' +
           '      %h1 %h1 %h1\n' +
@@ -564,6 +564,37 @@ describe('haml', function () {
         '    </p>\n' +
         '</div>\n');
     });
+  });
+
+  describe('Escaping HTML', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="simple">' +
+        '.main\n' +
+        '  <div>\n' +
+        '    &  <p>\n' +
+        '    &  </p>\n' +
+        '    &  <span>\n' +
+        '    &    <script>alert("I\'m evil!");\n' +
+        '    &  </span>\n' +
+        '  </div>\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('simple').call(null, {});
+      expect(html).toEqual(
+        '<div class="main">\n' +
+        '  <div>\n' +
+        '      &lt;p&gt;\n' +
+        '      &lt;/p&gt;\n' +
+        '      &lt;span&gt;\n' +
+        '        &lt;script&gt;alert(&quot;I&apos;m evil!&quot;);\n' +
+        '      &lt;/span&gt;\n' +
+        '  </div>\n' +
+        '</div>\n');
+    });
+
   });
 
 });
