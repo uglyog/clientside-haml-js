@@ -335,6 +335,14 @@ describe('haml', function () {
         '    = var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
         '    = ["hi", "there", "reader!"]\n' +
         '    = evilScript \n' +
+        '    %span&= errorHeading\n' +
+        '    &= var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
+        '    &= ["hi", "there", "reader!"]\n' +
+        '    &= evilScript \n' +
+        '    %span!= errorHeading\n' +
+        '    != var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
+        '    != ["hi", "there", "reader!"]\n' +
+        '    != evilScript \n' +
         '</script>');
     });
 
@@ -356,6 +364,18 @@ describe('haml', function () {
         '    Calculation: 7\n' +
         '    hi,there,reader!\n' +
         '    &lt;script&gt;alert(&quot;I&apos;m evil!&quot;);&lt;/script&gt;\n' +
+        '    <span>\n' +
+        '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' +
+        '    </span>\n' +
+        '    Calculation: 7\n' +
+        '    hi,there,reader!\n' +
+        '    &lt;script&gt;alert(&quot;I&apos;m evil!&quot;);&lt;/script&gt;\n' +
+        '    <span>\n' +
+        '      Error Heading <div>div text</div>\n' +
+        '    </span>\n' +
+        '    Calculation: 7\n' +
+        '    hi,there,reader!\n' +
+        '    <script>alert("I\'m evil!");</script>\n' +
         '  </div>\n' +
         '</div>\n');
     });
