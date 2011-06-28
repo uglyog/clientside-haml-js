@@ -521,6 +521,51 @@ describe('haml', function () {
 
   });
 
+  describe('template with Javascript code lines and no closing blocks', function () {
+
+    beforeEach(function () {
+      setFixtures(
+        '<script type="text/template" id="evaluation-with-loops">\n' +
+        '.main\n' +
+        '  - _(["Option 1", "Option 2", "Option 3"]).each(function (option) {\n' +
+        '    %span= option\n' +
+        '  - for (var i = 0; i < 5; i++) {\n' +
+        '    %p= i\n' +
+        '</script>');
+    });
+
+    it('should render the correct html when the template has loops', function () {
+      var html = haml.compileHaml('evaluation-with-loops').call(null, {});
+      expect(html).toEqual(
+        '<div class="main">\n' +
+        '    <span>\n' +
+        '      Option 1\n' +
+        '    </span>\n' +
+        '    <span>\n' +
+        '      Option 2\n' +
+        '    </span>\n' +
+        '    <span>\n' +
+        '      Option 3\n' +
+        '    </span>\n' +
+        '    <p>\n' +
+        '      0\n' +
+        '    </p>\n' +
+        '    <p>\n' +
+        '      1\n' +
+        '    </p>\n' +
+        '    <p>\n' +
+        '      2\n' +
+        '    </p>\n' +
+        '    <p>\n' +
+        '      3\n' +
+        '    </p>\n' +
+        '    <p>\n' +
+        '      4\n' +
+        '    </p>\n' +
+        '</div>\n');
+    });
+  });
+
   describe('Escaping HTML', function () {
 
     beforeEach(function () {
