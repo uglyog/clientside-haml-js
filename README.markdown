@@ -7,6 +7,9 @@ http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports all major br
 Chrome 10+, Safari), have minimal dependencies (only [http://documentcloud.github.com/underscore/]
 and [https://github.com/edtsech/underscore.string]).
 
+#Releases
+Release 0 -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] Release Notes [Release_0.markdown]
+
 # To use it
 
 * Include the haml.js in your page:
