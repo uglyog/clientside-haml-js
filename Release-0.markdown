@@ -1,6 +1,6 @@
 # Release 0 - 2011-06-28 - First release
 
-This is the first release of the HAML parser. The following list contains the outstanding HAML constructs:
+This is the first release of the HAML parser. The following HAML options have NOT been implemented:
 
 * HAML Options
 * #{} interpolation

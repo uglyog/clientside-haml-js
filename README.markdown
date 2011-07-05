@@ -8,7 +8,7 @@ Chrome 10+, Safari), have minimal dependencies (only [http://documentcloud.githu
 and [https://github.com/edtsech/underscore.string]).
 
 #Releases
-Release 0 -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] Release Notes [Release_0.markdown]
+Release 0 -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] Release Notes Release_0.markdown
 
 # To use it
 
