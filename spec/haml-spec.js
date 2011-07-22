@@ -4,6 +4,35 @@ describe('haml', function () {
 
   beforeEach(function () {
     haml.cache = {};
+    this.addMatchers({
+      toThrowContaining: function (expected) {
+        var result = false;
+        var exception;
+        if (typeof this.actual !== 'function') {
+          throw new Error('Actual is not a function');
+        }
+        try {
+          this.actual();
+        } catch (e) {
+          exception = e;
+        }
+        if (exception) {
+          result = exception.toString().indexOf(expected) >= 0;
+        }
+
+        var not = this.isNot ? "not " : "";
+
+        this.message = function () {
+          if (exception) {
+            return ["Expected function " + not + "to throw something with ", expected, ", but it threw", exception].join(' ');
+          } else {
+            return "Expected function to throw an exception.";
+          }
+        };
+
+        return result;
+      }
+    });
   });
 
   describe('empty template', function () {
@@ -54,36 +83,14 @@ describe('haml', function () {
         '  %h2\n' +
         '    %h3{id: "test", class: "test-class"\n' +
         '      %h4\n' +
-        '        %h5</script>');
-      this.addMatchers({
-        toThrowContaining: function (expected) {
-          var result = false;
-          var exception;
-          if (typeof this.actual !== 'function') {
-            throw new Error('Actual is not a function');
-          }
-          try {
-            this.actual();
-          } catch (e) {
-            exception = e;
-          }
-          if (exception) {
-            result = exception.toString().indexOf(expected) >= 0;
-          }
-
-          var not = this.isNot ? "not " : "";
-
-          this.message = function () {
-            if (exception) {
-              return ["Expected function " + not + "to throw something with ", expected, ", but it threw", exception].join(' ');
-            } else {
-              return "Expected function to throw an exception.";
-            }
-          };
-
-          return result;
-        }
-      });
+        '        %h5</script>' +
+        '<script type="text/template" id="invalid3">' +
+        '%a#back(href="#" class="button back)\n' +
+        '%span Back\n' +
+        '%a#continue(href="#" class="button continue")\n' +
+        '%span Save and Continue\n' +
+        '</script>'
+      );
     });
 
     it('should provide a meaningful message', function () {
@@ -97,6 +104,9 @@ describe('haml', function () {
       }).toThrowContaining('at line 3 and character 8:\n' +
         '    %h3{id: "test", class: "test-class"\n' +
         '-------^');
+      expect(function () {
+        haml.compileHaml('invalid3');
+      }).toThrowContaining('Expected a quoted string or an identifier for the attribute value');
     });
 
   });
