@@ -344,15 +344,15 @@ describe('haml', function () {
         '    = errorTitle\n' +
         '  .clear\n' +
         '    %span= errorHeading\n' +
-        '    = var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
+        '    = var label = "Calculation: "; label + (1 + 2 * 3)\n' +
         '    = ["hi", "there", "reader!"]\n' +
         '    = evilScript \n' +
         '    %span&= errorHeading\n' +
-        '    &= var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
+        '    &= var label = "Calculation: "; label + (1 + 2 * 3)\n' +
         '    &= ["hi", "there", "reader!"]\n' +
         '    &= evilScript \n' +
         '    %span!= errorHeading\n' +
-        '    != var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
+        '    != var label = "Calculation: "; label + (1 + 2 * 3)\n' +
         '    != ["hi", "there", "reader!"]\n' +
         '    != evilScript \n' +
         '</script>');
@@ -604,6 +604,31 @@ describe('haml', function () {
         '        &lt;script&gt;alert(&quot;I&apos;m evil!&quot;);\n' +
         '      &lt;/span&gt;\n' +
         '  </div>\n' +
+        '</div>\n');
+    });
+
+  });
+
+  describe('Issue #2 - Anonymous functions should pass through \'this\'', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="anonymous">\n' +
+        '.test = this.fnOnThis()\n' +
+        '.test2 = fnOnThis()\n' +
+        '</script>'
+      );
+    });
+
+    it('should provide a meaningful message', function () {
+      var that = { fnOnThis: function () { return 'TEST' } };
+      var context = { fnOnThis: function () { return 'TEST2' } };
+      var html = haml.compileHaml('anonymous').call(that, context);
+      expect(html).toEqual(
+        '<div class="test">\n' +
+        '  TEST\n' +
+        '</div>\n' +
+        '<div class="test2">\n' +
+        '  TEST2\n' +
         '</div>\n');
     });
 
