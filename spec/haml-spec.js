@@ -176,6 +176,7 @@ describe('haml', function () {
         '      This is some text\n' +
         '    This is some div text\n' +
         '    %div(id=test){id: 1, class: [model.name, "class2"]}\n' +
+        '    %a(href="#" data-key="MOD_DESC")/' +
         '</script>');
     });
 
@@ -191,6 +192,7 @@ describe('haml', function () {
         '    This is some div text\n' +
         '    <div id="test-1" class="class1 class2">\n' +
         '    </div>\n' +
+        '    <a href="#" data-key="MOD_DESC"/>\n' +
         '  </div>\n' +
         '</h1>\n');
     });
