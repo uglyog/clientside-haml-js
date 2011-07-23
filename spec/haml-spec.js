@@ -634,4 +634,41 @@ describe('haml', function () {
 
   });
 
+  describe('Issue #6 - Empty lines should be ignored', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="empty-lines">\n' +
+        '%div\n' +
+        '  %div\n' +
+        '    %div\n' +
+        '    \n' +
+        '    %div\n' +
+        '  \n' +
+        '    %div' +
+        '\n' +
+        '    %div' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('empty-lines').call(null, {});
+      expect(html).toEqual(
+        '<div>\n' +
+        '  <div>\n' +
+        '    <div>\n' +
+        '    \n' +
+        '    </div>\n' +
+        '    <div>\n' +
+        '  \n' +
+        '    </div>\n' +
+        '    <div>\n' +
+        '    </div>\n' +
+        '    <div>\n' +
+        '    </div>\n' +
+        '  </div>\n' +
+        '</div>\n');
+    });
+
+  });
+
 });
