@@ -94,11 +94,11 @@ describe('haml', function () {
     });
 
     it('should provide a meaningful message', function () {
-//      expect(function () {
-//        haml.compileHaml('invalid').call(null, {});
-//      }).toThrowContaining('at line 3 and character 16:\n' +
-//          '    %h3{%h3 %h4}\n' +
-//          '---------------^');
+      expect(function () {
+        haml.compileHaml('invalid').call(null, {});
+      }).toThrowContaining('at line 3 and character 16:\n' +
+          '    %h3{%h3 %h4}\n' +
+          '---------------^');
       expect(function () {
         haml.compileHaml('invalid2');
       }).toThrowContaining('at line 3 and character 8:\n' +
@@ -154,6 +154,7 @@ describe('haml', function () {
         '        class: "blah", name: null, test: false, checked: false, selected: true} This is some text\n' +
         '      This is some text\n' +
         '    This is some div text\n' +
+        '    %label{for: ["a", "b", "c"]}/\n' +
         '    %div{id: [\'test\', 1], class: [model.name, "class2"], for: "something"}\n' +
         '</script>');
     });
@@ -168,6 +169,7 @@ describe('haml', function () {
         '      This is some text\n' +
         '    </p>\n' +
         '    This is some div text\n' +
+        '    <label for="a-b-c"/>\n' +
         '    <div id="test-1" class="class1 class2" for="something">\n' +
         '    </div>\n' +
         '  </div>\n' +
