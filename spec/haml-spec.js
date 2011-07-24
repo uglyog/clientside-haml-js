@@ -696,13 +696,13 @@ describe('haml', function () {
       var html = haml.compileHaml('whitespace-removal').call(null, {});
       expect(html).toEqual(
         '<blockquote><div>\n' +
-        '  Foo!\n' +
-        '</div></blockquote>\n' +
-        '<img /><img /><img />\n' +
+        '    Foo!\n' +
+        '  </div></blockquote>\n' +
+        '<img/><img/><img/>\n' +
         '<p>Foo\n' +
         'Bar</p>\n' +
-        '<img /><pre>foo\n' +
-        'bar</pre><img />\n');
+        '<img/><pre>foo\n' +
+        'bar</pre><img/>\n');
     });
 
   });
