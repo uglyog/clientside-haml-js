@@ -673,4 +673,38 @@ describe('haml', function () {
 
   });
 
+  describe('Whitespace Removal: > and <', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="whitespace-removal">\n' +
+        '%blockquote<\n' +
+        '  %div\n' +
+        '    Foo!\n' +
+        '%img\n' +
+        '%img>\n' +
+        '%img\n' +
+        '%p<= "Foo\\\\nBar"\n' +
+        '%img\n' +
+        '%pre><\n' +
+        '  foo\n' +
+        '  bar\n' +
+        '%img\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('whitespace-removal').call(null, {});
+      expect(html).toEqual(
+        '<blockquote><div>\n' +
+        '  Foo!\n' +
+        '</div></blockquote>\n' +
+        '<img /><img /><img />\n' +
+        '<p>Foo\n' +
+        'Bar</p>\n' +
+        '<img /><pre>foo\n' +
+        'bar</pre><img />\n');
+    });
+
+  });
+
 });
