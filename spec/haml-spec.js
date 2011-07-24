@@ -154,7 +154,7 @@ describe('haml', function () {
         '        class: "blah", name: null, test: false, checked: false, selected: true} This is some text\n' +
         '      This is some text\n' +
         '    This is some div text\n' +
-        '    %label{for: ["a", "b", "c"]}/\n' +
+        '    %label(for = "a"){for: ["b", "c"]}/\n' +
         '    %div{id: [\'test\', 1], class: [model.name, "class2"], for: "something"}\n' +
         '</script>');
     });
@@ -703,6 +703,54 @@ describe('haml', function () {
         'Bar</p>\n' +
         '<img/><pre>foo\n' +
         'bar</pre><img/>\n');
+    });
+
+  });
+
+  describe('template with object reference', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="object-reference">\n' +
+        '%h1\n' +
+        '  %div[test]\n' +
+        '    %p[test2] This is some text\n' +
+        '      This is some text\n' +
+        '    This is some div text\n' +
+        '    .class1[test3]{id: 1, class: "class3", for: "something"}\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('object-reference').call(null, {
+        test: {
+          id: 'test'
+        },
+        test2: {
+          id: 'test2',
+          'class': 'blah'
+        },
+        test3: {
+          attributes: {
+            id: 'test',
+            'class': 'class2'
+          },
+          get: function (name) {
+            return this.attributes[name];
+          }
+        }
+      });
+      expect(html).toEqual(
+        '<h1>\n' +
+        '  <div id="test">\n' +
+        '    <p id="test2" class="blah">\n' +
+        '      This is some text\n' +
+        '      This is some text\n' +
+        '    </p>\n' +
+        '    This is some div text\n' +
+        '    <div class="class1 class2 class3" id="test-1" for="something">\n' +
+        '    </div>\n' +
+        '  </div>\n' +
+        '</h1>\n');
     });
 
   });
