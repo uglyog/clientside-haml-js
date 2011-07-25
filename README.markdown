@@ -1,14 +1,13 @@
 # Client-side HAML compiler in Javascript
 
 The clientside-haml-js is a compiler written in Javascript that compiles text templates in HAML format into Javascript
-functions that generate HTML. It has been inspired by the server side haml Javascript project
-https://github.com/creationix/haml-js, and has been written to be feature compatible with Ruby server side HAML
-http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html, supports all major browsers (IE 7+, Firefox 3.6+,
-Chrome 10+, Safari), have minimal dependencies (only [http://documentcloud.github.com/underscore/]
-and [https://github.com/edtsech/underscore.string]).
+functions that generate HTML. It has been inspired by the server side [haml Javascript project](https://github.com/creationix/haml-js),
+and has been written to be feature compatible with [Ruby server side HAML](http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html),
+supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have minimal dependencies (only
+[underscore.js](http://documentcloud.github.com/underscore/) and [underscore.string](https://github.com/edtsech/underscore.string)).
 
 #Releases
-Release 0 -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] Release Notes Release_0.markdown
+Release 0 -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] [Release Notes](Release_0.markdown)
 
 # To use it
 
@@ -267,6 +266,65 @@ With loops:
               4
             </p>
         </div>
+```
+
+You can leave the closing block out if the javascript line ends in either a brace ({), in which case a closing brace is
+added, or if it ends in an anonymous function (like `function(...) {`), in which case a closing brace and bracket is added.
+
+### Object references - []
+
+You can use object references to supply the id and class attributes of a tag by placing the object variable within square
+brackets. The Haml compiler will look for an id and class attribute on the object to use, and if not found, will look for
+a `get` function to call which takes the name of the attribute as a parameter. This will allow you to use objects from
+frameworks like [Backbone.js](http://documentcloud.github.com/backbone/) to set the id and class of a tag.
+
+So, the following Haml and Javascript:
+
+```haml
+        %h1
+          %div[test]
+            %p[test2] This is some text
+              This is some text
+            This is some div text
+            .class1[test3]{id: 1, class: "class3", for: "something"}
+```
+
+```javascript
+      var context = {
+        test: {
+          id: 'test'
+        },
+        test2: {
+          id: 'test2',
+          'class': 'blah'
+        },
+        test3: {
+          attributes: {
+            id: 'test',
+            'class': 'class2'
+          },
+          get: function (name) {
+            return this.attributes[name];
+          }
+        }
+      };
+      var html = haml.compileHaml('object-reference')(context);
+```
+
+should result in the following HTML:
+
+```html
+        <h1>
+          <div id="test">
+            <p id="test2" class="blah">
+              This is some text
+              This is some text
+            </p>
+            This is some div text
+            <div class="class1 class2 class3" id="test-1" for="something">
+            </div>
+          </div>
+        </h1>
 ```
 
 ## Jasmine Test

@@ -621,7 +621,7 @@ describe('haml', function () {
       );
     });
 
-    it('should provide a meaningful message', function () {
+    it('should the correct html', function () {
       var that = { fnOnThis: function () { return 'TEST' } };
       var context = { fnOnThis: function () { return 'TEST2' } };
       var html = haml.compileHaml('anonymous').call(that, context);
