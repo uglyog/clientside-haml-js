@@ -6,6 +6,9 @@ and has been written to be feature compatible with [Ruby server side HAML](http:
 supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have minimal dependencies (only
 [underscore.js](http://documentcloud.github.com/underscore/) and [underscore.string](https://github.com/edtsech/underscore.string)).
 
+**NOTE:** The haml compiler requires a browser with a JSON parser. For browsers like IE7, you need to also include a JSON
+ implementation. See [http://www.json.org/] for more details. A JSON implementation is available at [https://github.com/douglascrockford/JSON-js].
+
 #Releases
 Release 0 -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] [Release Notes](clientside-haml-js/blob/master/Release-0.markdown)
 
