@@ -768,4 +768,29 @@ describe('haml', function () {
 
   });
 
+  describe('html 5 data attributes', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="html5-attributes">\n' +
+        '%h1\n' +
+        '  %div{id: "test"}\n' +
+        '    %p{id: \'test2\', data: {\n' +
+        '        class: "blah", name: null, test: false, checked: false, selected: true}} This is some text\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('html5-attributes').call(null, { model: { name: 'class1' } });
+      expect(html).toEqual(
+        '<h1>\n' +
+        '  <div id="test">\n' +
+        '    <p id="test2" data-class="blah" data-selected="true">\n' +
+        '      This is some text\n' +
+        '    </p>\n' +
+        '  </div>\n' +
+        '</h1>\n');
+    });
+
+  });
+
 });
