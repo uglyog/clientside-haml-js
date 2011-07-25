@@ -1,5 +1,16 @@
 /*global haml */
 
+var isIe7or8 = function() {
+  if (navigator.appName === 'Microsoft Internet Explorer') {
+    var ua = navigator.userAgent;
+    var re = new RegExp("MSIE ([0-9]{1,}[.0-9]{0,})");
+    if (re.exec(ua) !== null) {
+      return parseFloat(RegExp.$1) < 9.0;
+    }
+  }
+  return false;
+};
+
 describe('haml', function () {
 
   beforeEach(function () {
@@ -74,12 +85,12 @@ describe('haml', function () {
   describe('invalid template', function () {
 
     beforeEach(function () {
-      setFixtures('<script type="text/template" id="invalid">\n%h1\n' +
+      setFixtures('<script type="text/template" id="invalid">%h1\n' +
         '  %h2\n' +
         '    %h3{%h3 %h4}\n' +
         '      %h4\n' +
         '        %h5</script>' +
-        '<script type="text/template" id="invalid2">\n%h1\n' +
+        '<script type="text/template" id="invalid2">%h1\n' +
         '  %h2\n' +
         '    %h3{id: "test", class: "test-class"\n' +
         '      %h4\n' +
@@ -94,14 +105,16 @@ describe('haml', function () {
     });
 
     it('should provide a meaningful message', function () {
+      // IE 7 and 8 add an extra newline at the start of the script contents
+      var line = isIe7or8() ? '4' : '3';
       expect(function () {
         haml.compileHaml('invalid').call(null, {});
-      }).toThrowContaining('at line 4 and character 16:\n' +
+      }).toThrowContaining('at line ' + line + ' and character 16:\n' +
           '    %h3{%h3 %h4}\n' +
           '---------------^');
       expect(function () {
         haml.compileHaml('invalid2');
-      }).toThrowContaining('at line 4 and character 8:\n' +
+      }).toThrowContaining('at line ' + line + ' and character 8:\n' +
         '    %h3{id: "test", class: "test-class"\n' +
         '-------^');
       expect(function () {
