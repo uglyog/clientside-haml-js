@@ -1,6 +1,7 @@
 # Release 1 - 2011-07-25 - Bugfixes plus main missing Haml features
 
 The following issues have been fixed:
+
 * #1 HTML style attributes with dashes
 * #2 Anonymous functions should pass through 'this'
 * #3 Textarea white space
