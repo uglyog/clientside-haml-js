@@ -696,7 +696,7 @@ describe('haml', function () {
         '%img\n' +
         '%img>\n' +
         '%img\n' +
-        '%p<= "Foo\\\\nBar"\n' +
+        '%p<= "Foo\\nBar"\n' +
         '%img\n' +
         '%pre><\n' +
         '  foo\n' +
@@ -780,13 +780,38 @@ describe('haml', function () {
     });
 
     it('should render the correct html', function () {
-      var html = haml.compileHaml('html5-attributes').call(null, { model: { name: 'class1' } });
+      var html = haml.compileHaml('html5-attributes')({});
       expect(html).toEqual(
         '<h1>\n' +
         '  <div id="test">\n' +
         '    <p id="test2" data-class="blah" data-selected="true">\n' +
         '      This is some text\n' +
         '    </p>\n' +
+        '  </div>\n' +
+        '</h1>\n');
+    });
+
+  });
+
+  describe('whitespace preservation', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="whitespace-preservation">\n' +
+        '%h1\n' +
+        '  %div\n' +
+        '    ~ "Foo\\n<pre>Bar\\nBaz</pre>\\n<a>Test\\nTest\\n</a>\\nOther"\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('whitespace-preservation')({});
+      expect(html).toEqual(
+        '<h1>\n' +
+        '  <div>\n' +
+        '    Foo\n' +
+        '<pre>Bar&#x000A;Baz</pre>\n' +
+        '<a>Test&#x000A;Test&#x000A;</a>\n' +
+        'Other\n' +
         '  </div>\n' +
         '</h1>\n');
     });
