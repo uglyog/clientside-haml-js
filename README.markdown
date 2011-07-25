@@ -7,7 +7,7 @@ supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have mini
 [underscore.js](http://documentcloud.github.com/underscore/) and [underscore.string](https://github.com/edtsech/underscore.string)).
 
 #Releases
-Release 0 -  2011-06-28 - [clientside-haml-js/tarball/release_0] [Release Notes](clientside-haml-js/blob/master/Release_0.markdown)
+Release 0 -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] [Release Notes](Release-0.markdown)
 
 # To use it
 
