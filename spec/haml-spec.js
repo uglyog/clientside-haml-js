@@ -197,7 +197,7 @@ describe('haml', function () {
       setFixtures('<script type="text/template" id="attributes">\n' +
         '%h1\n' +
         '  %div(id = "test")\n' +
-        '    %p(id=test2 class="blah" selected="selected") This is some text\n' +
+        '    %p(id=test2 class="blah"\n selected="selected") This is some text\n' +
         '      This is some text\n' +
         '    This is some div text\n' +
         '    %div(id=test){id: 1, class: [model.name, "class2"]}\n' +
