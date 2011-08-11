@@ -686,6 +686,33 @@ describe('haml', function () {
 
   });
 
+  describe('Issue #14 - rendering null values', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="null-js-values">\n' +
+        '.inline-null\n' +
+        '  = null;\n' +
+        '.null-evaluating\n' +
+        '  = nullValue;\n' +
+        '.embedded-null= null\n' +
+        '</script>')
+    });
+
+    it('should render null values as a string', function () {
+      var html = haml.compileHaml('null-js-values').call(null, {nullValue: null});
+      expect(html).toEqual(
+        '<div class="inline-null">\n' +
+        '  \n' +
+        '</div>\n' +
+        '<div class="null-evaluating">\n' +
+        '  \n' +
+        '</div>\n' +
+        '<div class="embedded-null">\n' +
+        '  \n' +
+        '</div>\n');
+    });
+  });
+
   describe('Whitespace Removal: > and <', function () {
 
     beforeEach(function () {
