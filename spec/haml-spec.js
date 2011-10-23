@@ -819,6 +819,12 @@ describe('haml', function () {
     });
 
   });
+  
+  describe('without template', function () {
+    it('should render the correct html', function () {
+      expect(haml.compileStringToJs("%div").call(null, {})).toEqual('<div>\n</div>\n');
+    });
+  });
 
   describe('whitespace preservation', function () {
 
