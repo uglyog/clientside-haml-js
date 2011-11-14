@@ -390,13 +390,13 @@ describe('haml', function () {
         '    </span>\n' +
         '    Calculation: 7\n' +
         '    hi,there,reader!\n' +
-        '    &lt;script&gt;alert(&quot;I&apos;m evil!&quot;);&lt;/script&gt;\n' +
+        '    &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);&lt;/script&gt;\n' +
         '    <span>\n' +
         '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' +
         '    </span>\n' +
         '    Calculation: 7\n' +
         '    hi,there,reader!\n' +
-        '    &lt;script&gt;alert(&quot;I&apos;m evil!&quot;);&lt;/script&gt;\n' +
+        '    &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);&lt;/script&gt;\n' +
         '    <span>\n' +
         '      Error Heading <div>div text</div>\n' +
         '    </span>\n' +
@@ -533,7 +533,7 @@ describe('haml', function () {
         '  <!-- This is a comment  -->\n' +
         '  <!--\n' +
         '    <span>\n' +
-        '      An error&apos;s a terrible thing\n' +
+        '      An error&#39;s a terrible thing\n' +
         '    </span>\n' +
         '  -->\n' +
         '  <!--[if IE]  >\n' +
@@ -616,7 +616,7 @@ describe('haml', function () {
         '      &lt;p&gt;\n' +
         '      &lt;/p&gt;\n' +
         '      &lt;span&gt;\n' +
-        '        &lt;script&gt;alert(&quot;I&apos;m evil!&quot;);\n' +
+        '        &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);\n' +
         '      &lt;/span&gt;\n' +
         '  </div>\n' +
         '</div>\n');
