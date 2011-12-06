@@ -493,6 +493,122 @@ root.haml =
     String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, "&#39;")
 
+  Buffer: class Buffer
+    constructor: (@generator) ->
+      @buffer = ''
+      @outputBuffer = ''
+
+    append: (str) ->
+       @buffer += str if str && str.length > 0
+
+    appendToOutputBuffer: (str) ->
+      if str && str.length > 0
+        @flush()
+        @outputBuffer += str
+
+    flush: () ->
+      if @buffer && @buffer.length > 0
+        @outputBuffer += '    html.push("' + @generator.escapeJs(@buffer) + '");\n'
+      @buffer = ''
+
+    output: () ->
+      @outputBuffer
+
+    trimWhitespace: () ->
+      if @buffer.length > 0
+        i = @buffer.length - 1
+        while i > 0
+          ch = @buffer.charAt(i)
+          if ch == ' ' or ch == '\t' or ch == '\n'
+            i--
+          else if i > 1 and (ch == 'n' or ch == 't') and (@buffer.charAt(i - 1) == '\\')
+            i -= 2
+          else
+            break
+        if i > 0 and i < @buffer.length - 1
+          @buffer = @buffer.substring(0, i + 1)
+        else if i == 0
+          @buffer = ''
+
+#  JsCodeGenerator: class JsCodeGenerator
+#
+#    constructor: () ->
+#      @outputBuffer = new Buffer(this)
+#
+#    initOutput: () ->
+#      @outputBuffer.appendToOutputBuffer('  var html = [];\n' +
+#        '  var hashFunction = null, hashObject = null, objRef = null, objRefFn = null;\n  with (context) {\n')
+#
+#    closeAndReturnOutput: () ->
+#      @outputBuffer.flush()
+#      @outputBuffer.output() + '  }\n  return html.join("");\n'
+#
+#    appendEmbeddedCode: (indentText, expression, escapeContents, perserveWhitespace, currentParsePoint) ->
+#      @outputBuffer.flush()
+#
+#      @outputBuffer.appendToOutputBuffer(indentText + 'try {\n')
+#      @outputBuffer.appendToOutputBuffer(indentText + '    var value = eval("' +
+#        expression.replace(/"/g, '\\"').replace(/\\n/g, '\\\\n') + '");\n')
+#      @outputBuffer.appendToOutputBuffer(indentText + '    value = value === null ? "" : value;')
+#      if escapeContents
+#        @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.escapeHTML(String(value)));\n')
+#      else if perserveWhitespace
+#        @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.perserveWhitespace(String(value)));\n')
+#      else
+#        @outputBuffer.appendToOutputBuffer(indentText + '    html.push(String(value));\n')
+#
+#      @outputBuffer.appendToOutputBuffer(indentText + '} catch (e) {\n')
+#      @outputBuffer.appendToOutputBuffer(indentText + '  throw new Error(haml.templateError(' +
+#              currentParsePoint.lineNumber + ', ' + currentParsePoint.characterNumber + ', "' +
+#              this.escapeJs(currentParsePoint.currentLine) + '",\n')
+#      @outputBuffer.appendToOutputBuffer(indentText + '    "Error evaluating expression - " + e));\n')
+#      @outputBuffer.appendToOutputBuffer(indentText + '}\n')
+#
+#    appendCodeLine: (indentText, line) ->
+#      @outputBuffer.flush()
+#      @outputBuffer.appendToOutputBuffer(indentText)
+#      @outputBuffer.appendToOutputBuffer(line)
+#      @outputBuffer.appendToOutputBuffer('\n')
+#
+#    lineMatchesStartFunctionBlock: (line) ->
+#      line.match(/function\s\((,?\s*\w+)*\)\s*\{\s*$/)
+#
+#    lineMatchesStartBlock: (line) ->
+#      line.match(/\{\s*$/)
+#
+#    closeOffCodeBlock: (indentText) ->
+#      @outputBuffer.flush()
+#      @outputBuffer.appendToOutputBuffer(indentText + '}\n')
+#
+#    closeOffFunctionBlock: (indentText) ->
+#      @outputBuffer.flush()
+#      @outputBuffer.appendToOutputBuffer(indentText + '});\n')
+#
+#    generateCodeForDynamicAttributes: (id, classes, attributeList, attributeHash, objectRef, currentParsePoint) ->
+#      @outputBuffer.flush()
+#      if attributeHash.length > 0
+#        attributeHash = @replaceReservedWordsInHash(attributeHash)
+#        @outputBuffer.appendToOutputBuffer('    hashFunction = function () { return eval("hashObject = ' +
+#          attributeHash.replace(/"/g, '\\"').replace(/\n/g, '\\n') + '"); };\n')
+#      if objectRef.length > 0
+#        @outputBuffer.appendToOutputBuffer('    objRefFn = function () { return eval("objRef = ' +
+#          objectRef.replace(/"/g, '\\"') + '"); };\n')
+#
+#      @outputBuffer.appendToOutputBuffer('    html.push(haml.generateElementAttributes(context, "' +
+#        id + '", ["' +
+#        classes.join('","') + '"], objRefFn, ' +
+#        JSON.stringify(attributeList) + ', hashFunction, ' +
+#        currentParsePoint.lineNumber + ', ' + currentParsePoint.characterNumber + ', "' +
+#        @escapeJs(currentParsePoint.currentLine) + '"));\n')
+#
+#    replaceReservedWordsInHash: (hash) ->
+#      resultHash = hash
+#      resultHash = resultHash.replace(reservedWord + ':', '"' + reservedWord + '":') for reservedWord in ['class', 'for']
+#      resultHash
+#
+#    escapeJs: (jsStr) ->
+#      jsStr.replace(/"/g, '\\"')
+
 `
 _.extend(root.haml, {
 
@@ -867,58 +983,6 @@ _.extend(root.haml, {
       if (!this.token.unknown) {
         this.bufferIndex -= this.token.matched.length;
         this.token = this.prevToken;
-      }
-    };
-  },
-
-  Buffer: function (generator) {
-    this.generator = generator;
-    this.buffer = '';
-    this.outputBuffer = '';
-
-    this.append = function (str) {
-      if (str && str.length > 0) {
-        this.buffer += str;
-      }
-    };
-
-    this.appendToOutputBuffer = function (str) {
-      if (str && str.length > 0) {
-        this.flush();
-        this.outputBuffer += str;
-      }
-    };
-
-    this.flush = function () {
-      if (this.buffer && this.buffer.length > 0) {
-        this.outputBuffer += '    html.push("' + this.generator.escapeJs(this.buffer) + '");\n';
-      }
-      this.buffer = '';
-    };
-
-    this.output = function () {
-      return this.outputBuffer;
-    };
-
-    this.trimWhitespace = function () {
-      if (this.buffer.length > 0) {
-        var i = this.buffer.length - 1;
-        while (i > 0) {
-          var ch = this.buffer.charAt(i);
-          if (ch === ' ' || ch === '\t' || ch === '\n') {
-            i--;
-          }
-          else if (i > 1 && (ch === 'n' || ch === 't') && (this.buffer.charAt(i - 1) === '\\')) {
-            i -= 2;
-          } else {
-            break;
-          }
-        }
-        if (i > 0 && i < this.buffer.length - 1) {
-          this.buffer = this.buffer.substring(0, i + 1);
-        } else if (i === 0) {
-          this.buffer = '';
-        }
       }
     };
   },
