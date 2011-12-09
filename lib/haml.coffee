@@ -493,28 +493,25 @@ root.haml =
     String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, "&#39;")
 
-`
-_.extend(root.haml, {
+class Tokeniser
+  constructor: (options) ->
+    @buffer = null
+    @bufferIndex = null
+    @prevToken = null
+    @token = null
 
-  Tokeniser: function (options) {
-    this.buffer = null;
-    this.bufferIndex = null;
-    this.prevToken = null;
-    this.token = null;
+    if options.templateId
+      template = document.getElementById(options.templateId)
+      if template
+        @buffer = template.innerHTML
+        @bufferIndex = 0
+      else
+        throw "Did not find a template with ID '" + options.templateId + "'"
+    else if options.template
+      @buffer = options.template
+      @bufferIndex = 0
 
-    if (options.templateId) {
-      var template = document.getElementById(options.templateId);
-      if (template) {
-        this.buffer = template.innerHTML;
-        this.bufferIndex = 0;
-      } else {
-        throw "Did not find a template with ID '" + options.templateId + "'";
-      }
-    } else if (options.template) {
-      this.buffer = options.template;
-      this.bufferIndex = 0;
-    }
-
+    `
     this.tokenMatchers = {
       whitespace:       /[ \t]+/g,
       element:          /%[a-zA-Z][a-zA-Z0-9]*/g,
@@ -834,44 +831,40 @@ _.extend(root.haml, {
 
       return text;
     };
+    `
 
-    this.advanceCharsInBuffer = function (numChars) {
-      for (var i = 0; i < numChars; i++) {
-        var ch = this.buffer.charCodeAt(this.bufferIndex + i);
-        var ch1 = this.buffer.charCodeAt(this.bufferIndex + i + 1);
-        if (ch === 13 && ch1 === 10) {
-          this.lineNumber++;
-          this.characterNumber = 0;
-          this.currentLine = this.getCurrentLine(i);
-          i++;
-        } else if (ch === 10) {
-          this.lineNumber++;
-          this.characterNumber = 0;
-          this.currentLine = this.getCurrentLine(i);
-        } else {
-          this.characterNumber++;
-        }
-      }
-      this.bufferIndex += numChars;
-    };
+  advanceCharsInBuffer: (numChars) ->
+    i = 0
+    while i < numChars
+      ch = @buffer.charCodeAt(@bufferIndex + i)
+      ch1 = @buffer.charCodeAt(@bufferIndex + i + 1)
+      if ch == 13 and ch1 == 10
+        @lineNumber++
+        @characterNumber = 0
+        @currentLine = @getCurrentLine(i)
+        i++
+      else if ch == 10
+        @lineNumber++
+        @characterNumber = 0
+        @currentLine = @getCurrentLine(i)
+      else
+        @characterNumber++
+      i++
+    @bufferIndex += numChars
 
-    this.currentParsePoint = function () {
-      return {
-        lineNumber: this.lineNumber,
-        characterNumber: this.characterNumber,
-        currentLine: this.currentLine
-      };
-    };
+  currentParsePoint: () ->
+    {
+      lineNumber: @lineNumber,
+      characterNumber: @characterNumber,
+      currentLine: @currentLine
+    }
 
-    this.pushBackToken = function () {
-      if (!this.token.unknown) {
-        this.bufferIndex -= this.token.matched.length;
-        this.token = this.prevToken;
-      }
-    };
-  }
-});
-`
+  pushBackToken: () ->
+    if !@token.unknown
+      @bufferIndex -= @token.matched.length
+      @token = @prevToken
+
+haml.Tokeniser = Tokeniser
 
 class Buffer
   constructor: (@generator) ->
