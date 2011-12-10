@@ -15,7 +15,7 @@ supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have mini
 * Release 1.1 -  2011-10-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1_1] [Release Notes](clientside-haml-js/blob/master/Release-1.1.markdown)
 * Release 2.0 -  2011-12-10 - [https://github.com/uglyog/clientside-haml-js/tarball/release_2_0] [Release Notes](clientside-haml-js/blob/master/Release-2.0.markdown)
 
-Thanks to following people who have contributed: @translated, @pjmurray, @ramoney75, @jasonxia, @makevoid
+Thanks to following people who have contributed: translated, pjmurray, ramoney75, jasonxia, makevoid
 
 # To use it
 
