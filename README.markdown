@@ -9,13 +9,13 @@ supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have mini
 **NOTE:** The haml compiler requires a browser with a JSON parser. For browsers like IE7, you need to also include a JSON
  implementation. See [http://www.json.org/] for more details. A JSON implementation is available at [https://github.com/douglascrockford/JSON-js].
 
+Thanks to following people who have contributed: [https://github.com/translated], pjmurray, ramoney75, jasonxia, makevoid
+
 #Releases
 * Release 0   -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] [Release Notes](clientside-haml-js/blob/master/Release-0.markdown)
 * Release 1   -  2011-07-25 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1] [Release Notes](clientside-haml-js/blob/master/Release-1.markdown)
 * Release 1.1 -  2011-10-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1_1] [Release Notes](clientside-haml-js/blob/master/Release-1.1.markdown)
 * Release 2.0 -  2011-12-10 - [https://github.com/uglyog/clientside-haml-js/tarball/release_2_0] [Release Notes](clientside-haml-js/blob/master/Release-2.0.markdown)
-
-Thanks to following people who have contributed: translated, pjmurray, ramoney75, jasonxia, makevoid
 
 # To use it
 
