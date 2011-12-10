@@ -90,7 +90,7 @@ root.haml =
       haml.closeElements(indent, elementStack, tokeniser, generator)
       generator.outputBuffer.append(haml.indentText(indent))
       contents = tokeniser.skipToEOLorEOF()
-      generator.outputBuffer.append(haml.escapeHTML(contents)) if (contents && contents.length > 0)
+      generator.outputBuffer.append(haml.HamlRuntime.escapeHTML(contents)) if (contents && contents.length > 0)
       generator.outputBuffer.append("\\n")
 
   ignoredLine: (tokeniser, indent, elementStack, generator) ->
@@ -166,7 +166,7 @@ root.haml =
     haml.eolOrEof(tokeniser)
 
     if tagOptions.selfClosingTag and contents.length > 0
-      throw haml.templateError(currentParsePoint.lineNumber, currentParsePoint.characterNumber,
+      throw haml.HamlRuntime.templateError(currentParsePoint.lineNumber, currentParsePoint.characterNumber,
               currentParsePoint.currentLine, "A self-closing tag can not have any contents")
     else if contents.length > 0
       contents = contents.substring(1) if contents.match(/^\\%/)
@@ -286,7 +286,7 @@ root.haml =
     if attributeHash.length > 0 or objectRef.length > 0
       generator.generateCodeForDynamicAttributes(id, classes, attributeList, attributeHash, objectRef, currentParsePoint)
     else
-      generator.outputBuffer.append(haml.generateElementAttributes(null, id, classes, null, attributeList, null,
+      generator.outputBuffer.append(haml.HamlRuntime.generateElementAttributes(null, id, classes, null, attributeList, null,
         currentParsePoint.lineNumber, currentParsePoint.characterNumber, currentParsePoint.currentLine))
     if tagOptions.selfClosingTag
       generator.outputBuffer.append("/>")
@@ -351,62 +351,6 @@ root.haml =
   lineHasElement: (ident, id, classes) ->
     ident.length > 0 or id.length > 0 or classes.length > 0
 
-  generateElementAttributes: (context, id, classes, objRefFn, attrList, attrFunction, lineNumber, characterNumber, currentLine) ->
-    attributes = {}
-
-    attributes = haml.combineAttributes(attributes, 'id', id)
-    if classes.length > 0 and classes[0].length > 0
-      attributes = haml.combineAttributes(attributes, 'class', classes)
-
-    if attrList
-      for own attr of attrList
-        attributes = haml.combineAttributes(attributes, attr, attrList[attr])
-
-    if objRefFn
-      try
-        object = objRefFn.call(this, context)
-        if object
-          objectId = null
-          if object.id
-            objectId = object.id
-          else if object.get
-            objectId = object.get('id')
-          attributes = haml.combineAttributes(attributes, 'id', objectId)
-          className = null
-          if object['class']
-            className = object['class']
-          else if object.get
-            className = object.get('class')
-          attributes = haml.combineAttributes(attributes, 'class', className)
-      catch e
-        throw haml.templateError(lineNumber, characterNumber, currentLine, "Error evaluating object reference - #{e}")
-
-    if attrFunction
-      try
-        hash = attrFunction.call(this, context)
-        if hash
-          for own attr of hash
-            if attr == 'data'
-              dataAttributes = hash[attr]
-              for own dataAttr of dataAttributes
-                attributes = haml.combineAttributes(attributes, 'data-' + dataAttr, dataAttributes[dataAttr])
-            else
-              attributes = haml.combineAttributes(attributes, attr, hash[attr])
-      catch ex
-        throw haml.templateError(lineNumber, characterNumber, currentLine, "Error evaluating attribute hash - #{ex}")
-
-    html = ''
-    if attributes
-      for own attr of attributes
-        if haml.hasValue(attributes[attr])
-          if (attr == 'id' or attr == 'for') and attributes[attr] instanceof Array
-            html += ' ' + attr + '="' + _(attributes[attr]).flatten().join('-') + '"'
-          else if attr == 'class' and attributes[attr] instanceof Array
-            html += ' ' + attr + '="' + _(attributes[attr]).flatten().join(' ') + '"'
-          else
-            html += ' ' + attr + '="' + haml.attrValue(attr, attributes[attr]) + '"'
-    html
-
   hasValue: (value) ->
     value? && value != false
 
@@ -459,39 +403,8 @@ root.haml =
 
     classes
 
-  templateError: (lineNumber, characterNumber, currentLine, error) ->
-    message = error + " at line " + lineNumber + " and character " + characterNumber +
-            ":\n" + currentLine + '\n'
-    i = 0
-    while i < characterNumber - 1
-      message += '-'
-      i++
-    message += '^'
-    message
-
   isEolOrEof: (tokeniser) ->
     tokeniser.token.eol or tokeniser.token.eof
-
-  perserveWhitespace: (str) ->
-    re = /<[a-zA-Z]+>[^<]*<\/[a-zA-Z]+>/g
-    out = ''
-    i = 0
-    result = re.exec(str)
-    if result
-      while result
-        out += str.substring(i, result.index)
-        out += result[0].replace(/\n/g, '&#x000A;')
-        i = result.index + result[0].length
-        result = re.exec(str)
-      out += str.substring(i)
-    else
-      out = str
-    out
-
-  # taken from underscore.string.js escapeHTML
-  escapeHTML: (str) ->
-    String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, "&#39;")
 
 class Tokeniser
   constructor: (options) ->
@@ -538,7 +451,7 @@ class Tokeniser
     this.getNextToken = function () {
 
       if (isNaN(this.bufferIndex)) {
-        throw haml.templateError(this.lineNumber, this.characterNumber, this.currentLine,
+        throw haml.HamlRuntime.templateError(this.lineNumber, this.characterNumber, this.currentLine,
                 "An internal parser error has occurred in the HAML parser");
       }
 
@@ -811,27 +724,23 @@ class Tokeniser
         return '';
       }
     };
-
-    this.parseError = function (error) {
-      return haml.templateError(this.lineNumber, this.characterNumber, this.currentLine, error);
-    };
-
-    this.skipToEOLorEOF = function () {
-      var text = '';
-
-      if (!this.token.eof && !this.token.eol) {
-        this.currentLineMatcher.lastIndex = this.bufferIndex;
-        var line = this.currentLineMatcher.exec(this.buffer);
-        if (line && line.index === this.bufferIndex) {
-          text = line[0];
-          this.advanceCharsInBuffer(text.length);
-          this.getNextToken();
-        }
-      }
-
-      return text;
-    };
     `
+
+  parseError: (error) ->
+    haml.HamlRuntime.templateError(@lineNumber, @characterNumber, @currentLine, error)
+
+  skipToEOLorEOF: () ->
+    text = ''
+
+    if !@token.eof && !@token.eol
+      @currentLineMatcher.lastIndex = @bufferIndex
+      line = @currentLineMatcher.exec(@buffer)
+      if line and line.index == @bufferIndex
+        text = line[0]
+        @advanceCharsInBuffer(text.length)
+        @getNextToken()
+
+    text
 
   advanceCharsInBuffer: (numChars) ->
     i = 0
@@ -904,85 +813,5 @@ class Buffer
         @buffer = ''
 
 haml.Buffer = Buffer
-
-class JsCodeGenerator
-
-  constructor: () ->
-    @outputBuffer = new haml.Buffer(this)
-
-  appendEmbeddedCode: (indentText, expression, escapeContents, perserveWhitespace, currentParsePoint) ->
-    @outputBuffer.flush()
-
-    @outputBuffer.appendToOutputBuffer(indentText + 'try {\n')
-    @outputBuffer.appendToOutputBuffer(indentText + '    var value = eval("' +
-      expression.replace(/"/g, '\\"').replace(/\\n/g, '\\\\n') + '");\n')
-    @outputBuffer.appendToOutputBuffer(indentText + '    value = value === null ? "" : value;')
-    if escapeContents
-      @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.escapeHTML(String(value)));\n')
-    else if perserveWhitespace
-      @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.perserveWhitespace(String(value)));\n')
-    else
-      @outputBuffer.appendToOutputBuffer(indentText + '    html.push(String(value));\n')
-
-    @outputBuffer.appendToOutputBuffer(indentText + '} catch (e) {\n');
-    @outputBuffer.appendToOutputBuffer(indentText + '  throw new Error(haml.templateError(' +
-        currentParsePoint.lineNumber + ', ' + currentParsePoint.characterNumber + ', "' +
-        @escapeJs(currentParsePoint.currentLine) + '",\n')
-    @outputBuffer.appendToOutputBuffer(indentText + '    "Error evaluating expression - " + e));\n')
-    @outputBuffer.appendToOutputBuffer(indentText + '}\n')
-
-  initOutput: () ->
-    @outputBuffer.appendToOutputBuffer('  var html = [];\n' +
-      '  var hashFunction = null, hashObject = null, objRef = null, objRefFn = null;\n  with (context) {\n')
-
-  closeAndReturnOutput: () ->
-    @outputBuffer.flush()
-    @outputBuffer.output() + '  }\n  return html.join("");\n'
-
-  appendCodeLine: (indentText, line) ->
-    @outputBuffer.flush()
-    @outputBuffer.appendToOutputBuffer(indentText)
-    @outputBuffer.appendToOutputBuffer(line)
-    @outputBuffer.appendToOutputBuffer('\n')
-
-  lineMatchesStartFunctionBlock: (line) ->
-    line.match(/function\s\((,?\s*\w+)*\)\s*\{\s*$/)
-
-  lineMatchesStartBlock: (line) ->
-    line.match(/\{\s*$/)
-
-  closeOffCodeBlock: (indentText) ->
-    @outputBuffer.flush()
-    @outputBuffer.appendToOutputBuffer(indentText + '}\n')
-
-  closeOffFunctionBlock: (indentText) ->
-    @outputBuffer.flush()
-    @outputBuffer.appendToOutputBuffer(indentText + '});\n')
-
-  generateCodeForDynamicAttributes: (id, classes, attributeList, attributeHash, objectRef, currentParsePoint) ->
-    @outputBuffer.flush()
-    if attributeHash.length > 0
-      attributeHash = @replaceReservedWordsInHash(attributeHash)
-      @outputBuffer.appendToOutputBuffer('    hashFunction = function () { return eval("hashObject = ' +
-        attributeHash.replace(/"/g, '\\"').replace(/\n/g, '\\n') + '"); };\n')
-    if objectRef.length > 0
-      @outputBuffer.appendToOutputBuffer('    objRefFn = function () { return eval("objRef = ' +
-        objectRef.replace(/"/g, '\\"') + '"); };\n')
-
-    @outputBuffer.appendToOutputBuffer('    html.push(haml.generateElementAttributes(context, "' +
-      id + '", ["' +
-      classes.join('","') + '"], objRefFn, ' +
-      JSON.stringify(attributeList) + ', hashFunction, ' +
-      currentParsePoint.lineNumber + ', ' + currentParsePoint.characterNumber + ', "' +
-      @escapeJs(currentParsePoint.currentLine) + '"));\n')
-
-  replaceReservedWordsInHash: (hash) ->
-    resultHash = hash
-    for reservedWord in ['class', 'for']
-      resultHash = resultHash.replace(reservedWord + ':', '"' + reservedWord + '":')
-    resultHash
-
-  escapeJs: (jsStr) ->
-    jsStr.replace(/"/g, '\\"')
-
 haml.JsCodeGenerator = JsCodeGenerator
+haml.HamlRuntime = HamlRuntime
