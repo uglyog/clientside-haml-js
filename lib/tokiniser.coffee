@@ -216,6 +216,6 @@ class Tokeniser
     }
 
   pushBackToken: () ->
-    if !@token.unknown
+    if !@token.unknown and !@token.eof
       @bufferIndex -= @token.matched.length
       @token = @prevToken

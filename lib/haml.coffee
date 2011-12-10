@@ -44,7 +44,6 @@ root.haml =
     #         )* EOF
     tokeniser.getNextToken()
     while !tokeniser.token.eof
-
       if !tokeniser.token.eol
         indent = haml.whitespace(tokeniser)
         if tokeniser.token.doctype
@@ -95,6 +94,13 @@ root.haml =
   commentLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.comment
       tokeniser.skipToEOLorEOF()
+      tokeniser.getNextToken()
+      i = haml.whitespace(tokeniser)
+      while (!tokeniser.token.eof and i > indent)
+        tokeniser.skipToEOLorEOF()
+        tokeniser.getNextToken()
+        i = haml.whitespace(tokeniser)
+      tokeniser.pushBackToken()
     else if tokeniser.token.slash
       haml.closeElements(indent, elementStack, tokeniser, generator)
       generator.outputBuffer.append(haml.indentText(indent))

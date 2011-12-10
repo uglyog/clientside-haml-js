@@ -515,11 +515,11 @@ describe('haml', function () {
         '  /\n' +
         '    %span\n' +
         '      = errorTitle\n' +
-        '-#  .clear\n' +
-        '-#    %span= errorHeading\n' +
-        '-#    = var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
-        '-#    = ["hi", "there", "reader!"]\n' +
-        '-#    = evilScript \n' +
+        '  -# .clear\n' +
+        '      %span= errorHeading\n' +
+        '  -#  = var label = "Calculation: "; return label + (1 + 2 * 3)\n' +
+        '  -#  = ["hi", "there", "reader!"]\n' +
+        '  -#  = evilScript \n' +
         '  /[if IE]  \n' +
         '    %a(href = "http://www.mozilla.com/en-US/firefox/" )\n' +
         '      %h1 Get Firefox\n' +
@@ -871,6 +871,36 @@ describe('haml', function () {
         '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n' +
         '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">\n' +
         '<html>\n</html>\n');
+    });
+
+  });
+
+  describe('Issue 13 - comments', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="comment-issue">\n' +
+        '#div1\n' +
+        '  -# if blahDiBlah\n' +
+        '    #shouldNotRender\n' +
+        '      .shouldAlsoNotRender\n' +
+        '        You should not see me\n' +
+        '  You should see me\n' +
+        '-# #div2\n' +
+        '  I\'m Invisible!\n' +
+        '#div3\n' +
+        '  You should see me\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('comment-issue')();
+      expect(html).toEqual(
+        '<div id="div1">\n' +
+        '  You should see me\n' +
+        '</div>\n' +
+        '<div id="div3">\n' +
+        '  You should see me\n' +
+        '</div>\n');
     });
 
   });
