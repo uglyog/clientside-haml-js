@@ -1,2 +1,0 @@
-#!/bin/bash
-java -cp $RHINO_HOME/js.jar org.mozilla.javascript.tools.shell.Main jslint.js lib/haml.js
