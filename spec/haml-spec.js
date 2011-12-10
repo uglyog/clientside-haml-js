@@ -733,7 +733,7 @@ describe('haml', function () {
     });
 
     it('should render the correct html', function () {
-      var html = haml.compileHaml('whitespace-removal').call(null, {});
+      var html = haml.compileHaml('whitespace-removal')();
       expect(html).toEqual(
         '<blockquote><div>\n' +
         '    Foo!\n' +
@@ -807,7 +807,7 @@ describe('haml', function () {
     });
 
     it('should render the correct html', function () {
-      var html = haml.compileHaml('html5-attributes')({});
+      var html = haml.compileHaml('html5-attributes')();
       expect(html).toEqual(
         '<h1>\n' +
         '  <div id="test">\n' +
@@ -822,7 +822,7 @@ describe('haml', function () {
   
   describe('without template', function () {
     it('should render the correct html', function () {
-      expect(haml.compileStringToJs("%div").call(null, {})).toEqual('<div>\n</div>\n');
+      expect(haml.compileStringToJs("%div")()).toEqual('<div>\n</div>\n');
     });
   });
 
@@ -837,7 +837,7 @@ describe('haml', function () {
     });
 
     it('should render the correct html', function () {
-      var html = haml.compileHaml('whitespace-preservation')({});
+      var html = haml.compileHaml('whitespace-preservation')();
       expect(html).toEqual(
         '<h1>\n' +
         '  <div>\n' +
@@ -847,6 +847,30 @@ describe('haml', function () {
         'Other\n' +
         '  </div>\n' +
         '</h1>\n');
+    });
+
+  });
+
+  describe('doctype', function () {
+
+    beforeEach(function () {
+      setFixtures('<script type="text/template" id="doctype">\n' +
+        '!!! XML\n' +
+        '!!! XML iso-8859-1\n' +
+        '!!!\n' +
+        '!!! 1.1\n' +
+        '%html\n' +
+        '</script>');
+    });
+
+    it('should render the correct html', function () {
+      var html = haml.compileHaml('doctype')();
+      expect(html).toEqual(
+        '<?xml version=\'1.0\' encoding=\'utf-8\' ?>\n' +
+        '<?xml version=\'1.0\' encoding=\'iso-8859-1\' ?>\n' +
+        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n' +
+        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">\n' +
+        '<html>\n</html>\n');
     });
 
   });

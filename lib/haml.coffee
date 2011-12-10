@@ -36,6 +36,7 @@ root.haml =
 
     # HAML -> WS* (
     #          TEMPLATELINE
+    #          | DOCTYPE
     #          | IGNOREDLINE
     #          | EMBEDDEDJS
     #          | JSCODE
@@ -46,7 +47,9 @@ root.haml =
 
       if !tokeniser.token.eol
         indent = haml.whitespace(tokeniser)
-        if tokeniser.token.exclamation
+        if tokeniser.token.doctype
+          haml.doctype(tokeniser, indent, generator)
+        else if tokeniser.token.exclamation
           haml.ignoredLine(tokeniser, indent, elementStack, generator)
         else if tokeniser.token.equal or tokeniser.token.escapeHtml or tokeniser.token.unescapeHtml or
         tokeniser.token.tilde
@@ -64,6 +67,30 @@ root.haml =
 
     haml.closeElements(0, elementStack, tokeniser, generator)
     generator.closeAndReturnOutput()
+
+  doctype: (tokeniser, indent, generator) ->
+    if tokeniser.token.doctype
+      generator.outputBuffer.append(haml.indentText(indent))
+      tokeniser.getNextToken()
+      contents = tokeniser.skipToEOLorEOF()
+      if contents and contents.length > 0
+        params = contents.split(/\s+/)
+        switch params[0]
+          when 'XML'
+            if params.length > 1
+              generator.outputBuffer.append("<?xml version='1.0' encoding='#{params[1]}' ?>")
+            else
+              generator.outputBuffer.append("<?xml version='1.0' encoding='utf-8' ?>")
+          when 'Strict' then generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">')
+          when 'Frameset' then generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">')
+          when '5' then generator.outputBuffer.append('<!DOCTYPE html>')
+          when '1.1' then generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">')
+          when 'Basic' then generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd">')
+          when 'Mobile' then generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd">')
+          when 'RDFa' then generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">')
+      else
+        generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')
+      generator.outputBuffer.append("\\n")
 
   commentLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.comment
@@ -96,7 +123,7 @@ root.haml =
   ignoredLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.exclamation
       tokeniser.getNextToken()
-      indent += haml.whitespace(tokeniser) if (tokeniser.token.ws)
+      indent += haml.whitespace(tokeniser) if tokeniser.token.ws
       tokeniser.pushBackToken()
       haml.closeElements(indent, elementStack, tokeniser, generator)
       contents = tokeniser.skipToEOLorEOF()

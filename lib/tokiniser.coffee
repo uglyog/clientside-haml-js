@@ -13,7 +13,8 @@ class Tokeniser
     comment:          /\-#/g,
     escapeHtml:       /\&=/g,
     unescapeHtml:     /\!=/g,
-    objectReference:  /\[[a-zA-Z_][a-zA-Z0-9_]*\]/g
+    objectReference:  /\[[a-zA-Z_][a-zA-Z0-9_]*\]/g,
+    doctype:          /!!!/g
 
   constructor: (options) ->
     @buffer = null
@@ -85,6 +86,7 @@ class Tokeniser
       @matchMultiCharToken(@tokenMatchers.idSelector, { idSelector: true, token: 'ID' }, (matched) -> matched.substring(1) )
       @matchMultiCharToken(@tokenMatchers.classSelector, { classSelector: true, token: 'CLASS' }, (matched) -> matched.substring(1) )
       @matchMultiCharToken(@tokenMatchers.identifier, { identifier: true, token: 'IDENTIFIER' })
+      @matchMultiCharToken(@tokenMatchers.doctype, { doctype: true, token: 'DOCTYPE' })
 
       if !@token
         str = @matchToken(@tokenMatchers.quotedString)
