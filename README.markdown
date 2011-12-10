@@ -1,9 +1,9 @@
-# Client-side HAML compiler in Javascript
+# Client-side HAML compiler for Javascript
 
-The clientside-haml-js is a compiler written in Javascript that compiles text templates in HAML format into Javascript
+The clientside-haml-js is a compiler written in Coffeescript that compiles text templates in HAML format into Javascript
 functions that generate HTML. It has been inspired by the server side [haml Javascript project](https://github.com/creationix/haml-js),
 and has been written to be feature compatible with [Ruby server side HAML](http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html),
-supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have minimal dependencies (only
+supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have minimal runtime dependencies (only
 [underscore.js](http://documentcloud.github.com/underscore/) and [underscore.string](https://github.com/edtsech/underscore.string)).
 
 **NOTE:** The haml compiler requires a browser with a JSON parser. For browsers like IE7, you need to also include a JSON
@@ -13,6 +13,7 @@ supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have mini
 * Release 0   -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] [Release Notes](clientside-haml-js/blob/master/Release-0.markdown)
 * Release 1   -  2011-07-25 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1] [Release Notes](clientside-haml-js/blob/master/Release-1.markdown)
 * Release 1.1 -  2011-10-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1_1] [Release Notes](clientside-haml-js/blob/master/Release-1.1.markdown)
+* Release 2.0 -  2011-12-10 - [https://github.com/uglyog/clientside-haml-js/tarball/release_2_0] [Release Notes](clientside-haml-js/blob/master/Release-2.0.markdown)
 
 # To use it
 
@@ -22,7 +23,7 @@ supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have mini
     <script type="text/javascript" src="js/haml.js"></script>
 ```
 
-* The HAML templates will have to be added to the body of the web page in a script tag, and have a unique ID.
+* The HAML templates can either be added to the body of the web page in a script tag (with a unique ID), as in:
 
 ```html
     <script type="text/haml-template" id="simple">
@@ -55,7 +56,7 @@ This will produce the following Javascript function:
 
 ```javascript
     var fn = haml.compileHaml('simple');
-    var html = fn({});
+    var html = fn();
 ```
 
 This will produce the following HTML:
@@ -71,10 +72,25 @@ This will produce the following HTML:
     </h1>
 ```
 
+* The HAML can also be passed in as a String, as in:
+
+```javascript
+    var fn = haml.compileStringToJs("%h1\n  %div\n    %p\n    %span');
+    var html = fn();
+```
+
+This should produce the same HTML as the example above.
+
+# Produced Javascript functions
+
+The generated javascript functions take a single optional context variable which provide the context to the template.
+All the properties of the context variable will be available as variables in the template. See the examples below for
+more details on how to use this.
+
 # Client-side HAML Flavour
 
 Although I tried keep the implementation as close to the Ruby one as possible, there are some differences. Also,
-currently not all features are implemented.
+currently not all features are implemented (see the release notes for details).
 
 ## Element Attributes with {}
 
@@ -186,7 +202,7 @@ and the result escaped and added to the contents of the tag. So for the followin
 and calling
 
 ```javascript
-      var html = haml.compileHaml('evaluation').call(null, {
+      var html = haml.compileHaml('evaluation').call({
           errorTitle: "Error Title",
           errorHeading: "Error Heading <div>div text</div>",
           evilScript: '<script>alert("I\'m evil!");</script>'
