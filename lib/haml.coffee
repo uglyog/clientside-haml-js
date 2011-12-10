@@ -330,7 +330,7 @@ root.haml =
           attributes['class'] = classes
         else
           attributes = 'class': classes
-      else if attrName != 'id'
+      else if attrName isnt 'id'
         attributes ||= {}
         attributes[attrName] = attrValue
     attributes
@@ -352,7 +352,7 @@ root.haml =
     ident.length > 0 or id.length > 0 or classes.length > 0
 
   hasValue: (value) ->
-    value? && value != false
+    value? && value isnt false
 
   attrValue: (attr, value) ->
     if attr in ['selected', 'checked', 'disabled'] then attr else value
