@@ -2,6 +2,19 @@ class Tokeniser
 
   currentLineMatcher: /[^\n]*/g
 
+  tokenMatchers:
+    whitespace:       /[ \t]+/g,
+    element:          /%[a-zA-Z][a-zA-Z0-9]*/g,
+    idSelector:       /#[a-zA-Z_\-][a-zA-Z0-9_\-]*/g,
+    classSelector:    /\.[a-zA-Z0-9_\-]+/g,
+    identifier:       /[a-zA-Z][a-zA-Z0-9\-]*/g,
+    quotedString:     /[\'][^\'\n]*[\']/g,
+    quotedString2:    /[\"][^\"\n]*[\"]/g,
+    comment:          /\-#/g,
+    escapeHtml:       /\&=/g,
+    unescapeHtml:     /\!=/g,
+    objectReference:  /\[[a-zA-Z_][a-zA-Z0-9_]*\]/g
+
   constructor: (options) ->
     @buffer = null
     @bufferIndex = null
@@ -19,31 +32,10 @@ class Tokeniser
       @buffer = options.template
       @bufferIndex = 0
 
-    `
-    this.tokenMatchers = {
-      whitespace:       /[ \t]+/g,
-      element:          /%[a-zA-Z][a-zA-Z0-9]*/g,
-      idSelector:       /#[a-zA-Z_\-][a-zA-Z0-9_\-]*/g,
-      classSelector:    /\.[a-zA-Z0-9_\-]+/g,
-      identifier:       /[a-zA-Z][a-zA-Z0-9\-]*/g,
-      quotedString:     /[\'][^\'\n]*[\']/g,
-      quotedString2:    /[\"][^\"\n]*[\"]/g,
-      comment:          /\-#/g,
-      escapeHtml:       /\&=/g,
-      unescapeHtml:     /\!=/g,
-      objectReference:  /\[[a-zA-Z_][a-zA-Z0-9_]*\]/g
-    };
-
-    this.matchToken = function (matcher) {
-      matcher.lastIndex = this.bufferIndex;
-      var result = matcher.exec(this.buffer);
-      if (result && result.index === this.bufferIndex) {
-        return result[0];
-      }
-      return null;
-    };
-
-    `
+  matchToken: (matcher) ->
+    matcher.lastIndex = @bufferIndex
+    result = matcher.exec(@buffer)
+    if result?.index == @bufferIndex then result[0]
 
   matchMultiCharToken: (matcher, token, tokenStr) ->
     if !@token
