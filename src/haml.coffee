@@ -375,7 +375,7 @@ root.haml =
     ident
 
   _eolOrEof: (tokeniser) ->
-    if tokeniser.token.eol
+    if tokeniser.token.eol or tokeniser.token.continueLine
       tokeniser.getNextToken()
     else if !tokeniser.token.eof
       throw tokeniser.parseError("Expected EOL or EOF")

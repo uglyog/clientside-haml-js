@@ -437,7 +437,7 @@
         return expect(html).toEqual('<?xml version=\'1.0\' encoding=\'utf-8\' ?>\n' + '<?xml version=\'1.0\' encoding=\'iso-8859-1\' ?>\n' + '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n' + '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">\n' + '<html>\n</html>\n');
       });
     });
-    return describe('Issue 13 - comments', function() {
+    describe('Issue 13 - comments', function() {
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="comment-issue">\n' + '#div1\n' + '  -# if blahDiBlah\n' + '    #shouldNotRender\n' + '      .shouldAlsoNotRender\n' + '        You should not see me\n' + '  You should see me\n' + '-# #div2\n' + '  I\'m Invisible!\n' + '#div3\n' + '  You should see me\n' + '</script>');
       });
@@ -445,6 +445,21 @@
         var html;
         html = haml.compileHaml('comment-issue')();
         return expect(html).toEqual('<div id="div1">\n' + '  You should see me\n' + '</div>\n' + '<div id="div3">\n' + '  You should see me\n' + '</div>\n');
+      });
+    });
+    return describe('Multiline code blocks', function() {
+      beforeEach(function() {
+        return setFixtures('<script type="text/template" id="multiline">\n' + '%whoo\n' + '  %hoo=                           |\n' + '    "I think this might get " +   |\n' + '    "pretty long so I should " +  |\n' + '    "probably make it " +         |\n' + '    "multiline so it doesn\'t " + |\n' + '    "look awful."                 |\n' + '  %p This is short.\n' + '</script>');
+      });
+      it('should render the correct html', function() {
+        var html;
+        html = haml.compileHaml('multiline')();
+        return expect(html).toEqual('<whoo>\n' + '  <hoo>\n' + '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' + '  </hoo>\n' + '  <p>\n' + '    This is short.\n' + '  </p>\n' + '</whoo>\n');
+      });
+      return it('with coffescript should render the correct html', function() {
+        var html;
+        html = haml.compileCoffeeHaml('multiline')();
+        return expect(html).toEqual('<whoo>\n' + '  <hoo>\n' + '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' + '  </hoo>\n' + '  <p>\n' + '    This is short.\n' + '  </p>\n' + '</whoo>\n');
       });
     });
   });

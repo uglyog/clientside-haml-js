@@ -1007,3 +1007,42 @@ describe 'haml', () ->
         '<div id="div3">\n' +
         '  You should see me\n' +
         '</div>\n')
+
+  describe 'Multiline code blocks', () ->
+
+    beforeEach () ->
+      setFixtures('<script type="text/template" id="multiline">\n' +
+        '%whoo\n' +
+        '  %hoo=                           |\n' +
+        '    "I think this might get " +   |\n' +
+        '    "pretty long so I should " +  |\n' +
+        '    "probably make it " +         |\n' +
+        '    "multiline so it doesn\'t " + |\n' +
+        '    "look awful."                 |\n' +
+        '  %p This is short.\n' +
+        '</script>')
+
+    it 'should render the correct html', () ->
+      html = haml.compileHaml('multiline')()
+      expect(html).toEqual(
+        '<whoo>\n' +
+        '  <hoo>\n' +
+        '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' +
+        '  </hoo>\n' +
+        '  <p>\n' +
+        '    This is short.\n' +
+        '  </p>\n' +
+        '</whoo>\n')
+
+    it 'with coffescript should render the correct html', () ->
+      html = haml.compileCoffeeHaml('multiline')()
+      expect(html).toEqual(
+        '<whoo>\n' +
+        '  <hoo>\n' +
+        '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' +
+        '  </hoo>\n' +
+        '  <p>\n' +
+        '    This is short.\n' +
+        '  </p>\n' +
+        '</whoo>\n')
+  

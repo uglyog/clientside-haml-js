@@ -14,7 +14,8 @@ class Tokeniser
     escapeHtml:       /\&=/g,
     unescapeHtml:     /\!=/g,
     objectReference:  /\[[a-zA-Z_@][a-zA-Z0-9_]*\]/g,
-    doctype:          /!!!/g
+    doctype:          /!!!/g,
+    continueLine:        /\|\s*\n/g
 
   constructor: (options) ->
     @buffer = null
@@ -82,6 +83,7 @@ class Tokeniser
           @currentLine = @getCurrentLine()
 
       @matchMultiCharToken(@tokenMatchers.whitespace, { ws: true, token: 'WS' })
+      @matchMultiCharToken(@tokenMatchers.continueLine, { continueLine: true, token: 'CONTINUELINE' })
       @matchMultiCharToken(@tokenMatchers.element, { element: true, token: 'ELEMENT' }, (matched) -> matched.substring(1) )
       @matchMultiCharToken(@tokenMatchers.idSelector, { idSelector: true, token: 'ID' }, (matched) -> matched.substring(1) )
       @matchMultiCharToken(@tokenMatchers.classSelector, { classSelector: true, token: 'CLASS' }, (matched) -> matched.substring(1) )
@@ -178,15 +180,34 @@ class Tokeniser
 
   skipToEOLorEOF: () ->
     text = ''
-
-    if !@token.eof && !@token.eol
+    unless @token.eof or @token.eol
       @currentLineMatcher.lastIndex = @bufferIndex
       line = @currentLineMatcher.exec(@buffer)
       if line and line.index == @bufferIndex
-        text = line[0]
-        @advanceCharsInBuffer(text.length)
-        @getNextToken()
+        contents = _(line[0]).rtrim()
+        if _(contents).endsWith('|')
+          text += contents.substring(0, contents.length - 1)
+          @advanceCharsInBuffer(contents.length - 1)
+          @getNextToken()
+          text += @parseMultiLine()
+        else
+          text = line[0]
+          @advanceCharsInBuffer(text.length)
+          @getNextToken()
+    text
 
+  parseMultiLine: () ->
+    text = ''
+    while @token.continueLine
+      @currentLineMatcher.lastIndex = @bufferIndex
+      line = @currentLineMatcher.exec(@buffer)
+      if line and line.index == @bufferIndex
+        contents = _(line[0]).rtrim()
+        if _(contents).endsWith('|')
+          text += contents.substring(0, contents.length - 1)
+          @advanceCharsInBuffer(contents.length - 1)
+        @getNextToken()
+    @pushBackToken()
     text
 
   advanceCharsInBuffer: (numChars) ->
