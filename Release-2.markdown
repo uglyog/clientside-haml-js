@@ -7,7 +7,7 @@ The following issues have been fixed since the 1.1 release:
 
 * Fix to prevent 0 values being rendered as empty string (thanks to Yongmin Xia)
 * Merged pull request from makevoid
-* Modified underscore string escapeHTML to convert apostrophes to &#39; instead of &apos; to support rendering in IE7
+* Modified underscore string escapeHTML to convert apostrophes to `&#39;` instead of `&apos;` to support rendering in IE7
 
 The following HAML options have **NOT** been implemented:
 
