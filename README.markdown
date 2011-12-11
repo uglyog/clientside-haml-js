@@ -1,10 +1,11 @@
-# Client-side HAML compiler for Javascript
+# Client-side HAML compiler for Javascript and CoffeeScript
 
-The clientside-haml-js is a compiler written in Coffeescript that compiles text templates in HAML format into Javascript
+The clientside-haml-js is a compiler written in CoffeeScript that compiles text templates in HAML format into Javascript
 functions that generate HTML. It has been inspired by the server side [haml Javascript project](https://github.com/creationix/haml-js),
 and has been written to be feature compatible with [Ruby server side HAML](http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html),
 supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have minimal runtime dependencies (only
-[underscore.js](http://documentcloud.github.com/underscore/) and [underscore.string](https://github.com/edtsech/underscore.string)).
+[underscore.js](http://documentcloud.github.com/underscore/), [underscore.string](https://github.com/edtsech/underscore.string)
+and CoffeeScript if using CoffeeScript in your templates).
 
 **NOTE:** The haml compiler requires a browser with a JSON parser. For browsers like IE7, you need to also include a JSON
  implementation. See [http://www.json.org/] for more details. A JSON implementation is available at [https://github.com/douglascrockford/JSON-js].
@@ -18,6 +19,7 @@ Thanks to following people who have contributed: [translated](https://github.com
 * Release 1   -  2011-07-25 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1] [Release Notes](clientside-haml-js/blob/master/Release-1.markdown)
 * Release 1.1 -  2011-10-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1_1] [Release Notes](clientside-haml-js/blob/master/Release-1.1.markdown)
 * Release 2   -  2011-12-10 - [https://github.com/uglyog/clientside-haml-js/tarball/release_2_0] [Release Notes](clientside-haml-js/blob/master/Release-2.markdown)
+* Release 3   -  2011-12-11 - [https://github.com/uglyog/clientside-haml-js/tarball/release_3_0] [Release Notes](clientside-haml-js/blob/master/Release-3.markdown)
 
 # To use it
 
@@ -27,7 +29,14 @@ Thanks to following people who have contributed: [translated](https://github.com
     <script type="text/javascript" src="js/haml.js"></script>
 ```
 
-* The HAML templates can either be added to the body of the web page in a script tag (with a unique ID), as in:
+* The HAML can either be passed in as a String, as in:
+
+```javascript
+    var fn = haml.compileStringToJs("%h1\n  %div\n    %p\n    %span');
+    var html = fn();
+```
+
+* or added to the body of the web page in a script tag (with a unique ID), as in:
 
 ```html
     <script type="text/haml-template" id="simple">
@@ -38,7 +47,8 @@ Thanks to following people who have contributed: [translated](https://github.com
     </script>
 ```
 
-* To compile the haml template into a Javascript function, call the haml.compileHaml function, providing it with the ID of the template.
+* To compile the haml template into a Javascript function, call the `haml.compileStringToJs` or `haml.compileHaml`
+functions, providing it with the haml contents or the ID of the haml template.
 
 ```javascript
     haml.compileHaml('simple')
@@ -48,15 +58,16 @@ This will produce the following Javascript function:
 
 ```javascript
     function anonymous(context) {
-      with(context) {
-        var html = "";
-        html += "<h1>\n  <div>\n    <p>\n    </p>\n    <span>\n    </span>\n  </div>\n</h1>\n";
-        return html;
+      var html = [];
+      var hashFunction = null, hashObject = null, objRef = null, objRefFn = null;
+      with (context || {}) {
+        html.push("<h1>\n  <div>\n    <p>\n    </p>\n    <span>\n    </span>\n  </div>\n</h1>\n");
       }
+      return html.join("");
     }
 ```
 
-* The function can be called, and it takes one parameter: a context object.
+* The function can be called, and it takes one option parameter: a context object.
 
 ```javascript
     var fn = haml.compileHaml('simple');
@@ -76,20 +87,71 @@ This will produce the following HTML:
     </h1>
 ```
 
-* The HAML can also be passed in as a String, as in:
+# HAML Templates with embedded CoffeeScript
 
-```javascript
-    var fn = haml.compileStringToJs("%h1\n  %div\n    %p\n    %span');
-    var html = fn();
+clientside-haml-js also can compile templates with embedded CoffeeScript in it. There are equivalent functions to compile
+these templates (use `compileCoffeeHaml` instead of `compileHaml` and `compileCoffeeHamlFromString` instead of
+`compileStringToJs`). The main difference in using compiled functions from the Javascript ones is that you pass the
+template context as the `this` pointer to the function via the call function instead of a parameter. You can then
+access the context variables using `@name` notation.
+
+For example, with the following template:
+
+```html
+    <script type="text/template" id="evaluation-using-context">
+    .main
+      - foo = @model.foo
+      - foo += " world"
+      %span
+        = foo
+    </script>
 ```
 
-This should produce the same HTML as the example above.
+and calling
+
+```coffescript
+    model = foo: "hello"
+    html = haml.compileCoffeeHaml('evaluation-using-context').call(model: model)
+```
+
+will generate the following function:
+
+```coffeescript
+    html = []
+    html.push("<div class=\"main\">\n")
+    foo = @model.foo
+    foo += " world"
+    html.push("  <span>\n    ")
+    try
+      exp = CoffeeScript.compile(" foo", bare: true)
+      value = eval(exp)
+      value ?= ""
+      html.push(haml.HamlRuntime.escapeHTML(String(value)))
+    catch e
+      throw new Error(haml.HamlRuntime.templateError(6, 5, "    = foo",
+        "Error evaluating expression - " + e))
+    html.push("\n  </span>\n</div>\n")
+    return html.join("")
+```
+
+and the resulting javascript function will render
+
+```html
+    <div class="main">
+      <span>
+        hello world
+      </span>
+    </div>
+```
 
 # Produced Javascript functions
 
-The generated javascript functions take a single optional context variable which provide the context to the template.
-All the properties of the context variable will be available as variables in the template. See the examples below for
-more details on how to use this.
+For the Javascript compiler, the generated javascript functions take a single optional context variable which provide
+the context to the template. All the properties of the context variable will be available as variables in the template.
+See the examples below for more details on how to use this.
+
+In the case of the CoffeeScript version, the functions use the context passed in as the `this` pointer via the call
+function. The variables are then available using the `@name` notation.
 
 # Client-side HAML Flavour
 
@@ -99,8 +161,10 @@ currently not all features are implemented (see the release notes for details).
 ## Element Attributes with {}
 
 Elements with {} attributes are evaluated at runtime as Javascript code. This is similar to the ruby implementation,
-but with Javascript code instead of Ruby. Values that result to null or false are excluded, and 'checked', 'selected' and
-'disabled' attributes are handled as boolean values. Ids will be joined by dashes (-) and classes by spaces.
+but with Javascript or CoffeeScript code instead of Ruby. Values that result to null or false are excluded, and
+'checked', 'selected' and 'disabled' attributes are handled as boolean values. Ids will be joined by dashes (-) and
+classes by spaces.
+
 The following template
 
 ```haml
@@ -183,9 +247,9 @@ output buffer. This allows lines which may cause parsing issues to be included i
         </h1>
 ```
 
-## Embedded Javascript
+## Embedded Javascript or CoffeeScript
 
-There are 3 ways you can embed javascript in your template, with {} attributes (see above), = expressions and - lines
+There are 3 ways you can embed code in your template, with {} attributes (see above), = expressions and - lines
 
 ### Assigning an expression to a tag
 
@@ -206,7 +270,7 @@ and the result escaped and added to the contents of the tag. So for the followin
 and calling
 
 ```javascript
-      var html = haml.compileHaml('evaluation').call({
+      var html = haml.compileHaml('evaluation')({
           errorTitle: "Error Title",
           errorHeading: "Error Heading <div>div text</div>",
           evilScript: '<script>alert("I\'m evil!");</script>'
@@ -231,10 +295,20 @@ should render
         </div>
 ```
 
-### Adding javascript code to the template
+In the case of CoffeeScript, you would use the call function:
 
-Any line starting with a minus (-) will be copied to the generated javascript function. Make sure you get your
-brackets and braces closed in the correct places!
+```coffeescript
+      html = haml.compileCoffeeHaml('evaluation').call(errorTitle: "Error Title",
+          errorHeading: "Error Heading <div>div text</div>",
+          evilScript: '<script>alert("I\'m evil!");</script>')
+```
+
+### Adding code to the template
+
+Any line starting with a minus (-) will be copied to the generated javascript function. For the Javascript version
+of the compiler, you can leave the closing block out if the javascript line ends in either a brace ({), in which case
+a closing brace is added, or if it ends in an anonymous function (like `(function(...) {`), in which case a closing
+brace and bracket is added.
 
 ```haml
         .main
@@ -252,16 +326,24 @@ brackets and braces closed in the correct places!
         </div>
 ```
 
-With loops:
+With loops, Javascript:
 
 ```haml
         .main
           - _(["Option 1", "Option 2", "Option 3"]).each(function (option) {
             %span= option
-          - });
           - for (var i = 0; i < 5; i++) {
             %p= i
-          - }
+```
+
+and CoffeeScript:
+
+```haml
+        .main
+          - for option in ["Option 1", "Option 2", "Option 3"]
+            %span= option
+          - for i in [0..4]
+            %p= i
 ```
 
 ```html
@@ -293,8 +375,10 @@ With loops:
         </div>
 ```
 
-You can leave the closing block out if the javascript line ends in either a brace ({), in which case a closing brace is
-added, or if it ends in an anonymous function (like `function(...) {`), in which case a closing brace and bracket is added.
+### Multiline statements
+
+Code lines can be extended over multiple lines by added a pipe (|) at the end of each line. Remember that the last
+line must also end with a pipe.
 
 ### Object references - []
 
@@ -353,4 +437,4 @@ should result in the following HTML:
 ```
 
 ## Jasmine Test
-For more information on what is implemented, have a look at the jasmine test in the spec folder.
+For more information on what is implemented, have a look at the release notes and the jasmine test in the spec folder.
