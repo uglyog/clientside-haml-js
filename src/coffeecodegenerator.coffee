@@ -76,12 +76,8 @@ class CoffeeCodeGenerator
     jsStr.replace(/"/g, '\\"')
 
   generateJsFunction: (functionBody) ->
-    console.log('------------------------------')
-    console.log(functionBody)
-    console.log('------------------------------')
     try
       fn = CoffeeScript.compile functionBody, bare: true
-      console.log("[#{fn}]")
       new Function(fn)
     catch e
       throw "Incorrect embedded code has resulted in an invalid Haml function - #{e}\nGenerated Function:\n#{fn}"
