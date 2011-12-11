@@ -13,7 +13,7 @@ class Tokeniser
     comment:          /\-#/g,
     escapeHtml:       /\&=/g,
     unescapeHtml:     /\!=/g,
-    objectReference:  /\[[a-zA-Z_][a-zA-Z0-9_]*\]/g,
+    objectReference:  /\[[a-zA-Z_@][a-zA-Z0-9_]*\]/g,
     doctype:          /!!!/g
 
   constructor: (options) ->
