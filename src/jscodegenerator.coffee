@@ -32,9 +32,9 @@ class JsCodeGenerator
     @outputBuffer.flush()
     @outputBuffer.output() + '  }\n  return html.join("");\n'
 
-  appendCodeLine: (indentText, line) ->
+  appendCodeLine: (line) ->
     @outputBuffer.flush()
-    @outputBuffer.appendToOutputBuffer(indentText)
+    @outputBuffer.appendToOutputBuffer(HamlRuntime.indentText(@indent))
     @outputBuffer.appendToOutputBuffer(line)
     @outputBuffer.appendToOutputBuffer('\n')
 
@@ -44,13 +44,15 @@ class JsCodeGenerator
   lineMatchesStartBlock: (line) ->
     line.match(/\{\s*$/)
 
-  closeOffCodeBlock: (indentText) ->
-    @outputBuffer.flush()
-    @outputBuffer.appendToOutputBuffer(indentText + '}\n')
+  closeOffCodeBlock: (tokeniser) ->
+    unless tokeniser.token.minus and tokeniser.matchToken(/\s*\}/g)
+      @outputBuffer.flush()
+      @outputBuffer.appendToOutputBuffer(HamlRuntime.indentText(@indent) + '}\n')
 
-  closeOffFunctionBlock: (indentText) ->
-    @outputBuffer.flush()
-    @outputBuffer.appendToOutputBuffer(indentText + '});\n')
+  closeOffFunctionBlock: (tokeniser) ->
+    unless tokeniser.token.minus and tokeniser.matchToken(/\s*\}/g)
+      @outputBuffer.flush()
+      @outputBuffer.appendToOutputBuffer(HamlRuntime.indentText(@indent) + '});\n')
 
   generateCodeForDynamicAttributes: (id, classes, attributeList, attributeHash, objectRef, currentParsePoint) ->
     @outputBuffer.flush()
@@ -77,3 +79,16 @@ class JsCodeGenerator
 
   escapeJs: (jsStr) ->
     jsStr.replace(/"/g, '\\"')
+
+  generateJsFunction: (functionBody) ->
+    try
+      new Function('context', functionBody)
+    catch e
+      throw "Incorrect embedded code has resulted in an invalid Haml function - #{e}\nGenerated Function:\n#{functionBody}"
+
+  generateFlush: (bufferStr) ->
+    '    html.push("' + @escapeJs(bufferStr) + '");\n'
+
+  setIndent: (indent) -> @indent = indent
+
+  mark: () ->

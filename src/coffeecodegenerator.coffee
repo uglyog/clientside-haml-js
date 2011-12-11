@@ -1,73 +1,70 @@
-class CoffeCodeGenerator
+class CoffeeCodeGenerator
 
   constructor: () ->
     @outputBuffer = new haml.Buffer(this)
 
   appendEmbeddedCode: (indentText, expression, escapeContents, perserveWhitespace, currentParsePoint) ->
     @outputBuffer.flush()
-
-    @outputBuffer.appendToOutputBuffer(indentText + 'try {\n')
-    @outputBuffer.appendToOutputBuffer(indentText + '    var value = eval("' +
-      expression.replace(/"/g, '\\"').replace(/\\n/g, '\\\\n') + '");\n')
-    @outputBuffer.appendToOutputBuffer(indentText + '    value = value === null ? "" : value;')
+    indent = @calcCodeIndent()
+    @outputBuffer.appendToOutputBuffer(indent + 'try\n')
+    @outputBuffer.appendToOutputBuffer(indent + '  exp = CoffeeScript.compile("' + expression.replace(/"/g, '\\"').replace(/\\n/g, '\\\\n') + '", bare: true)\n')
+    @outputBuffer.appendToOutputBuffer(indent + '  value = eval(exp)\n')
+    @outputBuffer.appendToOutputBuffer(indent + '  value ?= ""\n')
     if escapeContents
-      @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.HamlRuntime.escapeHTML(String(value)));\n')
+      @outputBuffer.appendToOutputBuffer(indent + '  html.push(haml.HamlRuntime.escapeHTML(String(value)))\n')
     else if perserveWhitespace
-      @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.HamlRuntime.perserveWhitespace(String(value)));\n')
+      @outputBuffer.appendToOutputBuffer(indent + '  html.push(haml.HamlRuntime.perserveWhitespace(String(value)))\n')
     else
-      @outputBuffer.appendToOutputBuffer(indentText + '    html.push(String(value));\n')
+      @outputBuffer.appendToOutputBuffer(indent + '  html.push(String(value))\n')
 
-    @outputBuffer.appendToOutputBuffer(indentText + '} catch (e) {\n');
-    @outputBuffer.appendToOutputBuffer(indentText + '  throw new Error(haml.HamlRuntime.templateError(' +
+    @outputBuffer.appendToOutputBuffer(indent + 'catch e \n');
+    @outputBuffer.appendToOutputBuffer(indent + '  throw new Error(haml.HamlRuntime.templateError(' +
         currentParsePoint.lineNumber + ', ' + currentParsePoint.characterNumber + ', "' +
         @escapeJs(currentParsePoint.currentLine) + '",\n')
-    @outputBuffer.appendToOutputBuffer(indentText + '    "Error evaluating expression - " + e));\n')
-    @outputBuffer.appendToOutputBuffer(indentText + '}\n')
+    @outputBuffer.appendToOutputBuffer(indent + '    "Error evaluating expression - " + e))\n')
 
   initOutput: () ->
-    @outputBuffer.appendToOutputBuffer('  var html = [];\n' +
-      '  var hashFunction = null, hashObject = null, objRef = null, objRefFn = null;\n  with (context || {}) {\n')
+    @outputBuffer.appendToOutputBuffer('html = []\n')
 
   closeAndReturnOutput: () ->
     @outputBuffer.flush()
-    @outputBuffer.output() + '  }\n  return html.join("");\n'
+    @outputBuffer.output() + 'return html.join("")\n'
 
-  appendCodeLine: (indentText, line) ->
+  appendCodeLine: (line) ->
     @outputBuffer.flush()
-    @outputBuffer.appendToOutputBuffer(indentText)
-    @outputBuffer.appendToOutputBuffer(line)
+    @outputBuffer.appendToOutputBuffer(HamlRuntime.indentText(@indent - @prevCodeIndent)) if @prevCodeIndent? and @prevCodeIndent < @indent
+    @outputBuffer.appendToOutputBuffer(_(line).trim())
     @outputBuffer.appendToOutputBuffer('\n')
+    @prevCodeIndent = @indent
 
   lineMatchesStartFunctionBlock: (line) ->
-    line.match(/function\s\((,?\s*\w+)*\)\s*\{\s*$/)
+    line.match(/\) [\-=]>\s*$/)
 
   lineMatchesStartBlock: (line) ->
-    line.match(/\{\s*$/)
+    true
 
-  closeOffCodeBlock: (indentText) ->
+  closeOffCodeBlock: (tokeniser) ->
     @outputBuffer.flush()
-    @outputBuffer.appendToOutputBuffer(indentText + '}\n')
 
-  closeOffFunctionBlock: (indentText) ->
+  closeOffFunctionBlock: (tokeniser) ->
     @outputBuffer.flush()
-    @outputBuffer.appendToOutputBuffer(indentText + '});\n')
 
   generateCodeForDynamicAttributes: (id, classes, attributeList, attributeHash, objectRef, currentParsePoint) ->
     @outputBuffer.flush()
     if attributeHash.length > 0
       attributeHash = @replaceReservedWordsInHash(attributeHash)
-      @outputBuffer.appendToOutputBuffer('    hashFunction = function () { return eval("hashObject = ' +
-        attributeHash.replace(/"/g, '\\"').replace(/\n/g, '\\n') + '"); };\n')
+      @outputBuffer.appendToOutputBuffer('hashFunction = () -> s = CoffeeScript.compile("' +
+        attributeHash.replace(/"/g, '\\"').replace(/\n/g, '\\n') + '", bare: true); eval "hashObject = " + s\n')
     if objectRef.length > 0
-      @outputBuffer.appendToOutputBuffer('    objRefFn = function () { return eval("objRef = ' +
-        objectRef.replace(/"/g, '\\"') + '"); };\n')
+      @outputBuffer.appendToOutputBuffer('objRefFn = () -> s = CoffeeScript.compile("' +
+        objectRef.replace(/"/g, '\\"') + '", bare: true); eval "objRef = " + s\n')
 
-    @outputBuffer.appendToOutputBuffer('    html.push(haml.HamlRuntime.generateElementAttributes(context, "' +
+    @outputBuffer.appendToOutputBuffer('html.push(haml.HamlRuntime.generateElementAttributes(this, "' +
       id + '", ["' +
-      classes.join('","') + '"], objRefFn, ' +
-      JSON.stringify(attributeList) + ', hashFunction, ' +
+      classes.join('","') + '"], objRefFn ? null, ' +
+      JSON.stringify(attributeList) + ', hashFunction ? null, ' +
       currentParsePoint.lineNumber + ', ' + currentParsePoint.characterNumber + ', "' +
-      @escapeJs(currentParsePoint.currentLine) + '"));\n')
+      @escapeJs(currentParsePoint.currentLine) + '"))\n')
 
   replaceReservedWordsInHash: (hash) ->
     resultHash = hash
@@ -77,3 +74,24 @@ class CoffeCodeGenerator
 
   escapeJs: (jsStr) ->
     jsStr.replace(/"/g, '\\"')
+
+  generateJsFunction: (functionBody) ->
+    console.log('------------------------------')
+    console.log(functionBody)
+    console.log('------------------------------')
+    try
+      fn = CoffeeScript.compile functionBody, bare: true
+#    console.log("[#{fn}]")
+      new Function(fn)
+    catch e
+      throw "Incorrect embedded code has resulted in an invalid Haml function - #{e}\nGenerated Function:\n#{fn}"
+
+  generateFlush: (bufferStr) ->
+    @calcCodeIndent() + 'html.push("' + @escapeJs(bufferStr) + '")\n'
+
+  setIndent: (indent) -> @indent = indent
+
+  mark: () -> @prevIndent = @indent
+
+  calcCodeIndent: () ->
+    if @prevCodeIndent? and @prevIndent > @prevCodeIndent then HamlRuntime.indentText(@prevIndent - @prevCodeIndent) else ''

@@ -2,34 +2,37 @@ root = this
 
 root.haml =
   compileHaml: (templateId) ->
+    @_compileHamlTemplate templateId, new haml.JsCodeGenerator()
+
+  compileCoffeeHaml: (templateId) ->
+    @_compileHamlTemplate templateId, new haml.CoffeeCodeGenerator()
+
+  compileStringToJs: (string) ->
+    codeGenerator = new haml.JsCodeGenerator()
+    result = @_compileHamlToJs new haml.Tokeniser(template: string), codeGenerator
+    codeGenerator.generateJsFunction(result)
+
+  compileCoffeeHamlFromString: (string) ->
+    codeGenerator = new haml.CoffeeCodeGenerator()
+    result = @_compileHamlToJs new haml.Tokeniser(template: string), codeGenerator
+    codeGenerator.generateJsFunction(result)
+
+  compileHamlToJsString: (string) ->
+    result = 'function (context) {\n'
+    result += @_compileHamlToJs new haml.Tokeniser(template: string), new haml.JsCodeGenerator()
+    result += '}\n'
+
+  _compileHamlTemplate: (templateId, codeGenerator) ->
     haml.cache ||= {}
 
     return haml.cache[templateId] if haml.cache[templateId]
 
-    result = @compileHamlToJs new haml.Tokeniser(templateId: templateId), new haml.JsCodeGenerator()
-
-    fn = null
-    try
-      fn = new Function('context', result)
-    catch e
-      throw "Incorrect embedded code has resulted in an invalid Haml function - #{e}\nGenerated Function:\n#{result}"
-
+    result = @_compileHamlToJs new haml.Tokeniser(templateId: templateId), codeGenerator
+    fn = codeGenerator.generateJsFunction(result)
     haml.cache[templateId] = fn
+    fn
 
-  compileStringToJs: (string) ->
-    result = @compileHamlToJs new haml.Tokeniser(template: string), new haml.JsCodeGenerator()
-
-    try
-      return new Function('context', result)
-    catch e
-      throw "Incorrect embedded code has resulted in an invalid Haml function - #{e}\nGenerated Function:\n#{result}"
-
-  compileHamlToJsString: (string) ->
-    result = 'function (context) {\n'
-    result += @compileHamlToJs new haml.Tokeniser(template: string), new haml.JsCodeGenerator()
-    result += '}\n'
-
-  compileHamlToJs: (tokeniser, generator) ->
+  _compileHamlToJs: (tokeniser, generator) ->
     elementStack = []
 
     generator.initOutput()
@@ -45,31 +48,32 @@ root.haml =
     tokeniser.getNextToken()
     while !tokeniser.token.eof
       if !tokeniser.token.eol
-        indent = haml.whitespace(tokeniser)
+        indent = haml._whitespace(tokeniser)
+        generator.setIndent(indent)
         if tokeniser.token.doctype
-          haml.doctype(tokeniser, indent, generator)
+          haml._doctype(tokeniser, indent, generator)
         else if tokeniser.token.exclamation
-          haml.ignoredLine(tokeniser, indent, elementStack, generator)
+          haml._ignoredLine(tokeniser, indent, elementStack, generator)
         else if tokeniser.token.equal or tokeniser.token.escapeHtml or tokeniser.token.unescapeHtml or
         tokeniser.token.tilde
-          haml.embeddedJs(tokeniser, indent, elementStack, innerWhitespace: true, generator)
+          haml._embeddedJs(tokeniser, indent, elementStack, innerWhitespace: true, generator)
         else if tokeniser.token.minus
-          haml.jsLine(tokeniser, indent, elementStack, generator)
+          haml._jsLine(tokeniser, indent, elementStack, generator)
         else if tokeniser.token.comment or tokeniser.token.slash
-          haml.commentLine(tokeniser, indent, elementStack, generator)
+          haml._commentLine(tokeniser, indent, elementStack, generator)
         else if tokeniser.token.amp
-          haml.escapedLine(tokeniser, indent, elementStack, generator)
+          haml._escapedLine(tokeniser, indent, elementStack, generator)
         else
-          haml.templateLine(tokeniser, elementStack, indent, generator)
+          haml._templateLine(tokeniser, elementStack, indent, generator)
       else
         tokeniser.getNextToken()
 
-    haml.closeElements(0, elementStack, tokeniser, generator)
+    haml._closeElements(0, elementStack, tokeniser, generator)
     generator.closeAndReturnOutput()
 
-  doctype: (tokeniser, indent, generator) ->
+  _doctype: (tokeniser, indent, generator) ->
     if tokeniser.token.doctype
-      generator.outputBuffer.append(haml.indentText(indent))
+      generator.outputBuffer.append(HamlRuntime.indentText(indent))
       tokeniser.getNextToken()
       contents = tokeniser.skipToEOLorEOF()
       if contents and contents.length > 0
@@ -91,19 +95,19 @@ root.haml =
         generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')
       generator.outputBuffer.append("\\n")
 
-  commentLine: (tokeniser, indent, elementStack, generator) ->
+  _commentLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.comment
       tokeniser.skipToEOLorEOF()
       tokeniser.getNextToken()
-      i = haml.whitespace(tokeniser)
+      i = haml._whitespace(tokeniser)
       while (!tokeniser.token.eof and i > indent)
         tokeniser.skipToEOLorEOF()
         tokeniser.getNextToken()
-        i = haml.whitespace(tokeniser)
+        i = haml._whitespace(tokeniser)
       tokeniser.pushBackToken()
     else if tokeniser.token.slash
-      haml.closeElements(indent, elementStack, tokeniser, generator)
-      generator.outputBuffer.append(haml.indentText(indent))
+      haml._closeElements(indent, elementStack, tokeniser, generator)
+      generator.outputBuffer.append(HamlRuntime.indentText(indent))
       generator.outputBuffer.append("<!--")
       contents = tokeniser.skipToEOLorEOF()
 
@@ -118,41 +122,42 @@ root.haml =
       if haml.tagHasContents(indent, tokeniser)
         generator.outputBuffer.append("\\n")
 
-  escapedLine: (tokeniser, indent, elementStack, generator) ->
+  _escapedLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.amp
-      haml.closeElements(indent, elementStack, tokeniser, generator)
-      generator.outputBuffer.append(haml.indentText(indent))
+      haml._closeElements(indent, elementStack, tokeniser, generator)
+      generator.outputBuffer.append(HamlRuntime.indentText(indent))
       contents = tokeniser.skipToEOLorEOF()
       generator.outputBuffer.append(haml.HamlRuntime.escapeHTML(contents)) if (contents && contents.length > 0)
       generator.outputBuffer.append("\\n")
 
-  ignoredLine: (tokeniser, indent, elementStack, generator) ->
+  _ignoredLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.exclamation
       tokeniser.getNextToken()
-      indent += haml.whitespace(tokeniser) if tokeniser.token.ws
+      indent += haml._whitespace(tokeniser) if tokeniser.token.ws
       tokeniser.pushBackToken()
-      haml.closeElements(indent, elementStack, tokeniser, generator)
+      haml._closeElements(indent, elementStack, tokeniser, generator)
       contents = tokeniser.skipToEOLorEOF()
-      generator.outputBuffer.append(haml.indentText(indent) + contents + '\\n')
+      generator.outputBuffer.append(HamlRuntime.indentText(indent) + contents + '\\n')
 
-  embeddedJs: (tokeniser, indent, elementStack, tagOptions, generator) ->
-    haml.closeElements(indent, elementStack, tokeniser, generator) if elementStack
+  _embeddedJs: (tokeniser, indent, elementStack, tagOptions, generator) ->
+    haml._closeElements(indent, elementStack, tokeniser, generator) if elementStack
     if tokeniser.token.equal or tokeniser.token.escapeHtml or tokeniser.token.unescapeHtml or tokeniser.token.tilde
       escapeHtml = tokeniser.token.escapeHtml or tokeniser.token.equal
       perserveWhitespace = tokeniser.token.tilde
       currentParsePoint = tokeniser.currentParsePoint()
       expression = tokeniser.skipToEOLorEOF()
-      indentText = haml.indentText(indent)
+      indentText = HamlRuntime.indentText(indent)
       generator.outputBuffer.append(indentText) if !tagOptions or tagOptions.innerWhitespace
       generator.appendEmbeddedCode(indentText, expression, escapeHtml, perserveWhitespace, currentParsePoint)
       generator.outputBuffer.append("\\n") if !tagOptions or tagOptions.innerWhitespace
 
-  jsLine: (tokeniser, indent, elementStack, generator) ->
+  _jsLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.minus
-      haml.closeElements(indent, elementStack, tokeniser, generator)
+      haml._closeElements(indent, elementStack, tokeniser, generator)
 
       line = tokeniser.skipToEOLorEOF()
-      generator.appendCodeLine(haml.indentText(indent), line)
+      generator.setIndent(indent)
+      generator.appendCodeLine(line)
 
       if generator.lineMatchesStartFunctionBlock(line)
         elementStack[indent] = fnBlock: true
@@ -160,8 +165,8 @@ root.haml =
         elementStack[indent] = block: true
 
   # TEMPLATELINE -> ([ELEMENT][IDSELECTOR][CLASSSELECTORS][ATTRIBUTES] [SLASH|CONTENTS])|(!CONTENTS) (EOL|EOF)
-  templateLine: (tokeniser, elementStack, indent, generator) ->
-    haml.closeElements(indent, elementStack, tokeniser, generator) unless tokeniser.token.eol
+  _templateLine: (tokeniser, elementStack, indent, generator) ->
+    haml._closeElements(indent, elementStack, tokeniser, generator) unless tokeniser.token.eol
 
     ident = haml.element(tokeniser)
     id = haml.idSelector(tokeniser)
@@ -207,11 +212,11 @@ root.haml =
       (!haml.lineHasElement(ident, id, classes) and haml.parentInnerWhitespace(elementStack, indent))
         i = indent
         i += 1 if ident.length > 0
-        generator.outputBuffer.append(haml.indentText(i) + contents + '\\n')
+        generator.outputBuffer.append(HamlRuntime.indentText(i) + contents + '\\n')
       else
         generator.outputBuffer.append(_(contents).trim() + '\\n')
     else if !haml.lineHasElement(ident, id, classes) and tagOptions.innerWhitespace
-      generator.outputBuffer.append(haml.indentText(indent) + '\\n')
+      generator.outputBuffer.append(HamlRuntime.indentText(indent) + '\\n')
 
   elementContents: (tokeniser, indent, tagOptions, generator) ->
     contents = ''
@@ -222,7 +227,7 @@ root.haml =
       if tokeniser.token.exclamation
         contents = tokeniser.skipToEOLorEOF()
       else if tokeniser.token.equal or tokeniser.token.escapeHtml or tokeniser.token.unescapeHtml
-        haml.embeddedJs(tokeniser, indent, null, tagOptions, generator)
+        haml._embeddedJs(tokeniser, indent, null, tagOptions, generator)
       else if !tokeniser.token.eol
         tokeniser.pushBackToken()
         contents = tokeniser.skipToEOLorEOF()
@@ -269,10 +274,10 @@ root.haml =
     if tokeniser.token.identifier
       name = tokeniser.token.tokenString
       tokeniser.getNextToken()
-      haml.whitespace(tokeniser)
+      haml._whitespace(tokeniser)
       throw tokeniser.parseError("Expected '=' after attribute name") unless tokeniser.token.equal
       tokeniser.getNextToken();
-      haml.whitespace(tokeniser)
+      haml._whitespace(tokeniser)
       if !tokeniser.token.string and !tokeniser.token.identifier
         throw tokeniser.parseError("Expected a quoted string or an identifier for the attribute value")
       attr =
@@ -282,31 +287,33 @@ root.haml =
 
     attr
 
-  closeElement: (indent, elementStack, tokeniser, generator) ->
+  _closeElement: (indent, elementStack, tokeniser, generator) ->
     if elementStack[indent]
+      generator.setIndent(indent)
       if elementStack[indent].htmlComment
-        generator.outputBuffer.append(haml.indentText(indent) + '-->\\n')
+        generator.outputBuffer.append(HamlRuntime.indentText(indent) + '-->\\n')
       else if elementStack[indent].htmlConditionalComment
-        generator.outputBuffer.append(haml.indentText(indent) + '<![endif]-->\\n')
+        generator.outputBuffer.append(HamlRuntime.indentText(indent) + '<![endif]-->\\n')
       else if elementStack[indent].block
-        generator.closeOffCodeBlock(haml.indentText(indent)) if !tokeniser.token.minus or !tokeniser.matchToken(/\s*\}/g)
+        generator.closeOffCodeBlock(tokeniser)
       else if elementStack[indent].fnBlock
-        generator.closeOffFunctionBlock(haml.indentText(indent)) if !tokeniser.token.minus or !tokeniser.matchToken(/\s*\}/g)
+        generator.closeOffFunctionBlock(tokeniser)
       else
         innerWhitespace = !elementStack[indent].tagOptions or elementStack[indent].tagOptions.innerWhitespace
         if innerWhitespace
-          generator.outputBuffer.append(haml.indentText(indent))
+          generator.outputBuffer.append(HamlRuntime.indentText(indent))
         else
           generator.outputBuffer.trimWhitespace()
         generator.outputBuffer.append('</' + elementStack[indent].tag + '>')
         outerWhitespace = !elementStack[indent].tagOptions or elementStack[indent].tagOptions.outerWhitespace
         generator.outputBuffer.append('\\n') if haml.parentInnerWhitespace(elementStack, indent) and outerWhitespace
       elementStack[indent] = null
+      generator.mark()
 
-  closeElements: (indent, elementStack, tokeniser, generator) ->
+  _closeElements: (indent, elementStack, tokeniser, generator) ->
     i = elementStack.length - 1
     while i >= indent
-      haml.closeElement(i--, elementStack, tokeniser, generator)
+      haml._closeElement(i--, elementStack, tokeniser, generator)
 
   openElement: (currentParsePoint, indent, ident, id, classes, objectRef, attributeList, attributeHash, elementStack, tagOptions, generator) ->
     element = if ident.length == 0 then "div" else ident
@@ -314,7 +321,7 @@ root.haml =
     parentInnerWhitespace = haml.parentInnerWhitespace(elementStack, indent)
     tagOuterWhitespace = !tagOptions or tagOptions.outerWhitespace
     generator.outputBuffer.trimWhitespace() unless tagOuterWhitespace
-    generator.outputBuffer.append(haml.indentText(indent)) if indent > 0 and parentInnerWhitespace and tagOuterWhitespace
+    generator.outputBuffer.append(HamlRuntime.indentText(indent)) if indent > 0 and parentInnerWhitespace and tagOuterWhitespace
     generator.outputBuffer.append('<' + element)
     if attributeHash.length > 0 or objectRef.length > 0
       generator.generateCodeForDynamicAttributes(id, classes, attributeList, attributeHash, objectRef, currentParsePoint)
@@ -390,15 +397,7 @@ root.haml =
   attrValue: (attr, value) ->
     if attr in ['selected', 'checked', 'disabled'] then attr else value
 
-  indentText: (indent) ->
-    text = ''
-    i = 0
-    while i < indent
-      text += '  '
-      i++
-    text
-
-  whitespace: (tokeniser) ->
+  _whitespace: (tokeniser) ->
     indent = 0
     if tokeniser.token.ws
       indent = tokeniser.token.tokenString.length / 2
@@ -442,4 +441,5 @@ root.haml =
 root.haml.Tokeniser = Tokeniser
 root.haml.Buffer = Buffer
 root.haml.JsCodeGenerator = JsCodeGenerator
+root.haml.CoffeeCodeGenerator = CoffeeCodeGenerator
 root.haml.HamlRuntime = HamlRuntime

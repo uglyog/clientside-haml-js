@@ -43,7 +43,7 @@ HamlRuntime =
 
     if objRefFn
       try
-        object = objRefFn.call(this, context)
+        object = objRefFn.call(context, context)
         if object
           objectId = null
           if object.id
@@ -62,7 +62,7 @@ HamlRuntime =
 
     if attrFunction
       try
-        hash = attrFunction.call(this, context)
+        hash = attrFunction.call(context, context)
         if hash
           for own attr of hash
             if attr == 'data'
@@ -85,3 +85,11 @@ HamlRuntime =
           else
             html += ' ' + attr + '="' + haml.attrValue(attr, attributes[attr]) + '"'
     html
+
+  indentText: (indent) ->
+    text = ''
+    i = 0
+    while i < indent
+      text += '  '
+      i++
+    text

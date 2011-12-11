@@ -4,7 +4,8 @@ class Buffer
     @outputBuffer = ''
 
   append: (str) ->
-     @buffer += str if str and str.length > 0
+    @generator.mark() if @buffer.length == 0
+    @buffer += str if str and str.length > 0
 
   appendToOutputBuffer: (str) ->
     if str and str.length > 0
@@ -13,7 +14,7 @@ class Buffer
 
   flush: () ->
     if @buffer and @buffer.length > 0
-      @outputBuffer += '    html.push("' + @generator.escapeJs(@buffer) + '");\n'
+      @outputBuffer += @generator.generateFlush(@buffer)
     @buffer = ''
 
   output: () ->
