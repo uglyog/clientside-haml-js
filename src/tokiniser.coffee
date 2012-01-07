@@ -1,3 +1,6 @@
+###
+  HAML Tokiniser: This class is responsible for parsing the haml source into tokens
+###
 class Tokeniser
 
   currentLineMatcher: /[^\n]*/g

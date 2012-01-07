@@ -1,9 +1,18 @@
+###
+  HamlRuntime: Haml runtime functions. These are used both by the compiler and the generated template fuctions
+###
 HamlRuntime =
-  # taken from underscore.string.js escapeHTML
+  ###
+    Taken from underscore.string.js escapeHTML, and replace the apos entity with character 39 so that it renderes
+    correctly in IE7
+  ###
   escapeHTML: (str) ->
     String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, "&#39;")
 
+  ###
+    Provides the implementation to preserve the whitespace as per the HAML reference
+  ###
   perserveWhitespace: (str) ->
     re = /<[a-zA-Z]+>[^<]*<\/[a-zA-Z]+>/g
     out = ''
@@ -20,6 +29,9 @@ HamlRuntime =
       out = str
     out
 
+  ###
+    Generates a error message including the current line in the source where the error occurred
+  ###
   templateError: (lineNumber, characterNumber, currentLine, error) ->
     message = error + " at line " + lineNumber + " and character " + characterNumber +
             ":\n" + currentLine + '\n'
@@ -30,6 +42,9 @@ HamlRuntime =
     message += '^'
     message
 
+  ###
+    Generates the attributes for the element by combining all the various sources together
+  ###
   generateElementAttributes: (context, id, classes, objRefFn, attrList, attrFunction, lineNumber, characterNumber, currentLine) ->
     attributes = {}
 
@@ -86,6 +101,9 @@ HamlRuntime =
             html += ' ' + attr + '="' + haml.attrValue(attr, attributes[attr]) + '"'
     html
 
+  ###
+    Returns a white space string with a length of indent * 2
+  ###
   indentText: (indent) ->
     text = ''
     i = 0
@@ -94,6 +112,10 @@ HamlRuntime =
       i++
     text
 
+  ###
+    Combines the attributes in the attributres hash with the given attribute and value
+    ID, FOR and CLASS attributes will expand to arrays when multiple values are provided
+  ###
   combineAttributes: (attributes, attrName, attrValue) ->
     if haml.hasValue(attrValue)
       if attrName == 'id' and attrValue.toString().length > 0

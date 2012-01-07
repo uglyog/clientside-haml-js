@@ -1,22 +1,45 @@
 root = this
 
 root.haml =
+
+  ###
+    Compiles the haml in the script block with ID templateId
+    Returns a javascript function
+  ###
   compileHaml: (templateId) ->
     @_compileHamlTemplate templateId, new haml.JsCodeGenerator()
 
+  ###
+    Compiles the haml in the script block with ID templateId using the coffeescript generator
+    Returns a javascript function
+  ###
   compileCoffeeHaml: (templateId) ->
     @_compileHamlTemplate templateId, new haml.CoffeeCodeGenerator()
 
+  ###
+    Compiles the haml in the passed in string
+    Returns a javascript function
+  ###
   compileStringToJs: (string) ->
     codeGenerator = new haml.JsCodeGenerator()
     result = @_compileHamlToJs new haml.Tokeniser(template: string), codeGenerator
     codeGenerator.generateJsFunction(result)
 
+  ###
+    Compiles the haml in the passed in string using the coffeescript generator
+    Returns a javascript function
+  ###
   compileCoffeeHamlFromString: (string) ->
     codeGenerator = new haml.CoffeeCodeGenerator()
     result = @_compileHamlToJs new haml.Tokeniser(template: string), codeGenerator
     codeGenerator.generateJsFunction(result)
 
+  ###
+    Compiles the haml in the passed in string
+    Returns the javascript function source
+
+    This is mainly used for precompiling the haml templates so they can be packaged.
+  ###
   compileHamlToJsString: (string) ->
     result = 'function (context) {\n'
     result += @_compileHamlToJs new haml.Tokeniser(template: string), new haml.JsCodeGenerator()
@@ -104,13 +127,15 @@ root.haml =
       tokeniser.skipToEOLorEOF()
       tokeniser.getNextToken()
       i = haml._whitespace(tokeniser)
+      filterBlock = []
       while (!tokeniser.token.eof and i > indent)
         tokeniser.pushBackToken()
         line = tokeniser.skipToEOLorEOF()
-        generator.outputBuffer.append(haml.HamlRuntime.indentText(i - 1) + haml.filters[filter](line))
-        generator.outputBuffer.append('\\n') if tokeniser.token.eol
+        filterBlock.push(haml.HamlRuntime.indentText(i - 1) + line)
+        filterBlock.push('\\n') if tokeniser.token.eol
         tokeniser.getNextToken()
         i = haml._whitespace(tokeniser)
+      haml.filters[filter](filterBlock.join(''), generator, haml.HamlRuntime.indentText(indent))
       tokeniser.pushBackToken()
 
   _commentLine: (tokeniser, indent, elementStack, generator) -> 

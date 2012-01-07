@@ -474,10 +474,13 @@
       html = haml.compileHaml('plain-filter')();
       return expect(html).toEqual('<h1>\n  <p>\n    Does not parse the filtered text. This is useful for large blocks of text without HTML tags,\n    when you don\'t want lines starting with . or - to be parsed.\n  </p>\n  <span>\n    Other Contents\n  </span>\n</h1>\n');
     });
-    return it('should raise an error if the filter is not found', function() {
+    it('should raise an error if the filter is not found', function() {
       return expect(function() {
         return haml.compileStringToJs('%p\n  :unknown\n    blah di blah di blah');
       }).toThrow('Filter \'unknown\' not registered. Filter functions need to be added to \'haml.filters\'. at line 2 and character 10:\n  :unknown\n---------^');
+    });
+    return it('generate javascript filters correctly', function() {
+      return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  // blah di blah di blah\n  function () {\n    return \'blah\';\n  }\n  //]]>\n  </script>\n</body>\n');
     });
   });
 

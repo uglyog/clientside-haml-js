@@ -44,3 +44,31 @@ describe 'filters', () ->
            :unknown
          ---------^'''
     )
+
+  it 'generate javascript filters correctly', () ->
+    expect(
+      haml.compileCoffeeHamlFromString(
+        '''
+        %body
+          :javascript
+            // blah di blah di blah
+            function () {
+              return 'blah';
+            }
+        '''
+      )()
+    ).toEqual(
+      '''
+         <body>
+           <script type="text/javascript">
+           //<![CDATA[
+           // blah di blah di blah
+           function () {
+             return 'blah';
+           }
+           //]]>
+           </script>
+         </body>
+         
+      '''
+    )
