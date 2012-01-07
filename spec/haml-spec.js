@@ -483,10 +483,13 @@
       return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  // blah di blah di blah\n  function () {\n    return \'blah\';\n  }\n  //]]>\n  </script>\n</body>\n');
     });
     it('generates css filters correctly', function() {
-      return expect(haml.compileStringToJs('%head\n  :css\n    /* blah di blah di blah */\n    .body {\n      color: red;\n    }')()).toEqual('<head>\n  <style>\n  //<![CDATA[\n  /* blah di blah di blah */\n  .body {\n    color: red;\n  }\n  //]]>\n  </style>\n</head>\n');
+      return expect(haml.compileStringToJs('%head\n  :css\n    /* blah di blah di blah */\n    .body {\n      color: red;\n    }')()).toEqual('<head>\n  <style type="text/css">\n  /*<![CDATA[*/\n  /* blah di blah di blah */\n  .body {\n    color: red;\n  }\n  /*]]>*/\n  </style>\n</head>\n');
     });
-    return it('generates CDATA filters correctly', function() {
+    it('generates CDATA filters correctly', function() {
       return expect(haml.compileStringToJs('%body\n  :cdata\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <![CDATA[\n  // blah di blah di blah\n  function () {\n    return \'blah\';\n  }\n  ]]>\n</body>\n');
+    });
+    return it('generates preserve filters correctly', function() {
+      return expect(haml.compileStringToJs('%p\n  :preserve\n    Foo\n    <pre>Bar\n    Baz</pre>\n    <a>Test\n    Test\n    </a>\n    Other')()).toEqual('<p>\nFoo\n<pre>Bar&#x000A;Baz</pre>\n<a>Test&#x000A;Test&#x000A;</a>\nOther\n</p>\n');
     });
   });
 

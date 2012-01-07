@@ -131,11 +131,10 @@ root.haml =
       while (!tokeniser.token.eof and i > indent)
         tokeniser.pushBackToken()
         line = tokeniser.skipToEOLorEOF()
-        filterBlock.push(haml.HamlRuntime.indentText(i - 1) + line)
-        filterBlock.push('\\n') if tokeniser.token.eol
+        filterBlock.push(haml.HamlRuntime.indentText(i - indent - 1) + line)
         tokeniser.getNextToken()
         i = haml._whitespace(tokeniser)
-      haml.filters[filter](filterBlock.join(''), generator, haml.HamlRuntime.indentText(indent))
+      haml.filters[filter](filterBlock, generator, haml.HamlRuntime.indentText(indent))
       tokeniser.pushBackToken()
 
   _commentLine: (tokeniser, indent, elementStack, generator) -> 

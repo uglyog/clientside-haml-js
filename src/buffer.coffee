@@ -1,3 +1,6 @@
+###
+  Provides buffering between the generated javascript and html contents
+###
 class Buffer
   constructor: (@generator) ->
     @buffer = ''

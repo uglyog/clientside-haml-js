@@ -88,13 +88,13 @@ describe 'filters', () ->
     ).toEqual(
       '''
          <head>
-           <style>
-           //<![CDATA[
+           <style type="text/css">
+           /*<![CDATA[*/
            /* blah di blah di blah */
            .body {
              color: red;
            }
-           //]]>
+           /*]]>*/
            </style>
          </head>
 
@@ -123,6 +123,33 @@ describe 'filters', () ->
            }
            ]]>
          </body>
+
+      '''
+    )
+
+  it 'generates preserve filters correctly', () ->
+    expect(
+      haml.compileStringToJs(
+        '''
+        %p
+          :preserve
+            Foo
+            <pre>Bar
+            Baz</pre>
+            <a>Test
+            Test
+            </a>
+            Other
+        '''
+      )()
+    ).toEqual(
+      '''
+         <p>
+         Foo
+         <pre>Bar&#x000A;Baz</pre>
+         <a>Test&#x000A;Test&#x000A;</a>
+         Other
+         </p>
 
       '''
     )

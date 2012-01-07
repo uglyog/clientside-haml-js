@@ -1,3 +1,6 @@
+###
+  Code generator that generates a coffeescript function body
+###
 class CoffeeCodeGenerator
 
   constructor: () ->
@@ -73,7 +76,7 @@ class CoffeeCodeGenerator
     resultHash
 
   escapeJs: (jsStr) ->
-    jsStr.replace(/"/g, '\\"')
+    jsStr.replace(/"/g, '\\"').replace(/\n/g, '\\n')
 
   generateJsFunction: (functionBody) ->
     try

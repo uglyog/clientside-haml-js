@@ -1,3 +1,6 @@
+###
+  Code generator that generates a Javascript function body
+###
 class JsCodeGenerator
 
   constructor: () ->
@@ -78,7 +81,7 @@ class JsCodeGenerator
     resultHash
 
   escapeJs: (jsStr) ->
-    jsStr.replace(/"/g, '\\"')
+    jsStr.replace(/"/g, '\\"').replace(/\n/g, '\\n')
 
   generateJsFunction: (functionBody) ->
     try
