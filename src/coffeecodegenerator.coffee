@@ -76,7 +76,7 @@ class CoffeeCodeGenerator
     resultHash
 
   escapeCode: (str) ->
-    str.replace(/\\/g, '\\\\').replace(/'/g, '\\\'').replace(/\n/g, '\\n').replace(/(^|[^\\]{2})\\\\#{/g, '$1\\#{')
+    str.replace(/\\/g, '\\\\').replace(/'/g, '\\\'').replace(/"/g, '\\\"').replace(/\n/g, '\\n').replace(/(^|[^\\]{2})\\\\#{/g, '$1\\#{')
 
   generateJsFunction: (functionBody) ->
     try

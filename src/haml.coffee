@@ -136,7 +136,7 @@ root.haml =
         filterBlock.push(haml.HamlRuntime.indentText(i - indent - 1) + line)
         tokeniser.getNextToken()
         i = haml._whitespace(tokeniser)
-      haml.filters[filter](filterBlock, generator, haml.HamlRuntime.indentText(indent))
+      haml.filters[filter](filterBlock, generator, haml.HamlRuntime.indentText(indent), tokeniser.currentParsePoint())
       tokeniser.pushBackToken()
 
   _commentLine: (tokeniser, indent, elementStack, generator) -> 

@@ -518,12 +518,17 @@
     it('generates javascript filter blocks correctly', function() {
       return expect(haml.compileStringToJs('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{message}");\n    });')({
         message: 'Hi there!'
-      })).toEqual('<body>\n  <script type=\'text/javascript\'>\n   //<![CDATA[\n     $(document).ready(function() {\n       alert("Hi there!");\n     });\n   //]]>\n  </script>\n</body>\n');
+      })).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  $(document).ready(function() {\n    alert("Hi there!");\n  });\n  //]]>\n  </script>\n</body>\n');
     });
-    return it('should support interpolation in coffeescript', function() {
-      return expect(haml.compileCoffeeHamlFromString('- h = (word) -> word.toLowerCase()\n%p\n  Look at \\\\#{h @word } lack of backslash: \\#{foo}\n  And yon presence thereof: \\{foo}  ').call({
+    it('should support interpolation in coffeescript', function() {
+      return expect(haml.compileCoffeeHamlFromString('- h = (word) -> word.toLowerCase()\n%p\n  Look at \\\\#{h @word } lack of backslash: \\#{foo}\n  And yon presence thereof: \\{foo}').call({
         word: 'YON'
       })).toEqual('<p>\n  Look at \\\\yon lack of backslash: #{foo}\n  And yon presence thereof: \\{foo}\n</p>\n');
+    });
+    return it('generates javascript filter blocks correctly with embedded coffeescript', function() {
+      return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{@message}");\n    });').call({
+        message: 'Hi there!'
+      })).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  $(document).ready(function() {\n    alert("Hi there!");\n  });\n  //]]>\n  </script>\n</body>\n');
     });
   });
 

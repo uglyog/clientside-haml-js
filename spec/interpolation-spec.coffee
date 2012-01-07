@@ -44,16 +44,16 @@ describe 'interpolated text', () ->
       )(message: 'Hi there!')
     ).toEqual(
       '''
-         <body>
-           <script type='text/javascript'>
-            //<![CDATA[
-              $(document).ready(function() {
-                alert("Hi there!");
-              });
-            //]]>
-           </script>
-         </body>
-         
+      <body>
+        <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+          alert("Hi there!");
+        });
+        //]]>
+        </script>
+      </body>
+      
       '''
     )
 
@@ -61,18 +61,44 @@ describe 'interpolated text', () ->
     expect(
       haml.compileCoffeeHamlFromString(
         '''
-           - h = (word) -> word.toLowerCase()
-           %p
-             Look at \\\\#{h @word } lack of backslash: \\#{foo}
-             And yon presence thereof: \\{foo}  
+        - h = (word) -> word.toLowerCase()
+        %p
+          Look at \\\\#{h @word } lack of backslash: \\#{foo}
+          And yon presence thereof: \\{foo}
         '''
       ).call(word: 'YON')
     ).toEqual(
+      '''
+      <p>
+        Look at \\\\yon lack of backslash: #{foo}
+        And yon presence thereof: \\{foo}
+      </p>
+
+      '''
+    )
+
+  it 'generates javascript filter blocks correctly with embedded coffeescript', () ->
+    expect(
+      haml.compileCoffeeHamlFromString(
         '''
-           <p>
-             Look at \\\\yon lack of backslash: #{foo}
-             And yon presence thereof: \\{foo}
-           </p>
-           
+        %body
+          :javascript
+            $(document).ready(function() {
+              alert("#{@message}");
+            });
         '''
+      ).call(message: 'Hi there!')
+    ).toEqual(
+      '''
+      <body>
+        <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+          alert("Hi there!");
+        });
+        //]]>
+        </script>
+      </body>
+      
+      '''
     )
