@@ -12,38 +12,39 @@
     return result;
   };
 
-  describe('haml', function() {
-    beforeEach(function() {
-      haml.cache = {};
-      return this.addMatchers({
-        toThrowContaining: function(expected) {
-          var exception, isnot, result, _ref;
-          result = false;
-          if (typeof this.actual !== 'function') {
-            throw new Error('Actual is not a function');
-          }
-          try {
-            this.actual();
-          } catch (e) {
-            exception = e;
-          }
-          if (exception != null) {
-            result = exception.toString().indexOf(expected) >= 0;
-          }
-          isnot = (_ref = this.isNot) != null ? _ref : {
-            "not ": ""
-          };
-          this.message = function() {
-            if (exception) {
-              return ["Expected function " + isnot + "to throw something with ", expected, ", but it threw", exception].join(' ');
-            } else {
-              return "Expected function to throw an exception.";
-            }
-          };
-          return result;
+  beforeEach(function() {
+    haml.cache = {};
+    return this.addMatchers({
+      toThrowContaining: function(expected) {
+        var exception, isnot, result, _ref;
+        result = false;
+        if (typeof this.actual !== 'function') {
+          throw new Error('Actual is not a function');
         }
-      });
+        try {
+          this.actual();
+        } catch (e) {
+          exception = e;
+        }
+        if (exception != null) {
+          result = exception.toString().indexOf(expected) >= 0;
+        }
+        isnot = (_ref = this.isNot) != null ? _ref : {
+          "not ": ""
+        };
+        this.message = function() {
+          if (exception) {
+            return ["Expected function " + isnot + "to throw something with ", expected, ", but it threw", exception].join(' ');
+          } else {
+            return "Expected function to throw an exception.";
+          }
+        };
+        return result;
+      }
     });
+  });
+
+  describe('haml', function() {
     describe('empty template', function() {
       beforeEach(function() {
         return setFixtures('<script type="text/haml-template" id="empty"></script>');
@@ -461,6 +462,22 @@
         html = haml.compileCoffeeHaml('multiline')();
         return expect(html).toEqual('<whoo>\n' + '  <hoo>\n' + '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' + '  </hoo>\n' + '  <p>\n' + '    This is short.\n' + '  </p>\n' + '</whoo>\n');
       });
+    });
+  });
+
+  describe('filters', function() {
+    beforeEach(function() {
+      return setFixtures('<script type="text/template" id="plain-filter">\n%h1\n  %p\n    :plain\n      Does not parse the filtered text. This is useful for large blocks of text without HTML tags,\n      when you don\'t want lines starting with . or - to be parsed.\n  %span Other Contents\n</script>');
+    });
+    it('should render the result of the filter function', function() {
+      var html;
+      html = haml.compileHaml('plain-filter')();
+      return expect(html).toEqual('<h1>\n  <p>\n    Does not parse the filtered text. This is useful for large blocks of text without HTML tags,\n    when you don\'t want lines starting with . or - to be parsed.\n  </p>\n  <span>\n    Other Contents\n  </span>\n</h1>\n');
+    });
+    return it('should raise an error if the filter is not found', function() {
+      return expect(function() {
+        return haml.compileStringToJs('%p\n  :unknown\n    blah di blah di blah');
+      }).toThrow('Filter \'unknown\' not registered. Filter functions need to be added to \'haml.filters\'. at line 2 and character 10:\n  :unknown\n---------^');
     });
   });
 

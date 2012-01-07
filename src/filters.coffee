@@ -1,0 +1,2 @@
+filters =
+  plain: (contents) -> contents

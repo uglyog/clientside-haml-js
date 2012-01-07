@@ -15,7 +15,8 @@ class Tokeniser
     unescapeHtml:     /\!=/g,
     objectReference:  /\[[a-zA-Z_@][a-zA-Z0-9_]*\]/g,
     doctype:          /!!!/g,
-    continueLine:        /\|\s*\n/g
+    continueLine:     /\|\s*\n/g,
+    filter:           /:\w+/g
 
   constructor: (options) ->
     @buffer = null
@@ -89,6 +90,7 @@ class Tokeniser
       @matchMultiCharToken(@tokenMatchers.classSelector, { classSelector: true, token: 'CLASS' }, (matched) -> matched.substring(1) )
       @matchMultiCharToken(@tokenMatchers.identifier, { identifier: true, token: 'IDENTIFIER' })
       @matchMultiCharToken(@tokenMatchers.doctype, { doctype: true, token: 'DOCTYPE' })
+      @matchMultiCharToken(@tokenMatchers.filter, { filter: true, token: 'FILTER' }, (matched) -> matched.substring(1) )
 
       if !@token
         str = @matchToken(@tokenMatchers.quotedString)

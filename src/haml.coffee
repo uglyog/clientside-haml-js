@@ -63,6 +63,8 @@ root.haml =
           haml._commentLine(tokeniser, indent, elementStack, generator)
         else if tokeniser.token.amp
           haml._escapedLine(tokeniser, indent, elementStack, generator)
+        else if tokeniser.token.filter
+          haml._filter(tokeniser, indent, generator)
         else
           haml._templateLine(tokeniser, elementStack, indent, generator)
       else
@@ -95,7 +97,23 @@ root.haml =
         generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')
       generator.outputBuffer.append("\\n")
 
-  _commentLine: (tokeniser, indent, elementStack, generator) ->
+  _filter: (tokeniser, indent, generator) ->
+    if tokeniser.token.filter
+      filter = tokeniser.token.tokenString
+      throw tokeniser.parseError("Filter '#{filter}' not registered. Filter functions need to be added to 'haml.filters'.") unless haml.filters[filter]
+      tokeniser.skipToEOLorEOF()
+      tokeniser.getNextToken()
+      i = haml._whitespace(tokeniser)
+      while (!tokeniser.token.eof and i > indent)
+        tokeniser.pushBackToken()
+        line = tokeniser.skipToEOLorEOF()
+        generator.outputBuffer.append(haml.HamlRuntime.indentText(i - 1) + haml.filters[filter](line))
+        generator.outputBuffer.append('\\n') if tokeniser.token.eol
+        tokeniser.getNextToken()
+        i = haml._whitespace(tokeniser)
+      tokeniser.pushBackToken()
+
+  _commentLine: (tokeniser, indent, elementStack, generator) -> 
     if tokeniser.token.comment
       tokeniser.skipToEOLorEOF()
       tokeniser.getNextToken()
@@ -406,3 +424,4 @@ root.haml.Buffer = Buffer
 root.haml.JsCodeGenerator = JsCodeGenerator
 root.haml.CoffeeCodeGenerator = CoffeeCodeGenerator
 root.haml.HamlRuntime = HamlRuntime
+root.haml.filters = filters

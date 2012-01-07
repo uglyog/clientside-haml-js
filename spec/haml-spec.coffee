@@ -7,33 +7,32 @@ isIe7or8 = () ->
       result = parseFloat(RegExp.$1) < 9.0
   result
 
+beforeEach () ->
+  haml.cache = {}
+  @addMatchers(
+    toThrowContaining: (expected) ->
+      result = false
+      if typeof @actual isnt 'function'
+        throw new Error('Actual is not a function')
+      try
+        @actual()
+      catch e
+        exception = e
+
+      result = exception.toString().indexOf(expected) >= 0 if exception?
+
+      isnot = @isNot ? "not " : ""
+
+      @message = () ->
+        if exception
+          ["Expected function " + isnot + "to throw something with ", expected, ", but it threw", exception].join(' ')
+        else
+          "Expected function to throw an exception."
+
+      result
+  )
 
 describe 'haml', () ->
-
-  beforeEach () ->
-    haml.cache = {}
-    @addMatchers(
-      toThrowContaining: (expected) ->
-        result = false
-        if typeof @actual isnt 'function'
-          throw new Error('Actual is not a function')
-        try
-          @actual()
-        catch e
-          exception = e
-
-        result = exception.toString().indexOf(expected) >= 0 if exception?
-
-        isnot = @isNot ? "not " : ""
-
-        @message = () ->
-          if exception
-            ["Expected function " + isnot + "to throw something with ", expected, ", but it threw", exception].join(' ')
-          else
-            "Expected function to throw an exception."
-
-        result
-    )
 
   describe 'empty template', () ->
 
@@ -1045,4 +1044,3 @@ describe 'haml', () ->
         '    This is short.\n' +
         '  </p>\n' +
         '</whoo>\n')
-  
