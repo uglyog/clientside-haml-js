@@ -73,7 +73,9 @@ root.haml =
       if !tokeniser.token.eol
         indent = haml._whitespace(tokeniser)
         generator.setIndent(indent)
-        if tokeniser.token.doctype
+        if tokeniser.token.eol
+          generator.outputBuffer.append(HamlRuntime.indentText(indent) + '\n')
+        else if tokeniser.token.doctype
           haml._doctype(tokeniser, indent, generator)
         else if tokeniser.token.exclamation
           haml._ignoredLine(tokeniser, indent, elementStack, generator)
@@ -179,7 +181,7 @@ root.haml =
       tokeniser.pushBackToken()
       haml._closeElements(indent, elementStack, tokeniser, generator)
       contents = tokeniser.skipToEOLorEOF()
-      generator.outputBuffer.append(HamlRuntime.indentText(indent) + contents + '\\n')
+      generator.outputBuffer.append(HamlRuntime.indentText(indent) + contents + '\n')
 
   _embeddedJs: (tokeniser, indent, elementStack, tagOptions, generator) ->
     haml._closeElements(indent, elementStack, tokeniser, generator) if elementStack
@@ -210,7 +212,7 @@ root.haml =
   _templateLine: (tokeniser, elementStack, indent, generator) ->
     haml._closeElements(indent, elementStack, tokeniser, generator) unless tokeniser.token.eol
 
-    ident = haml._element(tokeniser)
+    identifier = haml._element(tokeniser)
     id = haml._idSelector(tokeniser)
     classes = haml._classSelector(tokeniser)
     objectRef = haml._objectReference(tokeniser)
@@ -223,58 +225,56 @@ root.haml =
       selfClosingTag: false
       innerWhitespace: true
       outerWhitespace: true
+    lineHasElement = haml._lineHasElement(identifier, id, classes)
 
     if tokeniser.token.slash
       tagOptions.selfClosingTag = true
       tokeniser.getNextToken()
-    if tokeniser.token.gt and haml._lineHasElement(ident, id, classes)
+    if tokeniser.token.gt and lineHasElement
       tagOptions.outerWhitespace = false
       tokeniser.getNextToken()
-    if tokeniser.token.lt and haml._lineHasElement(ident, id, classes)
+    if tokeniser.token.lt and lineHasElement
       tagOptions.innerWhitespace = false
       tokeniser.getNextToken()
 
-    if haml._lineHasElement(ident, id, classes)
+    if lineHasElement
       if !tagOptions.selfClosingTag
-        tagOptions.selfClosingTag = haml._isSelfClosingTag(ident) and !haml._tagHasContents(indent, tokeniser)
-      haml._openElement(currentParsePoint, indent, ident, id, classes, objectRef, attrList, attributesHash, elementStack,
+        tagOptions.selfClosingTag = haml._isSelfClosingTag(identifier) and !haml._tagHasContents(indent, tokeniser)
+      haml._openElement(currentParsePoint, indent, identifier, id, classes, objectRef, attrList, attributesHash, elementStack,
         tagOptions, generator)
-    else if !haml._isEolOrEof(tokeniser) and !tokeniser.token.ws
+    else if !tokeniser.isEolOrEof() and !tokeniser.token.ws
       tokeniser.pushBackToken()
 
-    contents = haml._elementContents(tokeniser, indent + 1, tagOptions, generator)
-    haml._eolOrEof(tokeniser)
+    hasContents = false
+    tokeniser.getNextToken() if tokeniser.token.ws
 
-    if tagOptions.selfClosingTag and contents.length > 0
-      throw haml.HamlRuntime.templateError(currentParsePoint.lineNumber, currentParsePoint.characterNumber,
-              currentParsePoint.currentLine, "A self-closing tag can not have any contents")
-    else if contents.length > 0
-      contents = contents.substring(1) if contents.match(/^\\%/)
-      if tagOptions.innerWhitespace and haml._lineHasElement(ident, id, classes) or
-      (!haml._lineHasElement(ident, id, classes) and haml._parentInnerWhitespace(elementStack, indent))
-        i = indent
-        i += 1 if ident.length > 0
-        generator.outputBuffer.append(HamlRuntime.indentText(i) + contents + '\\n')
-      else
-        generator.outputBuffer.append(_(contents).trim() + '\\n')
-    else if !haml._lineHasElement(ident, id, classes) and tagOptions.innerWhitespace
-      generator.outputBuffer.append(HamlRuntime.indentText(indent) + '\\n')
-
-  _elementContents: (tokeniser, indent, tagOptions, generator) ->
-    contents = ''
-
-    if !tokeniser.token.eof
-      tokeniser.getNextToken() if tokeniser.token.ws
-
+    if tokeniser.token.equal or tokeniser.token.escapeHtml or tokeniser.token.unescapeHtml
+      haml._embeddedJs(tokeniser, indent + 1, null, tagOptions, generator)
+      hasContents = true
+    else
+      contents = ''
       if tokeniser.token.exclamation
         contents = tokeniser.skipToEOLorEOF()
-      else if tokeniser.token.equal or tokeniser.token.escapeHtml or tokeniser.token.unescapeHtml
-        haml._embeddedJs(tokeniser, indent, null, tagOptions, generator)
+        hasContents = contents.length > 0
       else if !tokeniser.token.eol
         tokeniser.pushBackToken()
         contents = tokeniser.skipToEOLorEOF()
+        contents = contents.substring(1) if contents.match(/^\\%/)
+        hasContents = contents.length > 0
 
-    contents
+      if contents.length > 0
+        if tagOptions.innerWhitespace and lineHasElement or (!lineHasElement and haml._parentInnerWhitespace(elementStack, indent))
+          indentText = HamlRuntime.indentText(if identifier.length > 0 then indent + 1 else indent)
+        else
+          indentText = ''
+          contents = _(contents).trim()
+        generator.outputBuffer.append(indentText + contents + '\n')
+
+    haml._eolOrEof(tokeniser)
+
+    if tagOptions.selfClosingTag and hasContents
+      throw haml.HamlRuntime.templateError(currentParsePoint.lineNumber, currentParsePoint.characterNumber,
+              currentParsePoint.currentLine, "A self-closing tag can not have any contents")
 
   _attributeHash: (tokeniser) ->
     attr = ''
@@ -333,9 +333,9 @@ root.haml =
     if elementStack[indent]
       generator.setIndent(indent)
       if elementStack[indent].htmlComment
-        generator.outputBuffer.append(HamlRuntime.indentText(indent) + '-->\\n')
+        generator.outputBuffer.append(HamlRuntime.indentText(indent) + '-->\n')
       else if elementStack[indent].htmlConditionalComment
-        generator.outputBuffer.append(HamlRuntime.indentText(indent) + '<![endif]-->\\n')
+        generator.outputBuffer.append(HamlRuntime.indentText(indent) + '<![endif]-->\n')
       else if elementStack[indent].block
         generator.closeOffCodeBlock(tokeniser)
       else if elementStack[indent].fnBlock
@@ -357,8 +357,8 @@ root.haml =
     while i >= indent
       haml._closeElement(i--, elementStack, tokeniser, generator)
 
-  _openElement: (currentParsePoint, indent, ident, id, classes, objectRef, attributeList, attributeHash, elementStack, tagOptions, generator) ->
-    element = if ident.length == 0 then "div" else ident
+  _openElement: (currentParsePoint, indent, identifier, id, classes, objectRef, attributeList, attributeHash, elementStack, tagOptions, generator) ->
+    element = if identifier.length == 0 then "div" else identifier
 
     parentInnerWhitespace = haml._parentInnerWhitespace(elementStack, indent)
     tagOuterWhitespace = !tagOptions or tagOptions.outerWhitespace
@@ -372,19 +372,19 @@ root.haml =
         currentParsePoint.lineNumber, currentParsePoint.characterNumber, currentParsePoint.currentLine))
     if tagOptions.selfClosingTag
       generator.outputBuffer.append("/>")
-      generator.outputBuffer.append("\\n") if tagOptions.outerWhitespace
+      generator.outputBuffer.append("\n") if tagOptions.outerWhitespace
     else
       generator.outputBuffer.append(">")
       elementStack[indent] =
         tag: element
         tagOptions: tagOptions
-      generator.outputBuffer.append("\\n") if tagOptions.innerWhitespace
+      generator.outputBuffer.append("\n") if tagOptions.innerWhitespace
 
   _isSelfClosingTag: (tag) ->
     tag in ['meta', 'img', 'link', 'script', 'br', 'hr']
 
   _tagHasContents: (indent, tokeniser) ->
-    if !haml._isEolOrEof(tokeniser)
+    if !tokeniser.isEolOrEof()
       true
     else
       nextToken = tokeniser.lookAhead(1)
@@ -393,8 +393,8 @@ root.haml =
   _parentInnerWhitespace: (elementStack, indent) ->
     indent == 0 or (!elementStack[indent - 1] or !elementStack[indent - 1].tagOptions or elementStack[indent - 1].tagOptions.innerWhitespace)
 
-  _lineHasElement: (ident, id, classes) ->
-    ident.length > 0 or id.length > 0 or classes.length > 0
+  _lineHasElement: (identifier, id, classes) ->
+    identifier.length > 0 or id.length > 0 or classes.length > 0
 
   hasValue: (value) ->
     value? && value isnt false
@@ -410,11 +410,11 @@ root.haml =
     indent
 
   _element: (tokeniser) ->
-    ident = ''
+    identifier = ''
     if tokeniser.token.element
-      ident = tokeniser.token.tokenString
+      identifier = tokeniser.token.tokenString
       tokeniser.getNextToken()
-    ident
+    identifier
 
   _eolOrEof: (tokeniser) ->
     if tokeniser.token.eol or tokeniser.token.continueLine
@@ -439,9 +439,6 @@ root.haml =
       tokeniser.getNextToken()
 
     classes
-
-  _isEolOrEof: (tokeniser) ->
-    tokeniser.token.eol or tokeniser.token.eof
 
 root.haml.Tokeniser = Tokeniser
 root.haml.Buffer = Buffer

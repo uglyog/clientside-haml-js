@@ -245,3 +245,6 @@ class Tokeniser
     if !@token.unknown and !@token.eof
       @bufferIndex -= @token.matched.length
       @token = @prevToken
+
+  isEolOrEof: () ->
+    @token.eol or @token.eof
