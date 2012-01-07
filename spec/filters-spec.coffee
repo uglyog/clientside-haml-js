@@ -45,7 +45,7 @@ describe 'filters', () ->
          ---------^'''
     )
 
-  it 'generates javascript filters correctly', () ->
+  it 'generates javascript filter blocks correctly', () ->
     expect(
       haml.compileCoffeeHamlFromString(
         '''
@@ -73,7 +73,7 @@ describe 'filters', () ->
       '''
     )
 
-  it 'generates css filters correctly', () ->
+  it 'generates css filter blocks correctly', () ->
     expect(
       haml.compileStringToJs(
         '''
@@ -101,7 +101,7 @@ describe 'filters', () ->
       '''
     )
 
-  it 'generates CDATA filters correctly', () ->
+  it 'generates CDATA filter blocks correctly', () ->
     expect(
       haml.compileStringToJs(
         '''
@@ -127,7 +127,7 @@ describe 'filters', () ->
       '''
     )
 
-  it 'generates preserve filters correctly', () ->
+  it 'generates preserve filter blocks correctly', () ->
     expect(
       haml.compileStringToJs(
         '''
@@ -149,6 +149,37 @@ describe 'filters', () ->
          <pre>Bar&#x000A;Baz</pre>
          <a>Test&#x000A;Test&#x000A;</a>
          Other
+         </p>
+
+      '''
+    )
+
+
+  it 'generates escape filter blocks correctly', () ->
+    expect(
+      haml.compileStringToJs(
+        '''
+        %p
+          :escape
+            Foo
+            <pre>'Bar'
+            Baz</pre>
+            <a>Test
+            Test
+            </a>
+            Other&
+        '''
+      )()
+    ).toEqual(
+      '''
+         <p>
+           Foo
+           &lt;pre&gt;&#39;Bar&#39;
+           Baz&lt;/pre&gt;
+           &lt;a&gt;Test
+           Test
+           &lt;/a&gt;
+           Other&amp;
          </p>
 
       '''

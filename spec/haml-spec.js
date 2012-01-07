@@ -479,17 +479,20 @@
         return haml.compileStringToJs('%p\n  :unknown\n    blah di blah di blah');
       }).toThrow('Filter \'unknown\' not registered. Filter functions need to be added to \'haml.filters\'. at line 2 and character 10:\n  :unknown\n---------^');
     });
-    it('generates javascript filters correctly', function() {
+    it('generates javascript filter blocks correctly', function() {
       return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  // blah di blah di blah\n  function () {\n    return \'blah\';\n  }\n  //]]>\n  </script>\n</body>\n');
     });
-    it('generates css filters correctly', function() {
+    it('generates css filter blocks correctly', function() {
       return expect(haml.compileStringToJs('%head\n  :css\n    /* blah di blah di blah */\n    .body {\n      color: red;\n    }')()).toEqual('<head>\n  <style type="text/css">\n  /*<![CDATA[*/\n  /* blah di blah di blah */\n  .body {\n    color: red;\n  }\n  /*]]>*/\n  </style>\n</head>\n');
     });
-    it('generates CDATA filters correctly', function() {
+    it('generates CDATA filter blocks correctly', function() {
       return expect(haml.compileStringToJs('%body\n  :cdata\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <![CDATA[\n  // blah di blah di blah\n  function () {\n    return \'blah\';\n  }\n  ]]>\n</body>\n');
     });
-    return it('generates preserve filters correctly', function() {
+    it('generates preserve filter blocks correctly', function() {
       return expect(haml.compileStringToJs('%p\n  :preserve\n    Foo\n    <pre>Bar\n    Baz</pre>\n    <a>Test\n    Test\n    </a>\n    Other')()).toEqual('<p>\nFoo\n<pre>Bar&#x000A;Baz</pre>\n<a>Test&#x000A;Test&#x000A;</a>\nOther\n</p>\n');
+    });
+    return it('generates escape filter blocks correctly', function() {
+      return expect(haml.compileStringToJs('%p\n  :escape\n    Foo\n    <pre>\'Bar\'\n    Baz</pre>\n    <a>Test\n    Test\n    </a>\n    Other&')()).toEqual('<p>\n  Foo\n  &lt;pre&gt;&#39;Bar&#39;\n  Baz&lt;/pre&gt;\n  &lt;a&gt;Test\n  Test\n  &lt;/a&gt;\n  Other&amp;\n</p>\n');
     });
   });
 

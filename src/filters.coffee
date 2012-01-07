@@ -46,3 +46,10 @@ filters =
   ###
   preserve: (contents, generator, indentText) ->
     generator.outputBuffer.append(haml.HamlRuntime.perserveWhitespace(contents.join('\n')) + '\n')
+
+  ###
+    Escape filter, renders the text in the block with html escaped
+  ###
+  escape: (contents, generator, indentText) ->
+    generator.outputBuffer.append(indentText + haml.HamlRuntime.escapeHTML(line) + '\n') for line in contents
+    true
