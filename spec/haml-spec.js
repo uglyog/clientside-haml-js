@@ -479,8 +479,14 @@
         return haml.compileStringToJs('%p\n  :unknown\n    blah di blah di blah');
       }).toThrow('Filter \'unknown\' not registered. Filter functions need to be added to \'haml.filters\'. at line 2 and character 10:\n  :unknown\n---------^');
     });
-    return it('generate javascript filters correctly', function() {
+    it('generates javascript filters correctly', function() {
       return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  // blah di blah di blah\n  function () {\n    return \'blah\';\n  }\n  //]]>\n  </script>\n</body>\n');
+    });
+    it('generates css filters correctly', function() {
+      return expect(haml.compileStringToJs('%head\n  :css\n    /* blah di blah di blah */\n    .body {\n      color: red;\n    }')()).toEqual('<head>\n  <style>\n  //<![CDATA[\n  /* blah di blah di blah */\n  .body {\n    color: red;\n  }\n  //]]>\n  </style>\n</head>\n');
+    });
+    return it('generates CDATA filters correctly', function() {
+      return expect(haml.compileStringToJs('%body\n  :cdata\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <![CDATA[\n  // blah di blah di blah\n  function () {\n    return \'blah\';\n  }\n  ]]>\n</body>\n');
     });
   });
 

@@ -45,7 +45,7 @@ describe 'filters', () ->
          ---------^'''
     )
 
-  it 'generate javascript filters correctly', () ->
+  it 'generates javascript filters correctly', () ->
     expect(
       haml.compileCoffeeHamlFromString(
         '''
@@ -70,5 +70,59 @@ describe 'filters', () ->
            </script>
          </body>
          
+      '''
+    )
+
+  it 'generates css filters correctly', () ->
+    expect(
+      haml.compileStringToJs(
+        '''
+        %head
+          :css
+            /* blah di blah di blah */
+            .body {
+              color: red;
+            }
+        '''
+      )()
+    ).toEqual(
+      '''
+         <head>
+           <style>
+           //<![CDATA[
+           /* blah di blah di blah */
+           .body {
+             color: red;
+           }
+           //]]>
+           </style>
+         </head>
+
+      '''
+    )
+
+  it 'generates CDATA filters correctly', () ->
+    expect(
+      haml.compileStringToJs(
+        '''
+        %body
+          :cdata
+            // blah di blah di blah
+            function () {
+              return 'blah';
+            }
+        '''
+      )()
+    ).toEqual(
+      '''
+         <body>
+           <![CDATA[
+           // blah di blah di blah
+           function () {
+             return 'blah';
+           }
+           ]]>
+         </body>
+
       '''
     )
