@@ -120,7 +120,7 @@ root.haml =
           when 'RDFa' then generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">')
       else
         generator.outputBuffer.append('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')
-      generator.outputBuffer.append("\\n")
+      generator.outputBuffer.append("\n")
 
   _filter: (tokeniser, indent, generator) ->
     if tokeniser.token.filter
@@ -164,7 +164,7 @@ root.haml =
         elementStack[indent] = htmlComment: true
 
       if haml._tagHasContents(indent, tokeniser)
-        generator.outputBuffer.append("\\n")
+        generator.outputBuffer.append("\n")
 
   _escapedLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.amp
@@ -172,7 +172,7 @@ root.haml =
       generator.outputBuffer.append(HamlRuntime.indentText(indent))
       contents = tokeniser.skipToEOLorEOF()
       generator.outputBuffer.append(haml.HamlRuntime.escapeHTML(contents)) if (contents && contents.length > 0)
-      generator.outputBuffer.append("\\n")
+      generator.outputBuffer.append("\n")
 
   _ignoredLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.exclamation
@@ -193,7 +193,7 @@ root.haml =
       indentText = HamlRuntime.indentText(indent)
       generator.outputBuffer.append(indentText) if !tagOptions or tagOptions.innerWhitespace
       generator.appendEmbeddedCode(indentText, expression, escapeHtml, perserveWhitespace, currentParsePoint)
-      generator.outputBuffer.append("\\n") if !tagOptions or tagOptions.innerWhitespace
+      generator.outputBuffer.append("\n") if !tagOptions or tagOptions.innerWhitespace
 
   _jsLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.minus
@@ -253,22 +253,23 @@ root.haml =
       hasContents = true
     else
       contents = ''
+      shouldInterpolate = false
       if tokeniser.token.exclamation
         contents = tokeniser.skipToEOLorEOF()
-        hasContents = contents.length > 0
       else if !tokeniser.token.eol
         tokeniser.pushBackToken()
         contents = tokeniser.skipToEOLorEOF()
         contents = contents.substring(1) if contents.match(/^\\%/)
-        hasContents = contents.length > 0
+        shouldInterpolate = true
 
-      if contents.length > 0
+      hasContents = contents.length > 0
+      if hasContents
         if tagOptions.innerWhitespace and lineHasElement or (!lineHasElement and haml._parentInnerWhitespace(elementStack, indent))
           indentText = HamlRuntime.indentText(if identifier.length > 0 then indent + 1 else indent)
         else
           indentText = ''
           contents = _(contents).trim()
-        generator.outputBuffer.append(indentText + contents + '\n')
+        generator.appendTextContents(indentText + contents + '\n', shouldInterpolate)
 
     haml._eolOrEof(tokeniser)
 
@@ -348,7 +349,7 @@ root.haml =
           generator.outputBuffer.trimWhitespace()
         generator.outputBuffer.append('</' + elementStack[indent].tag + '>')
         outerWhitespace = !elementStack[indent].tagOptions or elementStack[indent].tagOptions.outerWhitespace
-        generator.outputBuffer.append('\\n') if haml._parentInnerWhitespace(elementStack, indent) and outerWhitespace
+        generator.outputBuffer.append('\n') if haml._parentInnerWhitespace(elementStack, indent) and outerWhitespace
       elementStack[indent] = null
       generator.mark()
 

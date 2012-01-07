@@ -102,8 +102,8 @@ describe 'haml', () ->
       setFixtures('<script type="text/template" id="simple">\n' +
         '%h1\n' +
         '  %div\n' +
-        '    %p This is some text\n' +
-        '      This is some text\n' +
+        '    %p This is "some" text\n' +
+        '      This is "some" text\n' +
         '    This is some <div> text\n' +
         '    \\%span\n' +
         '    %span %h1 %h1 %h1</script>')
@@ -114,8 +114,25 @@ describe 'haml', () ->
         '<h1>\n' +
           '  <div>\n' +
           '    <p>\n' +
-          '      This is some text\n' +
-          '      This is some text\n' +
+          '      This is "some" text\n' +
+          '      This is "some" text\n' +
+          '    </p>\n' +
+          '    This is some <div> text\n' +
+          '    %span\n' +
+          '    <span>\n' +
+          '      %h1 %h1 %h1\n' +
+          '    </span>\n' +
+          '  </div>\n' +
+          '</h1>\n')
+
+    it 'should render the correct html with coffeescript', () ->
+      html = haml.compileCoffeeHaml('simple')()
+      expect(html).toEqual(
+        '<h1>\n' +
+          '  <div>\n' +
+          '    <p>\n' +
+          '      This is "some" text\n' +
+          '      This is "some" text\n' +
           '    </p>\n' +
           '    This is some <div> text\n' +
           '    %span\n' +

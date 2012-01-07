@@ -92,12 +92,17 @@
     });
     describe('simple template with text', function() {
       beforeEach(function() {
-        return setFixtures('<script type="text/template" id="simple">\n' + '%h1\n' + '  %div\n' + '    %p This is some text\n' + '      This is some text\n' + '    This is some <div> text\n' + '    \\%span\n' + '    %span %h1 %h1 %h1</script>');
+        return setFixtures('<script type="text/template" id="simple">\n' + '%h1\n' + '  %div\n' + '    %p This is "some" text\n' + '      This is "some" text\n' + '    This is some <div> text\n' + '    \\%span\n' + '    %span %h1 %h1 %h1</script>');
       });
-      return it('should render the correct html', function() {
+      it('should render the correct html', function() {
         var html;
         html = haml.compileHaml('simple')();
-        return expect(html).toEqual('<h1>\n' + '  <div>\n' + '    <p>\n' + '      This is some text\n' + '      This is some text\n' + '    </p>\n' + '    This is some <div> text\n' + '    %span\n' + '    <span>\n' + '      %h1 %h1 %h1\n' + '    </span>\n' + '  </div>\n' + '</h1>\n');
+        return expect(html).toEqual('<h1>\n' + '  <div>\n' + '    <p>\n' + '      This is "some" text\n' + '      This is "some" text\n' + '    </p>\n' + '    This is some <div> text\n' + '    %span\n' + '    <span>\n' + '      %h1 %h1 %h1\n' + '    </span>\n' + '  </div>\n' + '</h1>\n');
+      });
+      return it('should render the correct html with coffeescript', function() {
+        var html;
+        html = haml.compileCoffeeHaml('simple')();
+        return expect(html).toEqual('<h1>\n' + '  <div>\n' + '    <p>\n' + '      This is "some" text\n' + '      This is "some" text\n' + '    </p>\n' + '    This is some <div> text\n' + '    %span\n' + '    <span>\n' + '      %h1 %h1 %h1\n' + '    </span>\n' + '  </div>\n' + '</h1>\n');
       });
     });
     describe('template with {} attributes', function() {
@@ -493,6 +498,32 @@
     });
     return it('generates escape filter blocks correctly', function() {
       return expect(haml.compileStringToJs('%p\n  :escape\n    Foo\n    <pre>\'Bar\'\n    Baz</pre>\n    <a>Test\n    Test\n    </a>\n    Other&')()).toEqual('<p>\n  Foo\n  &lt;pre&gt;&#39;Bar&#39;\n  Baz&lt;/pre&gt;\n  &lt;a&gt;Test\n  Test\n  &lt;/a&gt;\n  Other&amp;\n</p>\n');
+    });
+  });
+
+  describe('interpolated text', function() {
+    it('should allow code to be interpolated within plain text using #{}', function() {
+      return expect(haml.compileStringToJs('%p This is #{quality} cake!')({
+        quality: 'scrumptious'
+      })).toEqual('<p>This is scrumptious cake!</p>');
+    });
+    it('should handle escaped markers', function() {
+      return expect(haml.compileStringToJs('%p\n  Look at \\#{h(word)} lack of backslash: \#{foo}\n  And yon presence thereof: \{foo}')({
+        h: (function(word) {
+          return word.reverse();
+        }),
+        word: 'noy'
+      })).toEqual('<p>\n  Look at \yon lack of backslash: #{foo}\n  And yon presence thereof: \{foo}\n</p>');
+    });
+    it('generates javascript filter blocks correctly', function() {
+      return expect(haml.compileStringToJs('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{message}");\n    });')({
+        message: 'Hi there!'
+      })).toEqual('<body>\n  <script type=\'text/javascript\'>\n   //<![CDATA[\n     $(document).ready(function() {\n       alert("Hi there!");\n     });\n   //]]>\n  </script>\n</body>\n');
+    });
+    return it('should support interpolation in coffeescript', function() {
+      return expect(haml.compileCoffeeHamlFromString('- h = (word) -> word.toLowerCase()\n%p\n  Look at \\\\#{h @word } lack of backslash: \\#{foo}\n  And yon presence thereof: \\{foo}  ').call({
+        word: 'YON'
+      })).toEqual('<p>\n  Look at \\\\yon lack of backslash: #{foo}\n  And yon presence thereof: \\{foo}\n</p>\n');
     });
   });
 

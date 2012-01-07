@@ -1,186 +1,72 @@
-describe 'filters', () ->
+describe 'interpolated text', () ->
 
-  beforeEach () ->
-      setFixtures(
-        '''<script type="text/template" id="plain-filter">
-           %h1
-             %p
-               :plain
-                 Does not parse the filtered text. This is useful for large blocks of text without HTML tags,
-                 when you don't want lines starting with . or - to be parsed.
-             %span Other Contents
-           </script>
-        '''
-      )
-
-  it 'should render the result of the filter function', () ->
-    html = haml.compileHaml('plain-filter')()
-    expect(html).toEqual(
-      '''
-      <h1>
-        <p>
-          Does not parse the filtered text. This is useful for large blocks of text without HTML tags,
-          when you don't want lines starting with . or - to be parsed.
-        </p>
-        <span>
-          Other Contents
-        </span>
-      </h1>
-
-      '''
+  it 'should allow code to be interpolated within plain text using #{}', () ->
+    expect(
+      haml.compileStringToJs('%p This is #{quality} cake!')(quality: 'scrumptious')
+    ).toEqual(
+      '''<p>This is scrumptious cake!</p>'''
     )
 
-  it 'should raise an error if the filter is not found', () ->
-    expect(() ->
+  it 'should handle escaped markers', () ->
+    expect(
       haml.compileStringToJs(
         '''
-        %p
-          :unknown
-            blah di blah di blah
+           %p
+             Look at \\#{h(word)} lack of backslash: \#{foo}
+             And yon presence thereof: \{foo}
         '''
-      )
-    ).toThrow(
-      '''Filter 'unknown' not registered. Filter functions need to be added to 'haml.filters'. at line 2 and character 10:
-           :unknown
-         ---------^'''
+      )(h: ((word) -> word.reverse()), word: 'noy')
+    ).toEqual(
+        '''
+           <p>
+             Look at \yon lack of backslash: #{foo}
+             And yon presence thereof: \{foo}
+           </p>
+        '''
     )
 
   it 'generates javascript filter blocks correctly', () ->
     expect(
-      haml.compileCoffeeHamlFromString(
+      haml.compileStringToJs(
         '''
         %body
           :javascript
-            // blah di blah di blah
-            function () {
-              return 'blah';
-            }
+            $(document).ready(function() {
+              alert("#{message}");
+            });
         '''
-      )()
+      )(message: 'Hi there!')
     ).toEqual(
       '''
          <body>
-           <script type="text/javascript">
-           //<![CDATA[
-           // blah di blah di blah
-           function () {
-             return 'blah';
-           }
-           //]]>
+           <script type='text/javascript'>
+            //<![CDATA[
+              $(document).ready(function() {
+                alert("Hi there!");
+              });
+            //]]>
            </script>
          </body>
          
       '''
     )
 
-  it 'generates css filter blocks correctly', () ->
+  it 'should support interpolation in coffeescript', () ->
     expect(
-      haml.compileStringToJs(
+      haml.compileCoffeeHamlFromString(
         '''
-        %head
-          :css
-            /* blah di blah di blah */
-            .body {
-              color: red;
-            }
+           - h = (word) -> word.toLowerCase()
+           %p
+             Look at \\\\#{h @word } lack of backslash: \\#{foo}
+             And yon presence thereof: \\{foo}  
         '''
-      )()
+      ).call(word: 'YON')
     ).toEqual(
-      '''
-         <head>
-           <style type="text/css">
-           /*<![CDATA[*/
-           /* blah di blah di blah */
-           .body {
-             color: red;
-           }
-           /*]]>*/
-           </style>
-         </head>
-
-      '''
-    )
-
-  it 'generates CDATA filter blocks correctly', () ->
-    expect(
-      haml.compileStringToJs(
         '''
-        %body
-          :cdata
-            // blah di blah di blah
-            function () {
-              return 'blah';
-            }
+           <p>
+             Look at \\\\yon lack of backslash: #{foo}
+             And yon presence thereof: \\{foo}
+           </p>
+           
         '''
-      )()
-    ).toEqual(
-      '''
-         <body>
-           <![CDATA[
-           // blah di blah di blah
-           function () {
-             return 'blah';
-           }
-           ]]>
-         </body>
-
-      '''
-    )
-
-  it 'generates preserve filter blocks correctly', () ->
-    expect(
-      haml.compileStringToJs(
-        '''
-        %p
-          :preserve
-            Foo
-            <pre>Bar
-            Baz</pre>
-            <a>Test
-            Test
-            </a>
-            Other
-        '''
-      )()
-    ).toEqual(
-      '''
-         <p>
-         Foo
-         <pre>Bar&#x000A;Baz</pre>
-         <a>Test&#x000A;Test&#x000A;</a>
-         Other
-         </p>
-
-      '''
-    )
-
-
-  it 'generates escape filter blocks correctly', () ->
-    expect(
-      haml.compileStringToJs(
-        '''
-        %p
-          :escape
-            Foo
-            <pre>'Bar'
-            Baz</pre>
-            <a>Test
-            Test
-            </a>
-            Other&
-        '''
-      )()
-    ).toEqual(
-      '''
-         <p>
-           Foo
-           &lt;pre&gt;&#39;Bar&#39;
-           Baz&lt;/pre&gt;
-           &lt;a&gt;Test
-           Test
-           &lt;/a&gt;
-           Other&amp;
-         </p>
-
-      '''
     )
