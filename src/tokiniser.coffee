@@ -38,11 +38,17 @@ class Tokeniser
       @buffer = options.template
       @bufferIndex = 0
 
+  ###
+    Try to match a token with the given regexp
+  ###
   matchToken: (matcher) ->
     matcher.lastIndex = @bufferIndex
     result = matcher.exec(@buffer)
     if result?.index == @bufferIndex then result[0]
 
+  ###
+    Match a multi-character token
+  ###
   matchMultiCharToken: (matcher, token, tokenStr) ->
     if !@token
       matched = @matchToken(matcher)
@@ -52,6 +58,9 @@ class Tokeniser
         @token.matched = matched
         @advanceCharsInBuffer(matched.length)
 
+  ###
+    Match a single character token
+  ###
   matchSingleCharToken: (ch, token) ->
     if !@token and @buffer.charAt(@bufferIndex) == ch
         @token = token
@@ -59,6 +68,9 @@ class Tokeniser
         @token.matched = ch
         @advanceCharsInBuffer(1)
 
+  ###
+    Match and return the next token in the input buffer
+  ###
   getNextToken: () ->
 
     throw haml.HamlRuntime.templateError(@lineNumber, @characterNumber, @currentLine,
@@ -148,6 +160,9 @@ class Tokeniser
 
     @token
 
+  ###
+    Look ahead a number of tokens and return the token found
+  ###
   lookAhead: (numberOfTokens) ->
     token = null
     if numberOfTokens > 0
@@ -169,20 +184,32 @@ class Tokeniser
       @bufferIndex = bufferIndex
     token
 
+  ###
+    Initilise the line and character counters
+  ###
   initLine: () ->
     if !@currentLine and @currentLine isnt ""
       @currentLine = @getCurrentLine()
       @lineNumber = 1
       @characterNumber = 0
 
+  ###
+    Returns the current line in the input buffer
+  ###
   getCurrentLine: (index) ->
       @currentLineMatcher.lastIndex = @bufferIndex + (index ? 0)
       line = @currentLineMatcher.exec(@buffer)
       if line then line[0] else ''
 
+  ###
+    Returns an error string filled out with the line and character counters
+  ###
   parseError: (error) ->
     haml.HamlRuntime.templateError(@lineNumber, @characterNumber, @currentLine, error)
 
+  ###
+    Skips to the end of the line and returns the string that was skipped
+  ###
   skipToEOLorEOF: () ->
     text = ''
     unless @token.eof or @token.eol
@@ -201,6 +228,9 @@ class Tokeniser
           @getNextToken()
     text
 
+  ###
+    Parses a multiline code block and returns the parsed text
+  ###
   parseMultiLine: () ->
     text = ''
     while @token.continueLine
@@ -215,6 +245,9 @@ class Tokeniser
     @pushBackToken()
     text
 
+  ###
+    Advances the input buffer pointer by a number of characters, updating the line and character counters
+  ###
   advanceCharsInBuffer: (numChars) ->
     i = 0
     while i < numChars
@@ -234,6 +267,9 @@ class Tokeniser
       i++
     @bufferIndex += numChars
 
+  ###
+    Returns the current line and character counters
+  ###
   currentParsePoint: () ->
     {
       lineNumber: @lineNumber,
@@ -241,10 +277,16 @@ class Tokeniser
       currentLine: @currentLine
     }
 
+  ###
+    Pushes back the current token onto the front of the input buffer
+  ###
   pushBackToken: () ->
     if !@token.unknown and !@token.eof
       @bufferIndex -= @token.matched.length
       @token = @prevToken
 
+  ###
+    Is the current token an end of line or end of input buffer
+  ###
   isEolOrEof: () ->
     @token.eol or @token.eof

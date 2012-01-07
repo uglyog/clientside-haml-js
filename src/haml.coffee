@@ -269,7 +269,7 @@ root.haml =
         else
           indentText = ''
           contents = _(contents).trim()
-        generator.appendTextContents(indentText + contents + '\n', shouldInterpolate)
+        generator.appendTextContents(indentText + contents + '\n', shouldInterpolate, currentParsePoint)
 
     haml._eolOrEof(tokeniser)
 

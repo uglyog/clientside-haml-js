@@ -98,7 +98,7 @@ class CoffeeCodeGenerator
   ###
     Append the text contents to the buffer (interpolating embedded code not required for coffeescript)
   ###
-  appendTextContents: (text, shouldInterpolate) ->
+  appendTextContents: (text, shouldInterpolate, currentParsePoint) ->
     if shouldInterpolate and text.match(/#{[^}]*}/)
       @outputBuffer.flush()
       @outputBuffer.appendToOutputBuffer(@calcCodeIndent() + 'html.push("' + @escapeCode(text) + '")\n')

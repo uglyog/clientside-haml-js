@@ -2,9 +2,14 @@ describe 'interpolated text', () ->
 
   it 'should allow code to be interpolated within plain text using #{}', () ->
     expect(
-      haml.compileStringToJs('%p This is #{quality} cake!')(quality: 'scrumptious')
+      haml.compileStringToJs('%p This is #{quality} cake! #{"Yay!"}')(quality: 'scrumptious')
     ).toEqual(
-      '''<p>This is scrumptious cake!</p>'''
+      '''
+      <p>
+        This is scrumptious cake! Yay!
+      </p>
+      
+      '''
     )
 
   it 'should handle escaped markers', () ->
@@ -12,16 +17,17 @@ describe 'interpolated text', () ->
       haml.compileStringToJs(
         '''
            %p
-             Look at \\#{h(word)} lack of backslash: \#{foo}
-             And yon presence thereof: \{foo}
+             Look at \\\\#{h(word)} lack of backslash: \\#{foo}
+             And yon presence thereof: \\{foo}
         '''
-      )(h: ((word) -> word.reverse()), word: 'noy')
+      )(h: ((word) -> word.toLowerCase()), word: 'YON')
     ).toEqual(
         '''
            <p>
-             Look at \yon lack of backslash: #{foo}
-             And yon presence thereof: \{foo}
+             Look at \\\\yon lack of backslash: #{foo}
+             And yon presence thereof: \\{foo}
            </p>
+           
         '''
     )
 

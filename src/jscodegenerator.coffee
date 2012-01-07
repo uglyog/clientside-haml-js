@@ -3,6 +3,8 @@
 ###
 class JsCodeGenerator
 
+  embeddedCodeBlockMatcher: /#{([^}]*)}/g
+
   constructor: () ->
     @outputBuffer = new haml.Buffer(this)
 
@@ -112,7 +114,7 @@ class JsCodeGenerator
     Escape the line so it is safe to put into a javascript string
   ###
   escapeCode: (jsStr) ->
-    jsStr.replace(/"/g, '\\"').replace(/\n/g, '\\n')
+    jsStr.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')
 
   ###
     Generate a function from the function body
@@ -139,10 +141,29 @@ class JsCodeGenerator
   mark: () ->
 
   ###
-    Append the text contents to the buffer, interpolating any embedded code
+    Append the text contents to the buffer, expanding any embedded code
   ###
-  appendTextContents: (text, shouldInterpolate) ->
+  appendTextContents: (text, shouldInterpolate, currentParsePoint) ->
     if shouldInterpolate and text.match(/#{[^}]*}/)
-      @outputBuffer.append(text)
+      @interpolateString(text, currentParsePoint)
     else
       @outputBuffer.append(text)
+
+  ###
+    Interpolate any embedded code in the text
+  ###
+  interpolateString: (text, currentParsePoint) ->
+    index = 0
+    result = @embeddedCodeBlockMatcher.exec(text)
+    while result
+      precheedingChar = text.charAt(result.index - 1) if result.index > 0
+      precheedingChar2 = text.charAt(result.index - 2) if result.index > 1
+      if precheedingChar is '\\' and precheedingChar2 isnt '\\'
+        @outputBuffer.append(text.substring(index, result.index - 1)) unless result.index == 0
+        @outputBuffer.append(result[0])
+      else
+        @outputBuffer.append(text.substring(index, result.index))
+        @appendEmbeddedCode(HamlRuntime.indentText(@indent + 1), result[1], false, false, currentParsePoint)
+      index = @embeddedCodeBlockMatcher.lastIndex
+      result = @embeddedCodeBlockMatcher.exec(text)
+    @outputBuffer.append(text.substring(index)) if index < text.length

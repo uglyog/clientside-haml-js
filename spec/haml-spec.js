@@ -503,17 +503,17 @@
 
   describe('interpolated text', function() {
     it('should allow code to be interpolated within plain text using #{}', function() {
-      return expect(haml.compileStringToJs('%p This is #{quality} cake!')({
+      return expect(haml.compileStringToJs('%p This is #{quality} cake! #{"Yay!"}')({
         quality: 'scrumptious'
-      })).toEqual('<p>This is scrumptious cake!</p>');
+      })).toEqual('<p>\n  This is scrumptious cake! Yay!\n</p>\n');
     });
     it('should handle escaped markers', function() {
-      return expect(haml.compileStringToJs('%p\n  Look at \\#{h(word)} lack of backslash: \#{foo}\n  And yon presence thereof: \{foo}')({
+      return expect(haml.compileStringToJs('%p\n  Look at \\\\#{h(word)} lack of backslash: \\#{foo}\n  And yon presence thereof: \\{foo}')({
         h: (function(word) {
-          return word.reverse();
+          return word.toLowerCase();
         }),
-        word: 'noy'
-      })).toEqual('<p>\n  Look at \yon lack of backslash: #{foo}\n  And yon presence thereof: \{foo}\n</p>');
+        word: 'YON'
+      })).toEqual('<p>\n  Look at \\\\yon lack of backslash: #{foo}\n  And yon presence thereof: \\{foo}\n</p>\n');
     });
     it('generates javascript filter blocks correctly', function() {
       return expect(haml.compileStringToJs('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{message}");\n    });')({
