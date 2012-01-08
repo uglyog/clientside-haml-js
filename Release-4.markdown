@@ -2,6 +2,7 @@
 
 Filters have finally been implemented. Filter functions can be added by adding a key to function mapping in `haml.filters`.
 See filters.coffee for examples. The following filters are available:
+
 * plain
 * javascript
 * css

@@ -456,6 +456,7 @@ and passing in `quality: 'scrumptious'` results in
 ## Filters
 
 The following filter blocks are supported:
+
 * **plain** - just renders the text in the block
 * **javascript** - wraps the filter block in a javascript and cdata tag
 * **css** - wraps the filter block in a style and cdata tag
@@ -518,5 +519,5 @@ results in
       </body>
 ```
 
-## Jasmine Test
-For more information on what is implemented, have a look at the release notes and the jasmine test in the spec folder.
+## Jasmine Tests
+For more information on what is implemented, have a look at the release notes and the jasmine tests in the spec folder.
