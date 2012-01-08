@@ -1,7 +1,7 @@
 ###
   Code generator that generates a coffeescript function body
 ###
-class CoffeeCodeGenerator
+class CoffeeCodeGenerator extends CodeGenerator
 
   constructor: () ->
     @outputBuffer = new haml.Buffer(this)
@@ -75,9 +75,33 @@ class CoffeeCodeGenerator
       resultHash = resultHash.replace(reservedWord + ':', "'" + reservedWord + "':")
     resultHash
 
+  ###
+    Escapes the string for insertion into the generated code. Embedded code blocks in strings must not be escaped
+  ###
   escapeCode: (str) ->
-    str.replace(/\\/g, '\\\\').replace(/'/g, '\\\'').replace(/"/g, '\\\"').replace(/\n/g, '\\n').replace(/(^|[^\\]{2})\\\\#{/g, '$1\\#{')
+    outString = ''
+    index = 0
+    result = @embeddedCodeBlockMatcher.exec(str)
+    while result
+      precheedingChar = str.charAt(result.index - 1) if result.index > 0
+      precheedingChar2 = str.charAt(result.index - 2) if result.index > 1
+      if precheedingChar is '\\' and precheedingChar2 isnt '\\'
+        outString += @_escapeText(str.substring(index, result.index - 1)) unless result.index == 0
+        outString += @_escapeText('\\' + result[0])
+      else
+        outString += @_escapeText(str.substring(index, result.index))
+        outString += result[0]
+      index = @embeddedCodeBlockMatcher.lastIndex
+      result = @embeddedCodeBlockMatcher.exec(str)
+    outString += @_escapeText(str.substring(index)) if index < str.length
+    outString
 
+  _escapeText: (text) ->
+    text.replace(/\\/g, '\\\\').replace(/'/g, '\\\'').replace(/"/g, '\\\"').replace(/\n/g, '\\n').replace(/(^|[^\\]{2})\\\\#{/g, '$1\\#{')
+
+  ###
+    Generates the javascript function by compiling the given code with coffeescript compiler
+  ###
   generateJsFunction: (functionBody) ->
     try
       fn = CoffeeScript.compile functionBody, bare: true
@@ -98,9 +122,18 @@ class CoffeeCodeGenerator
   ###
     Append the text contents to the buffer (interpolating embedded code not required for coffeescript)
   ###
-  appendTextContents: (text, shouldInterpolate, currentParsePoint) ->
+  appendTextContents: (text, shouldInterpolate, currentParsePoint, options) ->
     if shouldInterpolate and text.match(/#{[^}]*}/)
       @outputBuffer.flush()
-      @outputBuffer.appendToOutputBuffer(@calcCodeIndent() + 'html.push("' + @escapeCode(text) + '")\n')
+      prefix = suffix = ''
+      if options?.escapeHTML
+        prefix = 'haml.HamlRuntime.escapeHTML('
+        suffix = ')'
+      else if options?.perserveWhitespace
+        prefix = 'haml.HamlRuntime.perserveWhitespace('
+        suffix = ')'
+      @outputBuffer.appendToOutputBuffer(@calcCodeIndent() + 'html.push(' + prefix + '"' + @escapeCode(text) + '"' + suffix + ')\n')
     else
+      text = haml.HamlRuntime.escapeHTML(text) if options?.escapeHTML
+      text = haml.HamlRuntime.perserveWhitespace(text) if options?.perserveWhitespace
       @outputBuffer.append(text)

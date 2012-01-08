@@ -46,11 +46,11 @@ filters =
     Preserve filter, preserved blocks of text aren't indented, and newlines are replaced with the HTML escape code for newlines
   ###
   preserve: (contents, generator, indentText, currentParsePoint) ->
-    generator.outputBuffer.append(haml.HamlRuntime.perserveWhitespace(contents.join('\n')) + '\n')
+    generator.appendTextContents(contents.join('\n') + '\n', true, currentParsePoint, perserveWhitespace: true)
 
   ###
     Escape filter, renders the text in the block with html escaped
   ###
   escape: (contents, generator, indentText, currentParsePoint) ->
-    generator.outputBuffer.append(indentText + haml.HamlRuntime.escapeHTML(line) + '\n') for line in contents
+    generator.appendTextContents(indentText + line + '\n', true, currentParsePoint, escapeHTML: true) for line in contents
     true

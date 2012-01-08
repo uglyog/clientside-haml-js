@@ -1,9 +1,7 @@
 ###
   Code generator that generates a Javascript function body
 ###
-class JsCodeGenerator
-
-  embeddedCodeBlockMatcher: /#{([^}]*)}/g
+class JsCodeGenerator extends CodeGenerator
 
   constructor: () ->
     @outputBuffer = new haml.Buffer(this)
@@ -143,27 +141,38 @@ class JsCodeGenerator
   ###
     Append the text contents to the buffer, expanding any embedded code
   ###
-  appendTextContents: (text, shouldInterpolate, currentParsePoint) ->
+  appendTextContents: (text, shouldInterpolate, currentParsePoint, options = {}) ->
     if shouldInterpolate and text.match(/#{[^}]*}/)
-      @interpolateString(text, currentParsePoint)
+      @interpolateString(text, currentParsePoint, options)
     else
-      @outputBuffer.append(text)
+      @outputBuffer.append(@processText(text, options))
 
   ###
     Interpolate any embedded code in the text
   ###
-  interpolateString: (text, currentParsePoint) ->
+  interpolateString: (text, currentParsePoint, options) ->
     index = 0
     result = @embeddedCodeBlockMatcher.exec(text)
     while result
       precheedingChar = text.charAt(result.index - 1) if result.index > 0
       precheedingChar2 = text.charAt(result.index - 2) if result.index > 1
       if precheedingChar is '\\' and precheedingChar2 isnt '\\'
-        @outputBuffer.append(text.substring(index, result.index - 1)) unless result.index == 0
-        @outputBuffer.append(result[0])
+        @outputBuffer.append(@processText(text.substring(index, result.index - 1), options)) unless result.index == 0
+        @outputBuffer.append(@processText(result[0]), options)
       else
-        @outputBuffer.append(text.substring(index, result.index))
-        @appendEmbeddedCode(HamlRuntime.indentText(@indent + 1), result[1], false, false, currentParsePoint)
+        @outputBuffer.append(@processText(text.substring(index, result.index)), options)
+        @appendEmbeddedCode(HamlRuntime.indentText(@indent + 1), result[1], options.escapeHTML, options.perserveWhitespace, currentParsePoint)
       index = @embeddedCodeBlockMatcher.lastIndex
       result = @embeddedCodeBlockMatcher.exec(text)
-    @outputBuffer.append(text.substring(index)) if index < text.length
+    @outputBuffer.append(@processText(text.substring(index), options)) if index < text.length
+
+  ###
+    process text based on escape and preserve flags
+  ###
+  processText: (text, options) ->
+    if options?.escapeHTML
+      haml.HamlRuntime.escapeHTML(text)
+    else if options?.perserveWhitespace
+      haml.HamlRuntime.perserveWhitespace(text)
+    else
+      text

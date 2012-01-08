@@ -515,20 +515,20 @@
         word: 'YON'
       })).toEqual('<p>\n  Look at \\\\yon lack of backslash: #{foo}\n  And yon presence thereof: \\{foo}\n</p>\n');
     });
-    it('generates javascript filter blocks correctly', function() {
-      return expect(haml.compileStringToJs('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{message}");\n    });')({
+    it('generates filter blocks correctly', function() {
+      return expect(haml.compileStringToJs('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{message}");\n    });\n  %p\n    :preserve\n      Foo\n      #{"<pre>Bar\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other\n    :escape\n      Foo\n      #{"<pre>\'Bar\'\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other&')({
         message: 'Hi there!'
-      })).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  $(document).ready(function() {\n    alert("Hi there!");\n  });\n  //]]>\n  </script>\n</body>\n');
+      })).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  $(document).ready(function() {\n    alert("Hi there!");\n  });\n  //]]>\n  </script>\n  <p>\nFoo\n<pre>Bar&#x000A;Baz</pre>\n<a>Test&#x000A;Test&#x000A;</a>\nOther\n    Foo\n    &lt;pre&gt;&#39;Bar&#39;\nBaz&lt;/pre&gt;\n    &lt;a&gt;Test\n    Test\n    &lt;/a&gt;\n    Other&amp;\n  </p>\n</body>\n');
     });
     it('should support interpolation in coffeescript', function() {
       return expect(haml.compileCoffeeHamlFromString('- h = (word) -> word.toLowerCase()\n%p\n  Look at \\\\#{h @word } lack of backslash: \\#{foo}\n  And yon presence thereof: \\{foo}').call({
         word: 'YON'
       })).toEqual('<p>\n  Look at \\\\yon lack of backslash: #{foo}\n  And yon presence thereof: \\{foo}\n</p>\n');
     });
-    return it('generates javascript filter blocks correctly with embedded coffeescript', function() {
-      return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{@message}");\n    });').call({
+    return it('generates filter blocks correctly with embedded coffeescript', function() {
+      return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{@message}");\n    });\n  %p\n    :preserve\n      Foo\n      #{"<pre>Bar\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other\n    :escape\n      Foo\n      #{"<pre>\'Bar\'\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other&').call({
         message: 'Hi there!'
-      })).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  $(document).ready(function() {\n    alert("Hi there!");\n  });\n  //]]>\n  </script>\n</body>\n');
+      })).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  $(document).ready(function() {\n    alert("Hi there!");\n  });\n  //]]>\n  </script>\n  <p>\nFoo\n<pre>Bar&#x000A;Baz</pre>\n<a>Test&#x000A;Test&#x000A;</a>\nOther\n    Foo\n    &lt;pre&gt;&#39;Bar&#39;\nBaz&lt;/pre&gt;\n    &lt;a&gt;Test\n    Test\n    &lt;/a&gt;\n    Other&amp;\n  </p>\n</body>\n');
     });
   });
 

@@ -31,7 +31,7 @@ describe 'interpolated text', () ->
         '''
     )
 
-  it 'generates javascript filter blocks correctly', () ->
+  it 'generates filter blocks correctly', () ->
     expect(
       haml.compileStringToJs(
         '''
@@ -40,6 +40,21 @@ describe 'interpolated text', () ->
             $(document).ready(function() {
               alert("#{message}");
             });
+          %p
+            :preserve
+              Foo
+              #{"<pre>Bar\\nBaz</pre>"}
+              <a>Test
+              Test
+              </a>
+              Other
+            :escape
+              Foo
+              #{"<pre>'Bar'\\nBaz</pre>"}
+              <a>Test
+              Test
+              </a>
+              Other&
         '''
       )(message: 'Hi there!')
     ).toEqual(
@@ -52,6 +67,19 @@ describe 'interpolated text', () ->
         });
         //]]>
         </script>
+        <p>
+      Foo
+      <pre>Bar&#x000A;Baz</pre>
+      <a>Test&#x000A;Test&#x000A;</a>
+      Other
+          Foo
+          &lt;pre&gt;&#39;Bar&#39;
+      Baz&lt;/pre&gt;
+          &lt;a&gt;Test
+          Test
+          &lt;/a&gt;
+          Other&amp;
+        </p>
       </body>
       
       '''
@@ -77,7 +105,7 @@ describe 'interpolated text', () ->
       '''
     )
 
-  it 'generates javascript filter blocks correctly with embedded coffeescript', () ->
+  it 'generates filter blocks correctly with embedded coffeescript', () ->
     expect(
       haml.compileCoffeeHamlFromString(
         '''
@@ -86,6 +114,21 @@ describe 'interpolated text', () ->
             $(document).ready(function() {
               alert("#{@message}");
             });
+          %p
+            :preserve
+              Foo
+              #{"<pre>Bar\\nBaz</pre>"}
+              <a>Test
+              Test
+              </a>
+              Other
+            :escape
+              Foo
+              #{"<pre>'Bar'\\nBaz</pre>"}
+              <a>Test
+              Test
+              </a>
+              Other&
         '''
       ).call(message: 'Hi there!')
     ).toEqual(
@@ -98,6 +141,19 @@ describe 'interpolated text', () ->
         });
         //]]>
         </script>
+        <p>
+      Foo
+      <pre>Bar&#x000A;Baz</pre>
+      <a>Test&#x000A;Test&#x000A;</a>
+      Other
+          Foo
+          &lt;pre&gt;&#39;Bar&#39;
+      Baz&lt;/pre&gt;
+          &lt;a&gt;Test
+          Test
+          &lt;/a&gt;
+          Other&amp;
+        </p>
       </body>
       
       '''

@@ -5,6 +5,7 @@ appFiles  = [
   'src/hamlruntime.coffee',
   'src/tokiniser.coffee',
   'src/buffer.coffee',
+  'src/codegenerator.coffee',
   'src/jscodegenerator.coffee',
   'src/coffeecodegenerator.coffee',
   'src/filters.coffee',
