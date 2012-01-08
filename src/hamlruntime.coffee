@@ -1,9 +1,9 @@
 ###
-  HamlRuntime: Haml runtime functions. These are used both by the compiler and the generated template fuctions
+  Haml runtime functions. These are used both by the compiler and the generated template functions
 ###
 HamlRuntime =
   ###
-    Taken from underscore.string.js escapeHTML, and replace the apos entity with character 39 so that it renderes
+    Taken from underscore.string.js escapeHTML, and replace the apos entity with character 39 so that it renders
     correctly in IE7
   ###
   escapeHTML: (str) ->

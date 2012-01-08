@@ -2,6 +2,7 @@ fs     = require 'fs'
 {exec} = require 'child_process'
 
 appFiles  = [
+  'src/header.coffee',
   'src/hamlruntime.coffee',
   'src/tokiniser.coffee',
   'src/buffer.coffee',

@@ -1,5 +1,6 @@
-root = this
-
+###
+  Main haml compiler implemtation
+###
 root.haml =
 
   ###
