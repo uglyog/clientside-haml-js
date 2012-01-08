@@ -20,6 +20,7 @@ Thanks to following people who have contributed: [translated](https://github.com
 * Release 1.1 -  2011-10-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1_1] [Release Notes](clientside-haml-js/blob/master/Release-1.1.markdown)
 * Release 2   -  2011-12-10 - [https://github.com/uglyog/clientside-haml-js/tarball/release_2_0] [Release Notes](clientside-haml-js/blob/master/Release-2.markdown)
 * Release 3   -  2011-12-11 - [https://github.com/uglyog/clientside-haml-js/tarball/release_3_0] [Release Notes](clientside-haml-js/blob/master/Release-3.markdown)
+* Release 4   -  2012-01-08 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_0] [Release Notes](clientside-haml-js/blob/master/Release-4.markdown)
 
 # To use it
 
@@ -249,7 +250,8 @@ output buffer. This allows lines which may cause parsing issues to be included i
 
 ## Embedded Javascript or CoffeeScript
 
-There are 3 ways you can embed code in your template, with {} attributes (see above), = expressions and - lines
+There are 4 ways you can embed code in your template, with {} attributes (see above), = expressions and - lines and
+#{} blocks in plain text and filter blocks.
 
 ### Assigning an expression to a tag
 
@@ -434,6 +436,86 @@ should result in the following HTML:
             </div>
           </div>
         </h1>
+```
+
+### #{} Interpolated code blocks
+You can add code blocks using #{} form within any plain text and filter blocks. For example:
+
+```haml
+      %p This is #{quality} cake! #{"Yay!"}
+```
+
+and passing in `quality: 'scrumptious'` results in
+
+```html
+      <p>
+        This is scrumptious cake! Yay!
+      </p>
+```
+
+## Filters
+
+The following filter blocks are supported:
+* **plain** - just renders the text in the block
+* **javascript** - wraps the filter block in a javascript and cdata tag
+* **css** - wraps the filter block in a style and cdata tag
+* **cdata** - wraps the filter block in a CDATA tag
+* **preserve** - preserved blocks of text aren't indented, and newlines within tags are replaced with the HTML escape code for newlines
+* **escape** - renders the text in the block with html escaped
+
+Additional filters can be added by adding an entry to `haml.filters` that maps the filter name to a filter function.
+See filters.coffee for examples of filter functions. #{} Interpolated code blocks are also supported within filter blocks.
+
+ For example:
+
+```haml
+        %body
+          :javascript
+            $(document).ready(function() {
+              alert("#{message}");
+            });
+          %p
+            :preserve
+              Foo
+              #{"<pre>Bar\\nBaz</pre>"}
+              <a>Test
+              Test
+              </a>
+              Other
+            :escape
+              Foo
+              #{"<pre>'Bar'\\nBaz</pre>"}
+              <a>Test
+              Test
+              </a>
+              Other&
+```
+
+results in
+
+```html
+      <body>
+        <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+          alert("Hi there!");
+        });
+        //]]>
+        </script>
+        <p>
+      Foo
+      <pre>Bar&#x000A;Baz</pre>
+      <a>Test&#x000A;Test&#x000A;</a>
+      Other
+          Foo
+          &lt;pre&gt;&#39;Bar&#39;
+      Baz&lt;/pre&gt;
+          &lt;a&gt;Test
+          Test
+          &lt;/a&gt;
+          Other&amp;
+        </p>
+      </body>
 ```
 
 ## Jasmine Test
