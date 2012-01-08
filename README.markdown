@@ -251,7 +251,7 @@ output buffer. This allows lines which may cause parsing issues to be included i
 ## Embedded Javascript or CoffeeScript
 
 There are 4 ways you can embed code in your template, with {} attributes (see above), = expressions and - lines and
-#{} blocks in plain text and filter blocks.
+\#{} blocks in plain text and filter blocks.
 
 ### Assigning an expression to a tag
 
@@ -438,8 +438,8 @@ should result in the following HTML:
         </h1>
 ```
 
-### #{} Interpolated code blocks
-You can add code blocks using #{} form within any plain text and filter blocks. For example:
+### \#{} Interpolated code blocks
+You can add code blocks using \#{} form within any plain text and filter blocks. For example:
 
 ```haml
       %p This is #{quality} cake! #{"Yay!"}
@@ -464,7 +464,7 @@ The following filter blocks are supported:
 * **escape** - renders the text in the block with html escaped
 
 Additional filters can be added by adding an entry to `haml.filters` that maps the filter name to a filter function.
-See filters.coffee for examples of filter functions. #{} Interpolated code blocks are also supported within filter blocks.
+See filters.coffee for examples of filter functions. \#{} Interpolated code blocks are also supported within filter blocks.
 
  For example:
 
