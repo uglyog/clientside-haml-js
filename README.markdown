@@ -5,7 +5,7 @@ functions that generate HTML. It has been inspired by the server side [haml Java
 and has been written to be feature compatible with [Ruby server side HAML](http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html),
 supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have minimal runtime dependencies (only
 [underscore.js](http://documentcloud.github.com/underscore/), [underscore.string](https://github.com/edtsech/underscore.string)
-and CoffeeScript if using CoffeeScript in your templates).
+and CoffeeScript if using CoffeeScript in your templates and jQuery 1.5.1+ if using compilation of templates from a URL).
 
 **NOTE:** The haml compiler requires a browser with a JSON parser. For browsers like IE7, you need to also include a JSON
  implementation. See [http://www.json.org/] for more details. A JSON implementation is available at [https://github.com/douglascrockford/JSON-js].
@@ -156,16 +156,20 @@ function. The variables are then available using the `@name` notation.
 # Client-side HAML API
 
 The `haml.compileHaml` takes a single parameter. As a string value (legacy form), it expects the string to be an ID
-of a script element in the DOM. Otherwise, it accepts the following key/value pairs :
+of a script element in the DOM. Otherwise, it accepts the following key/value pairs:
+
 * _source_       - This contains the template in string form
 * _sourceId_     - This contains the element ID in the dom which contains the haml source
-* _sourceUrl_    - This contains the URL where the template can be fetched from
+* _sourceUrl_    - This contains the URL where the template can be fetched from (requires jQuery)
 * _outputFormat_ - This determines what is returned, and can be one of the following values:
 ** function - A javascript function (default)
 ** string   - The javascript source code
 * _generator_ - Which code generator to use, the following values are accepted:
 ** javascript (default)
 ** coffeescript
+
+One of either _source_, _sourceId_ or _sourceUrl_ **must** be provided. *Note*, also, that the _sourceUrl_ options
+requires jQuery 1.5.1+ as a dependency.
 
 # Client-side HAML Flavour
 
