@@ -4,11 +4,45 @@
 root.haml =
 
   ###
-    Compiles the haml in the script block with ID templateId
+    Compiles the haml provided in the parameters to a Javascipt function
+
+    Parameter:
+      String: Looks for a haml template in dom with this ID
+      Option Hash: The following options determines how haml sources and compiles the template
+        source - This contains the template in string form
+        sourceId - This contains the element ID in the dom which contains the haml source
+        sourceUrl - This contains the URL where the template can be fetched from
+        outputFormat - This determines what is returned, and has the following values:
+                         string - The javascript source code
+                         function - A javascript function (default)
+        generator - Which code generator to use
+                         javascript (default)
+                         coffeescript
+
     Returns a javascript function
   ###
-  compileHaml: (templateId) ->
-    @_compileHamlTemplate templateId, new haml.JsCodeGenerator()
+  compileHaml: (options) ->
+    if typeof options == 'string'
+      @_compileHamlTemplate options, new haml.JsCodeGenerator()
+    else
+      if options.generator isnt 'coffeescript'
+        codeGenerator = new haml.JsCodeGenerator()
+      else
+        codeGenerator = new haml.CoffeeCodeGenerator()
+
+      if options.source?
+        tokinser = new haml.Tokeniser(template: options.source)
+      else if options.sourceId?
+        tokinser = new haml.Tokeniser(templateId: options.sourceId)
+      else if options.sourceUrl?
+        tokinser = new haml.Tokeniser(templateUrl: options.sourceUrl)
+      else
+        throw "No template source specified for compileHaml. You need to provide a source, sourceId or sourceUrl option"
+      result = @_compileHamlToJs(tokinser, codeGenerator)
+      if options.outputFormat isnt 'string'
+        codeGenerator.generateJsFunction(result)
+      else
+        "function (context) {\n#{result}}\n"
 
   ###
     Compiles the haml in the script block with ID templateId using the coffeescript generator

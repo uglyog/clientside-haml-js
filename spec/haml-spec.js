@@ -532,4 +532,52 @@
     });
   });
 
+  describe('haml apis', function() {
+    return describe('compileHaml', function() {
+      var coffeeSource, hamlFixture;
+      hamlFixture = '%h1\n' + '  %div\n' + '    %p This is "some" text\n' + '      This is #{"some"} text\n' + '    This is some <div> text\n' + '    \\%span\n' + '    %span %h1 %h1 %h1\n';
+      coffeeSource = 'function (context) {\nhtml = []\nhtml.push(\'<h1>\\n  <div>\\n    <p>\\n      This is \\"some\\" text\\n\')\nhtml.push("      This is #{"some"} text\\n")\nhtml.push(\'    </p>\\n    This is some <div> text\\n    %span\\n    <span>\\n      %h1 %h1 %h1\\n    </span>\\n  </div>\\n</h1>\\n\')\nreturn html.join("")\n}\n';
+      beforeEach(function() {
+        return setFixtures('<script type="text/template" id="simple">\n' + hamlFixture + '</script>');
+      });
+      it('should take a source parameter', function() {
+        return expect(haml.compileHaml({
+          source: hamlFixture
+        })()).toEqual(haml.compileStringToJs(hamlFixture)());
+      });
+      it('should take a sourceId parameter', function() {
+        return expect(haml.compileHaml({
+          sourceId: 'simple'
+        })()).toEqual(haml.compileHaml('simple')());
+      });
+      it('should take a sourceUrl parameter', function() {
+        return expect(haml.compileHaml({
+          sourceUrl: 'https://raw.github.com/uglyog/clientside-haml-js/master/spec/fixture.haml'
+        })()).toEqual(haml.compileHaml('simple')());
+      });
+      it('should take a outputFormat parameter', function() {
+        expect(haml.compileHaml({
+          source: hamlFixture,
+          outputFormat: 'string'
+        })).toEqual(haml.compileHamlToJsString(hamlFixture));
+        return expect(typeof haml.compileHaml({
+          source: hamlFixture,
+          outputFormat: 'function'
+        })).toEqual('function');
+      });
+      return it('should take a generator parameter', function() {
+        expect(haml.compileHaml({
+          source: hamlFixture,
+          generator: 'javascript',
+          outputFormat: 'string'
+        })).toEqual(haml.compileHamlToJsString(hamlFixture));
+        return expect(haml.compileHaml({
+          source: hamlFixture,
+          generator: 'coffeescript',
+          outputFormat: 'string'
+        })).toEqual(coffeeSource);
+      });
+    });
+  });
+
 }).call(this);

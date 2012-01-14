@@ -27,16 +27,30 @@ class Tokeniser
     @prevToken = null
     @token = null
 
-    if options.templateId
+    if options.templateId?
       template = document.getElementById(options.templateId)
       if template
         @buffer = template.innerHTML
         @bufferIndex = 0
       else
         throw "Did not find a template with ID '" + options.templateId + "'"
-    else if options.template
+    else if options.template?
       @buffer = options.template
       @bufferIndex = 0
+    else if options.templateUrl?
+      errorFn = (jqXHR, textStatus, errorThrown) ->
+        throw "Failed to fetch haml template at URL #{options.templateUrl}: #{textStatus} #{errorThrown}"
+      successFn = (data) ->
+        @buffer = data
+        @bufferIndex = 0
+      jQuery.ajax
+        url: options.templateUrl
+        success: successFn
+        error: errorFn
+        dataType: 'text'
+        async: false
+        xhrFields:
+          withCredentials: true
 
   ###
     Try to match a token with the given regexp
