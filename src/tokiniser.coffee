@@ -40,7 +40,7 @@ class Tokeniser
     else if options.templateUrl?
       errorFn = (jqXHR, textStatus, errorThrown) ->
         throw "Failed to fetch haml template at URL #{options.templateUrl}: #{textStatus} #{errorThrown}"
-      successFn = (data) ->
+      successFn = (data) =>
         @buffer = data
         @bufferIndex = 0
       jQuery.ajax

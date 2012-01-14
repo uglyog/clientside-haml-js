@@ -32,7 +32,9 @@ describe 'haml apis', () ->
       expect(haml.compileHaml(sourceId: 'simple')()).toEqual(haml.compileHaml('simple')())
 
     it 'should take a sourceUrl parameter', () ->
-      expect(haml.compileHaml(sourceUrl: 'https://raw.github.com/uglyog/clientside-haml-js/master/spec/fixture.haml')()).toEqual(haml.compileHaml('simple')())
+      spyOn(jQuery, 'ajax').andCallFake (params) ->
+        params.success(hamlFixture)
+      expect(haml.compileHaml(sourceUrl: 'http://someurl/spec/fixture.haml')()).toEqual(haml.compileHaml('simple')())
     
     it 'should take a outputFormat parameter', () ->
       expect(haml.compileHaml(source: hamlFixture, outputFormat: 'string')).toEqual(haml.compileHamlToJsString(hamlFixture))

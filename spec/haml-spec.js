@@ -551,6 +551,9 @@
         })()).toEqual(haml.compileHaml('simple')());
       });
       it('should take a sourceUrl parameter', function() {
+        spyOn(jQuery, 'ajax').andCallFake(function(params) {
+          return params.success(hamlFixture);
+        });
         return expect(haml.compileHaml({
           sourceUrl: 'https://raw.github.com/uglyog/clientside-haml-js/master/spec/fixture.haml'
         })()).toEqual(haml.compileHaml('simple')());
