@@ -555,7 +555,7 @@
           return params.success(hamlFixture);
         });
         return expect(haml.compileHaml({
-          sourceUrl: 'https://raw.github.com/uglyog/clientside-haml-js/master/spec/fixture.haml'
+          sourceUrl: 'http://localhost:8080/clientside-haml-js/spec/fixture.haml'
         })()).toEqual(haml.compileHaml('simple')());
       });
       it('should take a outputFormat parameter', function() {
