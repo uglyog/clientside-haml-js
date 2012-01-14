@@ -168,7 +168,7 @@ of a script element in the DOM. Otherwise, it accepts the following key/value pa
 ** javascript (default)
 ** coffeescript
 
-One of either _source_, _sourceId_ or _sourceUrl_ **must** be provided. *Note*, also, that the _sourceUrl_ options
+One of either _source_, _sourceId_ or _sourceUrl_ **must** be provided. **Note**, also, that the _sourceUrl_ options
 requires jQuery 1.5.1+ as a dependency.
 
 # Client-side HAML Flavour
