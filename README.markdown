@@ -21,6 +21,7 @@ Thanks to following people who have contributed: [translated](https://github.com
 * Release 2   -  2011-12-10 - [https://github.com/uglyog/clientside-haml-js/tarball/release_2_0] [Release Notes](clientside-haml-js/blob/master/Release-2.markdown)
 * Release 3   -  2011-12-11 - [https://github.com/uglyog/clientside-haml-js/tarball/release_3_0] [Release Notes](clientside-haml-js/blob/master/Release-3.markdown)
 * Release 4   -  2012-01-08 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_0] [Release Notes](clientside-haml-js/blob/master/Release-4.markdown)
+* Release 4.1 -  2012-01-14 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_1] [Release Notes](clientside-haml-js/blob/master/Release-4.1.markdown)
 
 # To use it
 
@@ -33,7 +34,7 @@ Thanks to following people who have contributed: [translated](https://github.com
 * The HAML can either be passed in as a String, as in:
 
 ```javascript
-    var fn = haml.compileStringToJs("%h1\n  %div\n    %p\n    %span');
+    var fn = haml.compileHaml({source: "%h1\n  %div\n    %p\n    %span'});
     var html = fn();
 ```
 
@@ -48,11 +49,10 @@ Thanks to following people who have contributed: [translated](https://github.com
     </script>
 ```
 
-* To compile the haml template into a Javascript function, call the `haml.compileStringToJs` or `haml.compileHaml`
-functions, providing it with the haml contents or the ID of the haml template.
+* and calling
 
 ```javascript
-    haml.compileHaml('simple')
+    haml.compileHaml({sourceId: 'simple'});
 ```
 
 This will produce the following Javascript function:
@@ -71,7 +71,7 @@ This will produce the following Javascript function:
 * The function can be called, and it takes one option parameter: a context object.
 
 ```javascript
-    var fn = haml.compileHaml('simple');
+    var fn = haml.compileHaml({sourceId: 'simple'});
     var html = fn();
 ```
 
@@ -91,10 +91,9 @@ This will produce the following HTML:
 # HAML Templates with embedded CoffeeScript
 
 clientside-haml-js also can compile templates with embedded CoffeeScript in it. There are equivalent functions to compile
-these templates (use `compileCoffeeHaml` instead of `compileHaml` and `compileCoffeeHamlFromString` instead of
-`compileStringToJs`). The main difference in using compiled functions from the Javascript ones is that you pass the
-template context as the `this` pointer to the function via the call function instead of a parameter. You can then
-access the context variables using `@name` notation.
+these templates (use the generator option set to 'coffeescript'). The main difference in using compiled functions from
+the Javascript ones is that you pass the template context as the `this` pointer to the function via the call function
+instead of a parameter. You can then access the context variables using `@name` notation.
 
 For example, with the following template:
 
@@ -112,7 +111,7 @@ and calling
 
 ```coffescript
     model = foo: "hello"
-    html = haml.compileCoffeeHaml('evaluation-using-context').call(model: model)
+    html = haml.compileHaml(sourceId: 'evaluation-using-context', generator: 'coffeescript').call(model: model)
 ```
 
 will generate the following function:
@@ -153,6 +152,20 @@ See the examples below for more details on how to use this.
 
 In the case of the CoffeeScript version, the functions use the context passed in as the `this` pointer via the call
 function. The variables are then available using the `@name` notation.
+
+# Client-side HAML API
+
+The `haml.compileHaml` takes a single parameter. As a string value (legacy form), it expects the string to be an ID
+of a script element in the DOM. Otherwise, it accepts the following key/value pairs :
+* _source_       - This contains the template in string form
+* _sourceId_     - This contains the element ID in the dom which contains the haml source
+* _sourceUrl_    - This contains the URL where the template can be fetched from
+* _outputFormat_ - This determines what is returned, and can be one of the following values:
+** function - A javascript function (default)
+** string   - The javascript source code
+* _generator_ - Which code generator to use, the following values are accepted:
+** javascript (default)
+** coffeescript
 
 # Client-side HAML Flavour
 
