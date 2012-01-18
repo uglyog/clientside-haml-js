@@ -4,7 +4,7 @@ The clientside-haml-js is a compiler written in CoffeeScript that compiles text 
 functions that generate HTML. It has been inspired by the server side [haml Javascript project](https://github.com/creationix/haml-js),
 and has been written to be feature compatible with [Ruby server side HAML](http://haml-lang.com/docs/yardoc/file.HAML_REFERENCE.html),
 supports all major browsers (IE 7+, Firefox 3.6+, Chrome 10+, Safari), have minimal runtime dependencies (only
-[underscore.js](http://documentcloud.github.com/underscore/), [underscore.string](https://github.com/edtsech/underscore.string)
+[underscore.js (1.1.6+)](http://documentcloud.github.com/underscore/), [underscore.string (1.1.4+)](https://github.com/edtsech/underscore.string)
 and CoffeeScript if using CoffeeScript in your templates and jQuery 1.5.1+ if using compilation of templates from a URL).
 
 **NOTE:** The haml compiler requires a browser with a JSON parser. For browsers like IE7, you need to also include a JSON
