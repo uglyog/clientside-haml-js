@@ -28,6 +28,8 @@ Thanks to following people who have contributed: [translated](https://github.com
 * Include the haml.js in your page:
 
 ```javascript
+	<script type="text/javascript" src="js/underscore.js"></script>
+	<script type="text/javascript" src="js/underscore.string.js"></script>
     <script type="text/javascript" src="js/haml.js"></script>
 ```
 
