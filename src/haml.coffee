@@ -137,6 +137,7 @@ root.haml =
     if tokeniser.token.doctype
       generator.outputBuffer.append(HamlRuntime.indentText(indent))
       tokeniser.getNextToken()
+      tokeniser.getNextToken() if tokeniser.token.ws
       contents = tokeniser.skipToEOLorEOF()
       if contents and contents.length > 0
         params = contents.split(/\s+/)
@@ -166,7 +167,7 @@ root.haml =
       i = haml._whitespace(tokeniser)
       filterBlock = []
       while (!tokeniser.token.eof and i > indent)
-        tokeniser.pushBackToken()
+#        tokeniser.pushBackToken()
         line = tokeniser.skipToEOLorEOF()
         filterBlock.push(haml.HamlRuntime.indentText(i - indent - 1) + line)
         tokeniser.getNextToken()
@@ -188,6 +189,7 @@ root.haml =
       haml._closeElements(indent, elementStack, tokeniser, generator)
       generator.outputBuffer.append(HamlRuntime.indentText(indent))
       generator.outputBuffer.append("<!--")
+      tokeniser.getNextToken()
       contents = tokeniser.skipToEOLorEOF()
 
       generator.outputBuffer.append(contents) if contents and contents.length > 0
@@ -205,6 +207,7 @@ root.haml =
     if tokeniser.token.amp
       haml._closeElements(indent, elementStack, tokeniser, generator)
       generator.outputBuffer.append(HamlRuntime.indentText(indent))
+      tokeniser.getNextToken()
       contents = tokeniser.skipToEOLorEOF()
       generator.outputBuffer.append(haml.HamlRuntime.escapeHTML(contents)) if (contents && contents.length > 0)
       generator.outputBuffer.append("\n")
@@ -213,7 +216,7 @@ root.haml =
     if tokeniser.token.exclamation
       tokeniser.getNextToken()
       indent += haml._whitespace(tokeniser) if tokeniser.token.ws
-      tokeniser.pushBackToken()
+#      tokeniser.pushBackToken()
       haml._closeElements(indent, elementStack, tokeniser, generator)
       contents = tokeniser.skipToEOLorEOF()
       generator.outputBuffer.append(HamlRuntime.indentText(indent) + contents + '\n')
@@ -224,6 +227,7 @@ root.haml =
       escapeHtml = tokeniser.token.escapeHtml or tokeniser.token.equal
       perserveWhitespace = tokeniser.token.tilde
       currentParsePoint = tokeniser.currentParsePoint()
+      tokeniser.getNextToken()
       expression = tokeniser.skipToEOLorEOF()
       indentText = HamlRuntime.indentText(indent)
       generator.outputBuffer.append(indentText) if !tagOptions or tagOptions.innerWhitespace
@@ -233,7 +237,7 @@ root.haml =
   _jsLine: (tokeniser, indent, elementStack, generator) ->
     if tokeniser.token.minus
       haml._closeElements(indent, elementStack, tokeniser, generator)
-
+      tokeniser.getNextToken()
       line = tokeniser.skipToEOLorEOF()
       generator.setIndent(indent)
       generator.appendCodeLine(line)
@@ -277,8 +281,8 @@ root.haml =
         tagOptions.selfClosingTag = haml._isSelfClosingTag(identifier) and !haml._tagHasContents(indent, tokeniser)
       haml._openElement(currentParsePoint, indent, identifier, id, classes, objectRef, attrList, attributesHash, elementStack,
         tagOptions, generator)
-    else if !tokeniser.isEolOrEof() and !tokeniser.token.ws
-      tokeniser.pushBackToken()
+#    else if !tokeniser.isEolOrEof() and !tokeniser.token.ws
+#      tokeniser.pushBackToken()
 
     hasContents = false
     tokeniser.getNextToken() if tokeniser.token.ws
@@ -290,9 +294,10 @@ root.haml =
       contents = ''
       shouldInterpolate = false
       if tokeniser.token.exclamation
+        tokeniser.getNextToken()
         contents = tokeniser.skipToEOLorEOF()
-      else if !tokeniser.token.eol
-        tokeniser.pushBackToken()
+      else
+#        tokeniser.pushBackToken() if !tokeniser.token.eol
         contents = tokeniser.skipToEOLorEOF()
         contents = contents.substring(1) if contents.match(/^\\%/)
         shouldInterpolate = true

@@ -227,6 +227,7 @@ class Tokeniser
   skipToEOLorEOF: () ->
     text = ''
     unless @token.eof or @token.eol
+      text += @token.matched unless @token.unknown
       @currentLineMatcher.lastIndex = @bufferIndex
       line = @currentLineMatcher.exec(@buffer)
       if line and line.index == @bufferIndex
@@ -237,8 +238,8 @@ class Tokeniser
           @getNextToken()
           text += @parseMultiLine()
         else
-          text = line[0]
-          @advanceCharsInBuffer(text.length)
+          text += line[0]
+          @advanceCharsInBuffer(line[0].length)
           @getNextToken()
     text
 
