@@ -453,7 +453,7 @@
         return expect(html).toEqual('<div id="div1">\n' + '  You should see me\n' + '</div>\n' + '<div id="div3">\n' + '  You should see me\n' + '</div>\n');
       });
     });
-    return describe('Multiline code blocks', function() {
+    describe('Multiline code blocks', function() {
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="multiline">\n' + '%whoo\n' + '  %hoo=                           |\n' + '    "I think this might get " +   |\n' + '    "pretty long so I should " +  |\n' + '    "probably make it " +         |\n' + '    "multiline so it doesn\'t " + |\n' + '    "look awful."                 |\n' + '  %p This is short.\n' + '</script>');
       });
@@ -466,6 +466,16 @@
         var html;
         html = haml.compileCoffeeHaml('multiline')();
         return expect(html).toEqual('<whoo>\n' + '  <hoo>\n' + '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' + '  </hoo>\n' + '  <p>\n' + '    This is short.\n' + '  </p>\n' + '</whoo>\n');
+      });
+    });
+    return describe('Issue #21 - text node followed by tag node fails', function() {
+      return it('should no fail to generate a js function due to newlines', function() {
+        var html;
+        setFixtures('<script type="text/template" id="issue-21">\n%div\ntext\n%p 123\n</script>');
+        html = haml.compileHaml({
+          sourceId: 'issue-21'
+        })();
+        return expect(html).toEqual('<div>\n</div>\ntext\n<p>\n  123\n</p>\n');
       });
     });
   });

@@ -1061,3 +1061,29 @@ describe 'haml', () ->
         '    This is short.\n' +
         '  </p>\n' +
         '</whoo>\n')
+
+  describe 'Issue #21 - text node followed by tag node fails', () ->
+
+    it 'should no fail to generate a js function due to newlines', () ->
+
+      setFixtures(
+        '''<script type="text/template" id="issue-21">
+        %div
+        text
+        %p 123
+        </script>
+        '''
+      )
+
+      html = haml.compileHaml(sourceId: 'issue-21')()
+      expect(html).toEqual(
+        '''
+        <div>
+        </div>
+        text
+        <p>
+          123
+        </p>
+
+        '''
+      )
