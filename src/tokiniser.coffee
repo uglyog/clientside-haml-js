@@ -30,7 +30,7 @@ class Tokeniser
     if options.templateId?
       template = document.getElementById(options.templateId)
       if template
-        @buffer = template.innerHTML
+        @buffer = template.text
         @bufferIndex = 0
       else
         throw "Did not find a template with ID '" + options.templateId + "'"
