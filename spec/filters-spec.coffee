@@ -17,6 +17,7 @@ describe 'filters', () ->
     html = haml.compileHaml('plain-filter')()
     expect(html).toEqual(
       '''
+
       <h1>
         <p>
           Does not parse the filtered text. This is useful for large blocks of text without HTML tags,
@@ -69,7 +70,7 @@ describe 'filters', () ->
            //]]>
            </script>
          </body>
-         
+
       '''
     )
 

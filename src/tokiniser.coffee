@@ -257,7 +257,7 @@ class Tokeniser
           text += contents.substring(0, contents.length - 1)
           @advanceCharsInBuffer(contents.length - 1)
         @getNextToken()
-    @pushBackToken()
+    #@pushBackToken()
     text
 
   ###

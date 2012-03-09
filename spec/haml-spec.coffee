@@ -55,6 +55,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('simple')()
       expect(html).toEqual(
+        '\n' +
         '<h1>\n' +
         '  <div>\n' +
         '    <p>\n' +
@@ -111,36 +112,38 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('simple')()
       expect(html).toEqual(
+        '\n' +
         '<h1>\n' +
-          '  <div>\n' +
-          '    <p>\n' +
-          '      This is "some" text\n' +
-          '      This is "some" text\n' +
-          '    </p>\n' +
-          '    This is some <div> text\n' +
-          '    %span\n' +
-          '    <span>\n' +
-          '      %h1 %h1 %h1\n' +
-          '    </span>\n' +
-          '  </div>\n' +
-          '</h1>\n')
+        '  <div>\n' +
+        '    <p>\n' +
+        '      This is "some" text\n' +
+        '      This is "some" text\n' +
+        '    </p>\n' +
+        '    This is some <div> text\n' +
+        '    %span\n' +
+        '    <span>\n' +
+        '      %h1 %h1 %h1\n' +
+        '    </span>\n' +
+        '  </div>\n' +
+        '</h1>\n')
 
     it 'should render the correct html with coffeescript', () ->
       html = haml.compileCoffeeHaml('simple')()
       expect(html).toEqual(
+        '\n' +
         '<h1>\n' +
-          '  <div>\n' +
-          '    <p>\n' +
-          '      This is "some" text\n' +
-          '      This is "some" text\n' +
-          '    </p>\n' +
-          '    This is some <div> text\n' +
-          '    %span\n' +
-          '    <span>\n' +
-          '      %h1 %h1 %h1\n' +
-          '    </span>\n' +
-          '  </div>\n' +
-          '</h1>\n')
+        '  <div>\n' +
+        '    <p>\n' +
+        '      This is "some" text\n' +
+        '      This is "some" text\n' +
+        '    </p>\n' +
+        '    This is some <div> text\n' +
+        '    %span\n' +
+        '    <span>\n' +
+        '      %h1 %h1 %h1\n' +
+        '    </span>\n' +
+        '  </div>\n' +
+        '</h1>\n')
 
   describe 'template with {} attributes', () ->
 
@@ -169,6 +172,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('attributes')({ model: { name: 'class1' } })
       expect(html).toEqual(
+        '\n' +
         '<h1>\n' +
         '  <div id="test">\n' +
         '    <p id="test2" class="blah" selected="selected">\n' +
@@ -185,6 +189,7 @@ describe 'haml', () ->
     it 'with coffescript should render the correct html', () ->
       html = haml.compileCoffeeHaml('coffee-attributes').call({ model: { name: 'class1' } })
       expect(html).toEqual(
+        '\n' +
         '<h1>\n' +
         '  <div id="test">\n' +
         '    <p id="test2" class="blah" selected="selected">\n' +
@@ -214,6 +219,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('attributes')({ model: { name: 'class1' } })
       expect(html).toEqual(
+        '\n' +
         '<h1>\n' +
         '  <div id="test">\n' +
         '    <p id="test2" class="blah" selected="selected">\n' +
@@ -242,6 +248,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('attributes')()
       expect(html).toEqual(
+        '\n' +
         '<h1>\n' +
         '  <div id="test" class="test">\n' +
         '    <p id="test-2" class="blah test">\n' +
@@ -286,6 +293,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('self-closing-tags')({})
       expect(html).toEqual(
+        '\n' +
         '<div>\n' +
         '  meta, img, link, script, br, and hr\n' +
         '  <meta/>\n' +
@@ -320,7 +328,7 @@ describe 'haml', () ->
   describe 'template with unescaped HTML', () ->
 
     beforeEach () ->
-      setFixtures('<script type="text/template" id="unescaped">\n' +
+      setFixtures('<script type="text/template" id="unescaped">' +
         '%h1 !<div>\n' +
         '  !#test.test\n' +
         '    !%p#test.blah{id: 2, class: "test"} This is some text\n' +
@@ -370,6 +378,7 @@ describe 'haml', () ->
           evilScript: '<script>alert("I\'m evil!");</script>'
         })
       expect(html).toEqual(
+        '\n' +
         '<div class="box error">\n' +
         '  <span>\n' +
         '    Error Title\n' +
@@ -425,7 +434,7 @@ describe 'haml', () ->
           evilScript: '<script>alert("I\'m evil!");</script>'
         })
       expect(html).toEqual(
-        '<div class="box error">\n' +
+        '\n<div class="box error">\n' +
         '  <span>\n' +
         '    Error Title\n' +
         '  </span>\n' +
@@ -486,7 +495,7 @@ describe 'haml', () ->
     it 'should render the correct html using locally defined variables', () ->
       html = haml.compileHaml('evaluation')()
       expect(html).toEqual(
-        '<div class="main">\n' +
+        '\n<div class="main">\n' +
         '  <span>\n' +
         '    hello world\n' +
         '  </span>\n' +
@@ -495,7 +504,7 @@ describe 'haml', () ->
     it 'should render the correct html when the template has loops', () ->
       html = haml.compileHaml('evaluation-with-loops')()
       expect(html).toEqual(
-        '<div class="main">\n' +
+        '\n<div class="main">\n' +
         '    <span>\n' +
         '      Option 1\n' +
         '    </span>\n' +
@@ -526,7 +535,7 @@ describe 'haml', () ->
       model = { foo: "hello" }
       html = haml.compileHaml('evaluation-using-context').call(null, {model: model})
       expect(html).toEqual(
-        '<div class="main">\n' +
+        '\n<div class="main">\n' +
         '  <span>\n' +
         '    hello world\n' +
         '  </span>\n' +
@@ -536,7 +545,7 @@ describe 'haml', () ->
       model = { foo: "hello" }
       html = haml.compileHaml('attribute-hash-evaluation-using-outer-scope').call(null, {model: model})
       expect(html).toEqual(
-        '<div class="main">\n' +
+        '\n<div class="main">\n' +
         '  <span someattribute="hello world">\n' +
         '  </span>\n' +
         '</div>\n')
@@ -576,7 +585,7 @@ describe 'haml', () ->
     it 'should render the correct html using locally defined variables', () ->
       html = haml.compileCoffeeHaml('evaluation')()
       expect(html).toEqual(
-        '<div class="main">\n' +
+        '\n<div class="main">\n' +
         '  <span>\n' +
         '    <span/>\n' +
         '      <span/>\n' +
@@ -587,7 +596,7 @@ describe 'haml', () ->
     it 'should render the correct html when the template has loops', () ->
       html = haml.compileCoffeeHaml('evaluation-with-loops')()
       expect(html).toEqual(
-        '<div class="main">\n' +
+        '\n<div class="main">\n' +
         '    <span>\n' +
         '      Option 1\n' +
         '    </span>\n' +
@@ -618,7 +627,7 @@ describe 'haml', () ->
       model = { foo: "hello" }
       html = haml.compileCoffeeHaml('evaluation-using-context').call({model: model})
       expect(html).toEqual(
-        '<div class="main">\n' +
+        '\n<div class="main">\n' +
         '  <span>\n' +
         '    hello world\n' +
         '  </span>\n' +
@@ -628,7 +637,7 @@ describe 'haml', () ->
       model = { foo: "hello" }
       html = haml.compileCoffeeHaml('attribute-hash-evaluation-using-outer-scope').call({model: model})
       expect(html).toEqual(
-        '<div class="main">\n' +
+        '\n<div class="main">\n' +
         '  <span someattribute="hello world">\n' +
         '  </span>\n' +
         '</div>\n')
@@ -655,7 +664,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('comments')({errorTitle: "An error's a terrible thing"})
       expect(html).toEqual(
-        '<div class="main">\n' +
+        '\n<div class="main">\n' +
         '  <!-- This is a comment  -->\n' +
         '  <!--\n' +
         '    <span>\n' +
@@ -686,7 +695,7 @@ describe 'haml', () ->
     it 'should render the correct html when the template has loops', () ->
       html = haml.compileHaml('evaluation-with-loops')()
       expect(html).toEqual(
-        '<div class="main">\n' +
+        '\n<div class="main">\n' +
         '    <span>\n' +
         '      Option 1\n' +
         '    </span>\n' +
@@ -754,7 +763,7 @@ describe 'haml', () ->
       context = { fnOnThis: () -> return 'TEST2' }
       html = haml.compileHaml('anonymous').call(that, context)
       expect(html).toEqual(
-        '<div class="test">\n' +
+        '\n<div class="test">\n' +
         '  TEST\n' +
         '</div>\n' +
         '<div class="test2">\n' +
@@ -779,7 +788,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('empty-lines')()
       expect(html).toEqual(
-        '<div>\n' +
+        '\n<div>\n' +
         '  <div>\n' +
         '    <div>\n' +
         '    \n' +
@@ -808,7 +817,7 @@ describe 'haml', () ->
     it 'should render null values as a string', () ->
       html = haml.compileHaml('null-js-values')({nullValue: null})
       expect(html).toEqual(
-        '<div class="inline-null">\n' +
+        '\n<div class="inline-null">\n' +
         '  \n' +
         '</div>\n' +
         '<div class="null-evaluating">\n' +
@@ -839,7 +848,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('whitespace-removal')()
       expect(html).toEqual(
-        '<blockquote><div>\n' +
+        '\n<blockquote><div>\n' +
         '    Foo!\n' +
         '  </div></blockquote>\n' +
         '<img/><img/><img/>\n' +
@@ -878,7 +887,7 @@ describe 'haml', () ->
         }
       })
       expect(html).toEqual(
-        '<h1>\n' +
+        '\n<h1>\n' +
         '  <div id="test">\n' +
         '    <p id="test2" class="blah">\n' +
         '      This is some text\n' +
@@ -920,7 +929,7 @@ describe 'haml', () ->
         }
       })
       expect(html).toEqual(
-        '<h1>\n' +
+        '\n<h1>\n' +
         '  <div id="test">\n' +
         '    <p id="test2" class="blah">\n' +
         '      This is some text\n' +
@@ -945,7 +954,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('html5-attributes')()
       expect(html).toEqual(
-        '<h1>\n' +
+        '\n<h1>\n' +
         '  <div id="test">\n' +
         '    <p id="test2" data-class="blah" data-selected="true">\n' +
         '      This is some text\n' +
@@ -969,7 +978,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('whitespace-preservation')()
       expect(html).toEqual(
-        '<h1>\n' +
+        '\n<h1>\n' +
         '  <div>\n' +
         '    Foo\n' +
         '<pre>Bar&#x000A;Baz</pre>\n' +
@@ -992,7 +1001,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('doctype')()
       expect(html).toEqual(
-        '<?xml version=\'1.0\' encoding=\'utf-8\' ?>\n' +
+        '\n<?xml version=\'1.0\' encoding=\'utf-8\' ?>\n' +
         '<?xml version=\'1.0\' encoding=\'iso-8859-1\' ?>\n' +
         '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n' +
         '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">\n' +
@@ -1017,7 +1026,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('comment-issue')()
       expect(html).toEqual(
-        '<div id="div1">\n' +
+        '\n<div id="div1">\n' +
         '  You should see me\n' +
         '</div>\n' +
         '<div id="div3">\n' +
@@ -1041,7 +1050,7 @@ describe 'haml', () ->
     it 'should render the correct html', () ->
       html = haml.compileHaml('multiline')()
       expect(html).toEqual(
-        '<whoo>\n' +
+        '\n<whoo>\n' +
         '  <hoo>\n' +
         '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' +
         '  </hoo>\n' +
@@ -1053,7 +1062,7 @@ describe 'haml', () ->
     it 'with coffescript should render the correct html', () ->
       html = haml.compileCoffeeHaml('multiline')()
       expect(html).toEqual(
-        '<whoo>\n' +
+        '\n<whoo>\n' +
         '  <hoo>\n' +
         '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' +
         '  </hoo>\n' +
@@ -1063,6 +1072,9 @@ describe 'haml', () ->
         '</whoo>\n')
 
   describe 'Issue #21 - text node followed by tag node fails', () ->
+
+    hex = (str) ->
+      _(str).chain().chars().map((ch) -> _(ch.charCodeAt(0).toString(16)).pad(2, '0')).value().join('')
 
     it 'should no fail to generate a js function due to newlines', () ->
 
@@ -1078,6 +1090,7 @@ describe 'haml', () ->
       html = haml.compileHaml(sourceId: 'issue-21')()
       expect(html).toEqual(
         '''
+
         <div>
         </div>
         text
@@ -1087,3 +1100,18 @@ describe 'haml', () ->
 
         '''
       )
+
+    it "should handle Unix line endings", () ->
+      source = "\u000A%div\u000Atext\u000A%p 123\u000A"
+      html = haml.compileHaml(source: source)()
+      expect(html).toEqual("\n<div>\n</div>\ntext\n<p>\n  123\n</p>\n")
+
+    it "should handle Windows line endings", () ->
+      source = "\u000D\u000A%div\u000D\u000Atext\u000D\u000A%p 123\u000D\u000A"
+      html = haml.compileHaml(source: source)()
+      expect(hex(html)).toEqual(hex("\r\n<div>\n</div>\ntext\r\n<p>\n  123\r\n</p>\n"))
+
+    it "should handle endings in any order", () ->
+      source = "\u000D\u000A%div\u000A\u000Dtext\u000D%p 123\u000D\u000A"
+      html = haml.compileHaml(source: source)()
+      expect(hex(html)).toEqual(hex("\r\n<div>\n</div>\n\rtext\r%p 123\r\n"))

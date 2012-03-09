@@ -47,11 +47,11 @@ class JsCodeGenerator extends CodeGenerator
   ###
     Append a line of code to the output buffer
   ###
-  appendCodeLine: (line) ->
+  appendCodeLine: (line, eol) ->
     @outputBuffer.flush()
     @outputBuffer.appendToOutputBuffer(HamlRuntime.indentText(@indent))
     @outputBuffer.appendToOutputBuffer(line)
-    @outputBuffer.appendToOutputBuffer('\n')
+    @outputBuffer.appendToOutputBuffer(eol)
 
   ###
     Does the current line end with a function declaration?
@@ -112,7 +112,7 @@ class JsCodeGenerator extends CodeGenerator
     Escape the line so it is safe to put into a javascript string
   ###
   escapeCode: (jsStr) ->
-    jsStr.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')
+    jsStr.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r')
 
   ###
     Generate a function from the function body

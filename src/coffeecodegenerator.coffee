@@ -33,11 +33,11 @@ class CoffeeCodeGenerator extends CodeGenerator
     @outputBuffer.flush()
     @outputBuffer.output() + 'return html.join("")\n'
 
-  appendCodeLine: (line) ->
+  appendCodeLine: (line, eol) ->
     @outputBuffer.flush()
     @outputBuffer.appendToOutputBuffer(HamlRuntime.indentText(@indent - @prevCodeIndent)) if @prevCodeIndent? and @prevCodeIndent < @indent
     @outputBuffer.appendToOutputBuffer(_(line).trim())
-    @outputBuffer.appendToOutputBuffer('\n')
+    @outputBuffer.appendToOutputBuffer(eol)
     @prevCodeIndent = @indent
 
   lineMatchesStartFunctionBlock: (line) ->
