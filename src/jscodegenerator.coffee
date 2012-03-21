@@ -56,7 +56,7 @@ class JsCodeGenerator extends CodeGenerator
   ###
     Does the current line end with a function declaration?
   ###
-  lineMatchesStartFunctionBlock: (line) -> line.match(/function\s\((,?\s*\w+)*\)\s*\{\s*$/)
+  lineMatchesStartFunctionBlock: (line) -> line.match(/function\s*\((,?\s*\w+)*\)\s*\{\s*$/)
 
   ###
     Does the current line end with a starting code block
