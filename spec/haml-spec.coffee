@@ -1074,7 +1074,7 @@ describe 'haml', () ->
   describe 'Issue #21 - text node followed by tag node fails', () ->
 
     hex = (str) ->
-      _(str).chain().chars().map((ch) -> _(ch.charCodeAt(0).toString(16)).pad(2, '0')).value().join('')
+      _((_.str || _).chars(str)).map((ch) -> (_.str || _).pad(ch.charCodeAt(0).toString(16), 2, '0')).join('')
 
     it 'should no fail to generate a js function due to newlines', () ->
 

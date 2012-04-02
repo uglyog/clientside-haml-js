@@ -471,9 +471,9 @@
     return describe('Issue #21 - text node followed by tag node fails', function() {
       var hex;
       hex = function(str) {
-        return _(str).chain().chars().map(function(ch) {
-          return _(ch.charCodeAt(0).toString(16)).pad(2, '0');
-        }).value().join('');
+        return _((_.str || _).chars(str)).map(function(ch) {
+          return (_.str || _).pad(ch.charCodeAt(0).toString(16), 2, '0');
+        }).join('');
       };
       it('should no fail to generate a js function due to newlines', function() {
         var html;
