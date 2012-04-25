@@ -1115,3 +1115,19 @@ describe 'haml', () ->
       source = "\u000D\u000A%div\u000A\u000Dtext\u000D%p 123\u000D\u000A"
       html = haml.compileHaml(source: source)()
       expect(hex(html)).toEqual(hex("\r\n<div>\n</div>\n\rtext\r%p 123\r\n"))
+
+  describe 'Issue #24 - inconsistent indent handling', () ->
+
+    it 'should handle indentation modulo 2', () ->
+      expected = '''<table>
+                   <tr>
+                   </tr>
+                 </table>
+
+                 '''
+      html = haml.compileHaml(source: '%table\n\t%tr')()
+      expect(html).toEqual(expected)
+      html = haml.compileHaml(source: '%table\n %tr')()
+      expect(html).toEqual(expected)
+      html = haml.compileHaml(source: '%table\n  %tr')()
+      expect(html).toEqual(expected)

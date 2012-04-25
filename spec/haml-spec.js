@@ -468,7 +468,7 @@
         return expect(html).toEqual('\n<whoo>\n' + '  <hoo>\n' + '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' + '  </hoo>\n' + '  <p>\n' + '    This is short.\n' + '  </p>\n' + '</whoo>\n');
       });
     });
-    return describe('Issue #21 - text node followed by tag node fails', function() {
+    describe('Issue #21 - text node followed by tag node fails', function() {
       var hex;
       hex = function(str) {
         return _((_.str || _).chars(str)).map(function(ch) {
@@ -506,6 +506,24 @@
           source: source
         })();
         return expect(hex(html)).toEqual(hex("\r\n<div>\n</div>\n\rtext\r%p 123\r\n"));
+      });
+    });
+    return describe('Issue #24 - inconsistent indent handling', function() {
+      return it('should handle indentation modulo 2', function() {
+        var expected, html;
+        expected = '<table>\n  <tr>\n  </tr>\n</table>\n';
+        html = haml.compileHaml({
+          source: '%table\n\t%tr'
+        })();
+        expect(html).toEqual(expected);
+        html = haml.compileHaml({
+          source: '%table\n %tr'
+        })();
+        expect(html).toEqual(expected);
+        html = haml.compileHaml({
+          source: '%table\n  %tr'
+        })();
+        return expect(html).toEqual(expected);
       });
     });
   });
