@@ -1131,3 +1131,15 @@ describe 'haml', () ->
       expect(html).toEqual(expected)
       html = haml.compileHaml(source: '%table\n  %tr')()
       expect(html).toEqual(expected)
+
+    it 'should count tabs as 2 characters', () ->
+      expected = '''<table>
+                      <tr>
+                        <td>
+                        </td>
+                      </tr>
+                    </table>
+
+                 '''
+      html = haml.compileHaml(source: '%table\n\t%tr\n\t\t%td')()
+      expect(html).toEqual(expected)

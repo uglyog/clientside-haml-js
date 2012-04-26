@@ -509,7 +509,7 @@
       });
     });
     return describe('Issue #24 - inconsistent indent handling', function() {
-      return it('should handle indentation modulo 2', function() {
+      it('should handle indentation modulo 2', function() {
         var expected, html;
         expected = '<table>\n  <tr>\n  </tr>\n</table>\n';
         html = haml.compileHaml({
@@ -522,6 +522,14 @@
         expect(html).toEqual(expected);
         html = haml.compileHaml({
           source: '%table\n  %tr'
+        })();
+        return expect(html).toEqual(expected);
+      });
+      return it('should count tabs as 2 characters', function() {
+        var expected, html;
+        expected = '<table>\n  <tr>\n    <td>\n    </td>\n  </tr>\n</table>\n';
+        html = haml.compileHaml({
+          source: '%table\n\t%tr\n\t\t%td'
         })();
         return expect(html).toEqual(expected);
       });
