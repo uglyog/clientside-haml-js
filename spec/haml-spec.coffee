@@ -1143,3 +1143,20 @@ describe 'haml', () ->
                  '''
       html = haml.compileHaml(source: '%table\n\t%tr\n\t\t%td')()
       expect(html).toEqual(expected)
+
+  describe 'Issue #25 - Incorrect coffeescript indentation', () ->
+
+    it 'should indent the lines within logic blocks correctly', () ->
+      hamlSource =
+        '''
+           -if true
+             %a{href : '#new'} create new
+        '''
+      expected =
+        '''
+           <a href="#new">
+               create new
+             </a>
+        '''
+      expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript')()).trim()).toEqual(expected)
+      

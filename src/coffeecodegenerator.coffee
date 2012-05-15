@@ -54,15 +54,16 @@ class CoffeeCodeGenerator extends CodeGenerator
 
   generateCodeForDynamicAttributes: (id, classes, attributeList, attributeHash, objectRef, currentParsePoint) ->
     @outputBuffer.flush()
+    indent = @calcCodeIndent()
     if attributeHash.length > 0
       attributeHash = @replaceReservedWordsInHash(attributeHash)
-      @outputBuffer.appendToOutputBuffer("hashFunction = () -> s = CoffeeScript.compile('" +
+      @outputBuffer.appendToOutputBuffer(indent + "hashFunction = () -> s = CoffeeScript.compile('" +
         attributeHash.replace(/'/g, "\\'").replace(/\n/g, '\\n') + "', bare: true); eval 'hashObject = ' + s\n")
     if objectRef.length > 0
-      @outputBuffer.appendToOutputBuffer("objRefFn = () -> s = CoffeeScript.compile('" +
+      @outputBuffer.appendToOutputBuffer(indent + "objRefFn = () -> s = CoffeeScript.compile('" +
         objectRef.replace(/'/g, "\\'") + "', bare: true); eval 'objRef = ' + s\n")
 
-    @outputBuffer.appendToOutputBuffer("html.push(haml.HamlRuntime.generateElementAttributes(this, '" +
+    @outputBuffer.appendToOutputBuffer(indent + "html.push(haml.HamlRuntime.generateElementAttributes(this, '" +
       id + "', ['" +
       classes.join("','") + "'], objRefFn ? null, " +
       JSON.stringify(attributeList) + ", hashFunction ? null, " +
