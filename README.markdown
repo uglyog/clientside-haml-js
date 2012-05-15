@@ -24,6 +24,7 @@ Thanks to following people who have contributed: [translated](https://github.com
 * Release 4.1 -  2012-01-14 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_1] [Release Notes](clientside-haml-js/blob/master/Release-4.1.markdown)
 * Release 4.2 -  2012-03-13 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_2] [Release Notes](clientside-haml-js/blob/master/Release-4.2.markdown)
 * Release 4.3 -  2012-04-02 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_3] [Release Notes](clientside-haml-js/blob/master/Release-4.3.markdown)
+* Release 4.4 -  2012-05-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_4] [Release Notes](clientside-haml-js/blob/master/Release-4.4.markdown)
 
 # To use it
 
