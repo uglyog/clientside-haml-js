@@ -49,8 +49,8 @@ class Tokeniser
         error: errorFn
         dataType: 'text'
         async: false
-        xhrFields:
-          withCredentials: true
+        beforeSend: (xhr) ->
+          xhr.withCredentials = true
 
   ###
     Try to match a token with the given regexp
