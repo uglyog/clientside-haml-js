@@ -91,7 +91,7 @@ root.haml =
     fn
 
   _compileHamlToJs: (tokeniser, generator) ->
-    elementStack = []
+    generator.elementStack = []
 
     generator.initOutput()
 
@@ -114,25 +114,25 @@ root.haml =
         else if tokeniser.token.doctype
           @_doctype(tokeniser, indent, generator)
         else if tokeniser.token.exclamation
-          @_ignoredLine(tokeniser, indent, elementStack, generator)
+          @_ignoredLine(tokeniser, indent, generator.elementStack, generator)
         else if tokeniser.token.equal or tokeniser.token.escapeHtml or tokeniser.token.unescapeHtml or
         tokeniser.token.tilde
-          @_embeddedJs(tokeniser, indent, elementStack, innerWhitespace: true, generator)
+          @_embeddedJs(tokeniser, indent, generator.elementStack, innerWhitespace: true, generator)
         else if tokeniser.token.minus
-          @_jsLine(tokeniser, indent, elementStack, generator)
+          @_jsLine(tokeniser, indent, generator.elementStack, generator)
         else if tokeniser.token.comment or tokeniser.token.slash
-          @_commentLine(tokeniser, indent, elementStack, generator)
+          @_commentLine(tokeniser, indent, generator.elementStack, generator)
         else if tokeniser.token.amp
-          @_escapedLine(tokeniser, indent, elementStack, generator)
+          @_escapedLine(tokeniser, indent, generator.elementStack, generator)
         else if tokeniser.token.filter
           @_filter(tokeniser, indent, generator)
         else
-          @_templateLine(tokeniser, elementStack, indent, generator)
+          @_templateLine(tokeniser, generator.elementStack, indent, generator)
       else
         generator.outputBuffer.append(tokeniser.token.matched)
         tokeniser.getNextToken()
 
-    @_closeElements(0, elementStack, tokeniser, generator)
+    @_closeElements(0, generator.elementStack, tokeniser, generator)
     generator.closeAndReturnOutput()
 
   _doctype: (tokeniser, indent, generator) ->

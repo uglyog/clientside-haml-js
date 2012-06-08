@@ -118,7 +118,9 @@ class CoffeeCodeGenerator extends CodeGenerator
   mark: () -> @prevIndent = @indent
 
   calcCodeIndent: () ->
-    if @prevCodeIndent? and @prevIndent > @prevCodeIndent then HamlRuntime.indentText(@prevIndent - @prevCodeIndent) else ''
+    codeIndent = 0
+    (codeIndent += 1 if @elementStack[i]?.block or @elementStack[i]?.fnBlock) for i in [0..@indent]
+    HamlRuntime.indentText(codeIndent)
 
   ###
     Append the text contents to the buffer (interpolating embedded code not required for coffeescript)

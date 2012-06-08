@@ -1159,4 +1159,29 @@ describe 'haml', () ->
              </a>
         '''
       expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript')()).trim()).toEqual(expected)
-      
+
+  describe 'Issue #27 - multiple levels of nesting confuses haml parser', () ->
+
+    it 'should indent the lines within logic blocks correctly', () ->
+      hamlSource =
+        '''
+           %ul{"class":"nav nav-tabs"}
+             - for player in @players
+               %li
+                 %a{'href':"#player#{player.id}", "data-toggle":"tab"}
+                   = player.get("name")
+        '''
+      expected =
+        '''
+           <ul class="nav nav-tabs">
+               <li>
+                 <a href="#player1" data-toggle="tab">
+                   travis
+                 </a>
+               </li>
+           </ul>
+        '''
+      players = [
+        {id: 1, name: 'travis', get: (attr) -> @name}
+      ]
+      expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(players: players)).trim()).toEqual(expected)
