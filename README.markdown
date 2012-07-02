@@ -15,16 +15,17 @@ Thanks to following people who have contributed: [translated](https://github.com
 [makevoid](https://github.com/makevoid)
 
 #Releases
-* Release 0   -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] [Release Notes](clientside-haml-js/blob/master/Release-0.markdown)
-* Release 1   -  2011-07-25 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1] [Release Notes](clientside-haml-js/blob/master/Release-1.markdown)
-* Release 1.1 -  2011-10-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1_1] [Release Notes](clientside-haml-js/blob/master/Release-1.1.markdown)
-* Release 2   -  2011-12-10 - [https://github.com/uglyog/clientside-haml-js/tarball/release_2_0] [Release Notes](clientside-haml-js/blob/master/Release-2.markdown)
-* Release 3   -  2011-12-11 - [https://github.com/uglyog/clientside-haml-js/tarball/release_3_0] [Release Notes](clientside-haml-js/blob/master/Release-3.markdown)
-* Release 4   -  2012-01-08 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_0] [Release Notes](clientside-haml-js/blob/master/Release-4.markdown)
-* Release 4.1 -  2012-01-14 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_1] [Release Notes](clientside-haml-js/blob/master/Release-4.1.markdown)
-* Release 4.2 -  2012-03-13 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_2] [Release Notes](clientside-haml-js/blob/master/Release-4.2.markdown)
-* Release 4.3 -  2012-04-02 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_3] [Release Notes](clientside-haml-js/blob/master/Release-4.3.markdown)
+* Release 4.5 -  2012-07-02 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_5] [Release Notes](clientside-haml-js/blob/master/Release-4.5.markdown)
 * Release 4.4 -  2012-05-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_4] [Release Notes](clientside-haml-js/blob/master/Release-4.4.markdown)
+* Release 4.3 -  2012-04-02 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_3] [Release Notes](clientside-haml-js/blob/master/Release-4.3.markdown)
+* Release 4.2 -  2012-03-13 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_2] [Release Notes](clientside-haml-js/blob/master/Release-4.2.markdown)
+* Release 4.1 -  2012-01-14 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_1] [Release Notes](clientside-haml-js/blob/master/Release-4.1.markdown)
+* Release 4   -  2012-01-08 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_0] [Release Notes](clientside-haml-js/blob/master/Release-4.markdown)
+* Release 3   -  2011-12-11 - [https://github.com/uglyog/clientside-haml-js/tarball/release_3_0] [Release Notes](clientside-haml-js/blob/master/Release-3.markdown)
+* Release 2   -  2011-12-10 - [https://github.com/uglyog/clientside-haml-js/tarball/release_2_0] [Release Notes](clientside-haml-js/blob/master/Release-2.markdown)
+* Release 1.1 -  2011-10-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1_1] [Release Notes](clientside-haml-js/blob/master/Release-1.1.markdown)
+* Release 1   -  2011-07-25 - [https://github.com/uglyog/clientside-haml-js/tarball/release_1] [Release Notes](clientside-haml-js/blob/master/Release-1.markdown)
+* Release 0   -  2011-06-28 - [https://github.com/uglyog/clientside-haml-js/tarball/release_0] [Release Notes](clientside-haml-js/blob/master/Release-0.markdown)
 
 # To use it
 
