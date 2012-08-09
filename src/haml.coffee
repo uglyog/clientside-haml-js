@@ -18,6 +18,7 @@ root.haml =
         generator - Which code generator to use
                          javascript (default)
                          coffeescript
+                         productionjavascript
 
     Returns a javascript function
   ###
@@ -25,10 +26,10 @@ root.haml =
     if typeof options == 'string'
       @_compileHamlTemplate options, new haml.JsCodeGenerator()
     else
-      if options.generator isnt 'coffeescript'
-        codeGenerator = new haml.JsCodeGenerator()
-      else
-        codeGenerator = new haml.CoffeeCodeGenerator()
+      codeGenerator = switch options.generator
+        when 'coffeescript' then new haml.CoffeeCodeGenerator()
+        when 'productionjavascript' then new haml.ProductionJsCodeGenerator()
+        else new haml.JsCodeGenerator()
 
       if options.source?
         tokinser = new haml.Tokeniser(template: options.source)
@@ -504,6 +505,7 @@ root.haml =
 root.haml.Tokeniser = Tokeniser
 root.haml.Buffer = Buffer
 root.haml.JsCodeGenerator = JsCodeGenerator
+root.haml.ProductionJsCodeGenerator = ProductionJsCodeGenerator
 root.haml.CoffeeCodeGenerator = CoffeeCodeGenerator
 root.haml.HamlRuntime = HamlRuntime
 root.haml.filters = filters

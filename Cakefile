@@ -8,6 +8,7 @@ appFiles  = [
   'src/buffer.coffee',
   'src/codegenerator.coffee',
   'src/jscodegenerator.coffee',
+  'src/productionjscodegenerator.coffee',
   'src/coffeecodegenerator.coffee',
   'src/filters.coffee',
   'src/haml.coffee'

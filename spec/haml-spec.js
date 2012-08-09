@@ -66,42 +66,90 @@
       });
     });
     describe('simple template', function() {
+      var generator, _i, _len, _ref, _results;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="simple">\n' + '%h1\n' + '  %div\n' + '    %p\n' + '    %span</script>');
       });
-      return it('should render the correct html', function() {
-        var html;
-        html = haml.compileHaml('simple')();
-        return expect(html).toEqual('\n' + '<h1>\n' + '  <div>\n' + '    <p>\n' + '    </p>\n' + '    <span>\n' + '    </span>\n' + '  </div>\n' + '</h1>\n');
-      });
+      _ref = ['javascript', 'productionjavascript'];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _results.push((function(generator) {
+          return it('should render the correct html for ' + generator, function() {
+            var html;
+            html = haml.compileHaml({
+              sourceId: 'simple',
+              generator: generator
+            })();
+            return expect(html).toEqual('\n' + '<h1>\n' + '  <div>\n' + '    <p>\n' + '    </p>\n' + '    <span>\n' + '    </span>\n' + '  </div>\n' + '</h1>\n');
+          });
+        })(generator));
+      }
+      return _results;
     });
     describe('invalid template', function() {
+      var generator, _i, _len, _ref, _results;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="invalid">%h1\n' + '  %h2\n' + '    %h3{%h3 %h4}\n' + '      %h4\n' + '        %h5</script>' + '<script type="text/template" id="invalid2">%h1\n' + '  %h2\n' + '    %h3{id: "test", class: "test-class"\n' + '      %h4\n' + '        %h5</script>' + '<script type="text/template" id="invalid3">' + '%a#back(href="#" class="button back)\n' + '%span Back\n' + '%a#continue(href="#" class="button continue")\n' + '%span Save and Continue\n' + '</script>');
       });
-      return it('should provide a meaningful message', function() {
-        var line;
-        line = isIe7or8() ? '4' : '3';
-        expect(function() {
-          return haml.compileHaml('invalid')();
-        }).toThrowContaining('at line ' + line + ' and character 16:\n' + '    %h3{%h3 %h4}\n' + '---------------^');
-        expect(function() {
-          return haml.compileHaml('invalid2');
-        }).toThrowContaining('at line ' + line + ' and character 8:\n' + '    %h3{id: "test", class: "test-class"\n' + '-------^');
-        return expect(function() {
-          return haml.compileHaml('invalid3');
-        }).toThrowContaining('Expected a quoted string or an identifier for the attribute value');
-      });
+      _ref = ['javascript', 'productionjavascript'];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _results.push((function(generator) {
+          return it('should provide a meaningful message for ' + generator, function() {
+            var line;
+            line = isIe7or8() ? '4' : '3';
+            expect(function() {
+              return haml.compileHaml({
+                sourceId: 'invalid',
+                generator: generator
+              })();
+            }).toThrowContaining((function() {
+              switch (generator) {
+                case 'productionjavascript':
+                  return 'Incorrect embedded code has resulted in an invalid Haml function';
+                default:
+                  return 'at line ' + line + ' and character 16:\n' + '    %h3{%h3 %h4}\n' + '---------------^';
+              }
+            })());
+            expect(function() {
+              return haml.compileHaml({
+                sourceId: 'invalid2',
+                generator: generator
+              });
+            }).toThrowContaining('at line ' + line + ' and character 8:\n' + '    %h3{id: "test", class: "test-class"\n' + '-------^');
+            return expect(function() {
+              return haml.compileHaml({
+                sourceId: 'invalid3',
+                generator: generator
+              });
+            }).toThrowContaining('Expected a quoted string or an identifier for the attribute value');
+          });
+        })(generator));
+      }
+      return _results;
     });
     describe('simple template with text', function() {
+      var generator, _fn, _i, _len, _ref;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="simple">\n' + '%h1\n' + '  %div\n' + '    %p This is "some" text\n' + '      This is "some" text\n' + '    This is some <div> text\n' + '    \\%span\n' + '    %span %h1 %h1 %h1</script>');
       });
-      it('should render the correct html', function() {
-        var html;
-        html = haml.compileHaml('simple')();
-        return expect(html).toEqual('\n' + '<h1>\n' + '  <div>\n' + '    <p>\n' + '      This is "some" text\n' + '      This is "some" text\n' + '    </p>\n' + '    This is some <div> text\n' + '    %span\n' + '    <span>\n' + '      %h1 %h1 %h1\n' + '    </span>\n' + '  </div>\n' + '</h1>\n');
-      });
+      _ref = ['javascript', 'productionjavascript'];
+      _fn = function(generator) {
+        return it('should render the correct html for ' + generator, function() {
+          var html;
+          html = haml.compileHaml({
+            sourceId: 'simple',
+            generator: generator
+          })();
+          return expect(html).toEqual('\n' + '<h1>\n' + '  <div>\n' + '    <p>\n' + '      This is "some" text\n' + '      This is "some" text\n' + '    </p>\n' + '    This is some <div> text\n' + '    %span\n' + '    <span>\n' + '      %h1 %h1 %h1\n' + '    </span>\n' + '  </div>\n' + '</h1>\n');
+        });
+      };
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _fn(generator);
+      }
       return it('should render the correct html with coffeescript', function() {
         var html;
         html = haml.compileCoffeeHaml('simple')();
@@ -109,18 +157,29 @@
       });
     });
     describe('template with {} attributes', function() {
+      var generator, _fn, _i, _len, _ref;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="attributes">\n' + '%h1\n' + '  %div{id: "test"}\n' + '    %p{id: \'test2\', ' + '        class: "blah", name: null, test: false, checked: false, selected: true} This is some text\n' + '      This is some text\n' + '    This is some div text\n' + '    %label(for = "a"){for: ["b", "c"]}/\n' + '    %div{id: [\'test\', 1], class: [model.name, "class2"], for: "something"}\n' + '</script>\n' + '<script type="text/template" id="coffee-attributes">\n' + '%h1\n' + '  %div{id: "test"}\n' + '    %p{id: \'test2\', ' + '        class: "blah", name: null, test: false, checked: false, selected: true} This is some text\n' + '      This is some text\n' + '    This is some div text\n' + '    %label(for = "a"){for: ["b", "c"]}/\n' + '    %div{id: [\'test\', 1], class: [@model.name, "class2"], for: "something"}\n' + '</script>');
       });
-      it('should render the correct html', function() {
-        var html;
-        html = haml.compileHaml('attributes')({
-          model: {
-            name: 'class1'
-          }
+      _ref = ['javascript', 'productionjavascript'];
+      _fn = function(generator) {
+        return it('should render the correct html for ' + generator, function() {
+          var html;
+          html = haml.compileHaml({
+            sourceId: 'attributes',
+            generator: generator
+          })({
+            model: {
+              name: 'class1'
+            }
+          });
+          return expect(html).toEqual('\n' + '<h1>\n' + '  <div id="test">\n' + '    <p id="test2" class="blah" selected="selected">\n' + '      This is some text\n' + '      This is some text\n' + '    </p>\n' + '    This is some div text\n' + '    <label for="a-b-c"/>\n' + '    <div id="test-1" class="class1 class2" for="something">\n' + '    </div>\n' + '  </div>\n' + '</h1>\n');
         });
-        return expect(html).toEqual('\n' + '<h1>\n' + '  <div id="test">\n' + '    <p id="test2" class="blah" selected="selected">\n' + '      This is some text\n' + '      This is some text\n' + '    </p>\n' + '    This is some div text\n' + '    <label for="a-b-c"/>\n' + '    <div id="test-1" class="class1 class2" for="something">\n' + '    </div>\n' + '  </div>\n' + '</h1>\n');
-      });
+      };
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _fn(generator);
+      }
       return it('with coffescript should render the correct html', function() {
         var html;
         html = haml.compileCoffeeHaml('coffee-attributes').call({
@@ -132,18 +191,30 @@
       });
     });
     describe('template with () attributes', function() {
+      var generator, _i, _len, _ref, _results;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="attributes">\n' + '%h1\n' + '  %div(id = "test")\n' + '    %p(id=test2 class="blah"\n selected="selected") This is some text\n' + '      This is some text\n' + '    This is some div text\n' + '    %div(id=test){id: 1, class: [model.name, "class2"]}\n' + '    %a(href="#" data-key="MOD_DESC")/' + '</script>');
       });
-      return it('should render the correct html', function() {
-        var html;
-        html = haml.compileHaml('attributes')({
-          model: {
-            name: 'class1'
-          }
-        });
-        return expect(html).toEqual('\n' + '<h1>\n' + '  <div id="test">\n' + '    <p id="test2" class="blah" selected="selected">\n' + '      This is some text\n' + '      This is some text\n' + '    </p>\n' + '    This is some div text\n' + '    <div id="test-1" class="class1 class2">\n' + '    </div>\n' + '    <a href="#" data-key="MOD_DESC"/>\n' + '  </div>\n' + '</h1>\n');
-      });
+      _ref = ['javascript', 'productionjavascript'];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _results.push((function(generator) {
+          return it('should render the correct html for ' + generator, function() {
+            var html;
+            html = haml.compileHaml({
+              sourceId: 'attributes',
+              generator: generator
+            })({
+              model: {
+                name: 'class1'
+              }
+            });
+            return expect(html).toEqual('\n' + '<h1>\n' + '  <div id="test">\n' + '    <p id="test2" class="blah" selected="selected">\n' + '      This is some text\n' + '      This is some text\n' + '    </p>\n' + '    This is some div text\n' + '    <div id="test-1" class="class1 class2">\n' + '    </div>\n' + '    <a href="#" data-key="MOD_DESC"/>\n' + '  </div>\n' + '</h1>\n');
+          });
+        })(generator));
+      }
+      return _results;
     });
     describe('template with id and class selectors', function() {
       beforeEach(function() {
@@ -176,18 +247,30 @@
       });
     });
     describe('template with Javascript evaluation', function() {
+      var generator, _i, _len, _ref, _results;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="evaluation">\n' + '.box.error\n' + '  %span\n' + '    = errorTitle\n' + '  .clear\n' + '    %span= errorHeading\n' + '    = var label = "Calculation: "; label + (1 + 2 * 3)\n' + '    = ["hi", "there", "reader!"]\n' + '    = evilScript \n' + '    %span&= errorHeading\n' + '    &= var label = "Calculation: "; label + (1 + 2 * 3)\n' + '    &= ["hi", "there", "reader!"]\n' + '    &= evilScript \n' + '    %span!= errorHeading\n' + '    != var label = "Calculation: "; label + (1 + 2 * 3)\n' + '    != ["hi", "there", "reader!"]\n' + '    != evilScript \n' + '</script>');
       });
-      return it('should render the correct html', function() {
-        var html;
-        html = haml.compileHaml('evaluation')({
-          errorTitle: "Error Title",
-          errorHeading: "Error Heading <div>div text</div>",
-          evilScript: '<script>alert("I\'m evil!");</script>'
-        });
-        return expect(html).toEqual('\n' + '<div class="box error">\n' + '  <span>\n' + '    Error Title\n' + '  </span>\n' + '  <div class="clear">\n' + '    <span>\n' + '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' + '    </span>\n' + '    Calculation: 7\n' + '    hi,there,reader!\n' + '    &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);&lt;/script&gt;\n' + '    <span>\n' + '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' + '    </span>\n' + '    Calculation: 7\n' + '    hi,there,reader!\n' + '    &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);&lt;/script&gt;\n' + '    <span>\n' + '      Error Heading <div>div text</div>\n' + '    </span>\n' + '    Calculation: 7\n' + '    hi,there,reader!\n' + '    <script>alert("I\'m evil!");</script>\n' + '  </div>\n' + '</div>\n');
-      });
+      _ref = ['javascript', 'productionjavascript'];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _results.push((function(generator) {
+          return it('should render the correct html for ' + generator, function() {
+            var html;
+            html = haml.compileHaml({
+              sourceId: 'evaluation',
+              generator: generator
+            })({
+              errorTitle: "Error Title",
+              errorHeading: "Error Heading <div>div text</div>",
+              evilScript: '<script>alert("I\'m evil!");</script>'
+            });
+            return expect(html).toEqual('\n' + '<div class="box error">\n' + '  <span>\n' + '    Error Title\n' + '  </span>\n' + '  <div class="clear">\n' + '    <span>\n' + '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' + '    </span>\n' + '    Calculation: 7\n' + '    hi,there,reader!\n' + '    &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);&lt;/script&gt;\n' + '    <span>\n' + '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' + '    </span>\n' + '    Calculation: 7\n' + '    hi,there,reader!\n' + '    &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);&lt;/script&gt;\n' + '    <span>\n' + '      Error Heading <div>div text</div>\n' + '    </span>\n' + '    Calculation: 7\n' + '    hi,there,reader!\n' + '    <script>alert("I\'m evil!");</script>\n' + '  </div>\n' + '</div>\n');
+          });
+        })(generator));
+      }
+      return _results;
     });
     describe('template with Coffee evaluation', function() {
       beforeEach(function() {
@@ -204,39 +287,59 @@
       });
     });
     describe('template with Javascript code lines', function() {
+      var generator, _i, _len, _ref, _results;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="evaluation">\n' + '.main\n' + '  - var foo = "hello";\n' + '  - foo += " world";\n' + '  %span\n' + '    = foo\n' + '</script>\n' + '<script type="text/template" id="evaluation-with-loops">\n' + '.main\n' + '  - _(["Option 1", "Option 2", "Option 3"]).each(function (option) {\n' + '    %span= option\n' + '  - });\n' + '  - for (var i = 0; i < 5; i++) {\n' + '    %p= i\n' + '  - }\n' + '</script>' + '<script type="text/template" id="evaluation-using-context">\n' + '.main\n' + '  - var foo = model.foo;\n' + '  - foo += " world";\n' + '  %span\n' + '    = foo\n' + '</script>' + '<script type="text/template" id="attribute-hash-evaluation-using-outer-scope">\n' + '.main\n' + '  - var foo = "hello world";\n' + '  %span{someattribute: foo}\n' + '</script>');
       });
-      it('should render the correct html using locally defined variables', function() {
-        var html;
-        html = haml.compileHaml('evaluation')();
-        return expect(html).toEqual('\n<div class="main">\n' + '  <span>\n' + '    hello world\n' + '  </span>\n' + '</div>\n');
-      });
-      it('should render the correct html when the template has loops', function() {
-        var html;
-        html = haml.compileHaml('evaluation-with-loops')();
-        return expect(html).toEqual('\n<div class="main">\n' + '    <span>\n' + '      Option 1\n' + '    </span>\n' + '    <span>\n' + '      Option 2\n' + '    </span>\n' + '    <span>\n' + '      Option 3\n' + '    </span>\n' + '    <p>\n' + '      0\n' + '    </p>\n' + '    <p>\n' + '      1\n' + '    </p>\n' + '    <p>\n' + '      2\n' + '    </p>\n' + '    <p>\n' + '      3\n' + '    </p>\n' + '    <p>\n' + '      4\n' + '    </p>\n' + '</div>\n');
-      });
-      it('should provide access to the context within inline javascript', function() {
-        var html, model;
-        model = {
-          foo: "hello"
-        };
-        html = haml.compileHaml('evaluation-using-context').call(null, {
-          model: model
-        });
-        return expect(html).toEqual('\n<div class="main">\n' + '  <span>\n' + '    hello world\n' + '  </span>\n' + '</div>\n');
-      });
-      return it('should be able to access variables declared as part of the haml', function() {
-        var html, model;
-        model = {
-          foo: "hello"
-        };
-        html = haml.compileHaml('attribute-hash-evaluation-using-outer-scope').call(null, {
-          model: model
-        });
-        return expect(html).toEqual('\n<div class="main">\n' + '  <span someattribute="hello world">\n' + '  </span>\n' + '</div>\n');
-      });
+      _ref = ['javascript', 'productionjavascript'];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _results.push((function(generator) {
+          it('should render the correct html using locally defined variables for ' + generator, function() {
+            var html;
+            html = haml.compileHaml({
+              sourceId: 'evaluation',
+              generator: generator
+            })();
+            return expect(html).toEqual('\n<div class="main">\n' + '  <span>\n' + '    hello world\n' + '  </span>\n' + '</div>\n');
+          });
+          it('should render the correct html when the template has loops for ' + generator, function() {
+            var html;
+            html = haml.compileHaml('evaluation-with-loops', {
+              generator: generator
+            })();
+            return expect(html).toEqual('\n<div class="main">\n' + '    <span>\n' + '      Option 1\n' + '    </span>\n' + '    <span>\n' + '      Option 2\n' + '    </span>\n' + '    <span>\n' + '      Option 3\n' + '    </span>\n' + '    <p>\n' + '      0\n' + '    </p>\n' + '    <p>\n' + '      1\n' + '    </p>\n' + '    <p>\n' + '      2\n' + '    </p>\n' + '    <p>\n' + '      3\n' + '    </p>\n' + '    <p>\n' + '      4\n' + '    </p>\n' + '</div>\n');
+          });
+          it('should provide access to the context within inline javascript for ' + generator, function() {
+            var html, model;
+            model = {
+              foo: "hello"
+            };
+            html = haml.compileHaml({
+              sourceId: 'evaluation-using-context',
+              generator: generator
+            }).call(null, {
+              model: model
+            });
+            return expect(html).toEqual('\n<div class="main">\n' + '  <span>\n' + '    hello world\n' + '  </span>\n' + '</div>\n');
+          });
+          return it('should be able to access variables declared as part of the haml for ' + generator, function() {
+            var html, model;
+            model = {
+              foo: "hello"
+            };
+            html = haml.compileHaml({
+              sourceId: 'attribute-hash-evaluation-using-outer-scope',
+              generator: generator
+            }).call(null, {
+              model: model
+            });
+            return expect(html).toEqual('\n<div class="main">\n' + '  <span someattribute="hello world">\n' + '  </span>\n' + '</div>\n');
+          });
+        })(generator));
+      }
+      return _results;
     });
     describe('template with Coffeescript code lines', function() {
       beforeEach(function() {
@@ -286,14 +389,26 @@
       });
     });
     describe('template with Javascript code lines and no closing blocks', function() {
+      var generator, _i, _len, _ref, _results;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="evaluation-with-loops">\n' + '.main\n' + '  - _(["Option 1", "Option 2", "Option 3"]).each(function (option) {\n' + '    %span= option\n' + '  - for (var i = 0; i < 5; i++) {\n' + '    %p= i\n' + '</script>');
       });
-      return it('should render the correct html when the template has loops', function() {
-        var html;
-        html = haml.compileHaml('evaluation-with-loops')();
-        return expect(html).toEqual('\n<div class="main">\n' + '    <span>\n' + '      Option 1\n' + '    </span>\n' + '    <span>\n' + '      Option 2\n' + '    </span>\n' + '    <span>\n' + '      Option 3\n' + '    </span>\n' + '    <p>\n' + '      0\n' + '    </p>\n' + '    <p>\n' + '      1\n' + '    </p>\n' + '    <p>\n' + '      2\n' + '    </p>\n' + '    <p>\n' + '      3\n' + '    </p>\n' + '    <p>\n' + '      4\n' + '    </p>\n' + '</div>\n');
-      });
+      _ref = ['javascript', 'productionjavascript'];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _results.push((function(generator) {
+          return it('should render the correct html when the template has loops for ' + generator, function() {
+            var html;
+            html = haml.compileHaml({
+              sourceId: 'evaluation-with-loops',
+              generator: generator
+            })();
+            return expect(html).toEqual('\n<div class="main">\n' + '    <span>\n' + '      Option 1\n' + '    </span>\n' + '    <span>\n' + '      Option 2\n' + '    </span>\n' + '    <span>\n' + '      Option 3\n' + '    </span>\n' + '    <p>\n' + '      0\n' + '    </p>\n' + '    <p>\n' + '      1\n' + '    </p>\n' + '    <p>\n' + '      2\n' + '    </p>\n' + '    <p>\n' + '      3\n' + '    </p>\n' + '    <p>\n' + '      4\n' + '    </p>\n' + '</div>\n');
+          });
+        })(generator));
+      }
+      return _results;
     });
     describe('Escaping HTML', function() {
       beforeEach(function() {
@@ -306,24 +421,36 @@
       });
     });
     describe('Issue #2 - Anonymous functions should pass through \'this\'', function() {
+      var generator, _i, _len, _ref, _results;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="anonymous">\n' + '.test = this.fnOnThis()\n' + '.test2 = fnOnThis()\n' + '</script>');
       });
-      return it('should the correct html', function() {
-        var context, html, that;
-        that = {
-          fnOnThis: function() {
-            return 'TEST';
-          }
-        };
-        context = {
-          fnOnThis: function() {
-            return 'TEST2';
-          }
-        };
-        html = haml.compileHaml('anonymous').call(that, context);
-        return expect(html).toEqual('\n<div class="test">\n' + '  TEST\n' + '</div>\n' + '<div class="test2">\n' + '  TEST2\n' + '</div>\n');
-      });
+      _ref = ['javascript', 'productionjavascript'];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _results.push((function(generator) {
+          return it('should the correct html for ' + generator, function() {
+            var context, html, that;
+            that = {
+              fnOnThis: function() {
+                return 'TEST';
+              }
+            };
+            context = {
+              fnOnThis: function() {
+                return 'TEST2';
+              }
+            };
+            html = haml.compileHaml({
+              sourceId: 'anonymous',
+              generator: generator
+            }).call(that, context);
+            return expect(html).toEqual('\n<div class="test">\n' + '  TEST\n' + '</div>\n' + '<div class="test2">\n' + '  TEST2\n' + '</div>\n');
+          });
+        })(generator));
+      }
+      return _results;
     });
     describe('Issue #6 - Empty lines should be ignored', function() {
       beforeEach(function() {
@@ -336,16 +463,28 @@
       });
     });
     describe('Issue #14 - rendering null values', function() {
+      var generator, _i, _len, _ref, _results;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="null-js-values">\n' + '.inline-null\n' + '  = null;\n' + '.null-evaluating\n' + '  = nullValue;\n' + '.embedded-null= null\n' + '</script>');
       });
-      return it('should render null values as a string', function() {
-        var html;
-        html = haml.compileHaml('null-js-values')({
-          nullValue: null
-        });
-        return expect(html).toEqual('\n<div class="inline-null">\n' + '  \n' + '</div>\n' + '<div class="null-evaluating">\n' + '  \n' + '</div>\n' + '<div class="embedded-null">\n' + '  \n' + '</div>\n');
-      });
+      _ref = ['javascript', 'productionjavascript'];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _results.push((function(generator) {
+          return it('should render null values as a string for ' + generator, function() {
+            var html;
+            html = haml.compileHaml({
+              sourceId: 'null-js-values',
+              generator: generator
+            })({
+              nullValue: null
+            });
+            return expect(html).toEqual('\n<div class="inline-null">\n' + '  \n' + '</div>\n' + '<div class="null-evaluating">\n' + '  \n' + '</div>\n' + '<div class="embedded-null">\n' + '  \n' + '</div>\n');
+          });
+        })(generator));
+      }
+      return _results;
     });
     describe('Whitespace Removal: > and <', function() {
       beforeEach(function() {
@@ -457,14 +596,21 @@
       });
     });
     describe('Multiline code blocks', function() {
+      var generator, _i, _len, _ref;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="multiline">\n' + '%whoo\n' + '  %hoo=                           |\n' + '    "I think this might get " +   |\n' + '    "pretty long so I should " +  |\n' + '    "probably make it " +         |\n' + '    "multiline so it doesn\'t " + |\n' + '    "look awful."                 |\n' + '  %p This is short.\n' + '</script>');
       });
-      it('should render the correct html', function() {
-        var html;
-        html = haml.compileHaml('multiline')();
-        return expect(html).toEqual('\n<whoo>\n' + '  <hoo>\n' + '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' + '  </hoo>\n' + '  <p>\n' + '    This is short.\n' + '  </p>\n' + '</whoo>\n');
-      });
+      _ref = ['javascript', 'productionjavascript'];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        it('should render the correct html for ' + generator, function() {
+          var html;
+          html = haml.compileHaml('multiline', {
+            generator: generator
+          })();
+          return expect(html).toEqual('\n<whoo>\n' + '  <hoo>\n' + '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' + '  </hoo>\n' + '  <p>\n' + '    This is short.\n' + '  </p>\n' + '</whoo>\n');
+        });
+      }
       return it('with coffescript should render the correct html', function() {
         var html;
         html = haml.compileCoffeeHaml('multiline')();

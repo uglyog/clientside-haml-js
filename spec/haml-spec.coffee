@@ -52,18 +52,20 @@ describe 'haml', () ->
         '    %p\n' +
         '    %span</script>')
 
-    it 'should render the correct html', () ->
-      html = haml.compileHaml('simple')()
-      expect(html).toEqual(
-        '\n' +
-        '<h1>\n' +
-        '  <div>\n' +
-        '    <p>\n' +
-        '    </p>\n' +
-        '    <span>\n' +
-        '    </span>\n' +
-        '  </div>\n' +
-        '</h1>\n')
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'should render the correct html for ' + generator, () ->
+          html = haml.compileHaml(sourceId: 'simple', generator: generator)()
+          expect(html).toEqual(
+            '\n' +
+            '<h1>\n' +
+            '  <div>\n' +
+            '    <p>\n' +
+            '    </p>\n' +
+            '    <span>\n' +
+            '    </span>\n' +
+            '  </div>\n' +
+            '</h1>\n')
 
   describe 'invalid template', () ->
 
@@ -86,16 +88,22 @@ describe 'haml', () ->
         '</script>'
       )
 
-    it 'should provide a meaningful message', () ->
-      # IE 7 and 8 add an extra newline at the start of the script contents
-      line = if isIe7or8() then '4' else '3'
-      expect(() -> haml.compileHaml('invalid')() ).toThrowContaining('at line ' + line + ' and character 16:\n' +
-          '    %h3{%h3 %h4}\n' +
-          '---------------^')
-      expect(() -> haml.compileHaml('invalid2') ).toThrowContaining('at line ' + line + ' and character 8:\n' +
-        '    %h3{id: "test", class: "test-class"\n' +
-        '-------^')
-      expect(() -> haml.compileHaml('invalid3') ).toThrowContaining('Expected a quoted string or an identifier for the attribute value')
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'should provide a meaningful message for ' + generator, () ->
+          # IE 7 and 8 add an extra newline at the start of the script contents
+          line = if isIe7or8() then '4' else '3'
+          expect(() -> haml.compileHaml(sourceId: 'invalid', generator: generator)() ).toThrowContaining(
+            switch generator
+              when 'productionjavascript' then 'Incorrect embedded code has resulted in an invalid Haml function'
+              else
+                'at line ' + line + ' and character 16:\n' +
+                '    %h3{%h3 %h4}\n' +
+                '---------------^')
+          expect(() -> haml.compileHaml(sourceId: 'invalid2', generator: generator) ).toThrowContaining('at line ' + line + ' and character 8:\n' +
+            '    %h3{id: "test", class: "test-class"\n' +
+            '-------^')
+          expect(() -> haml.compileHaml(sourceId: 'invalid3', generator: generator) ).toThrowContaining('Expected a quoted string or an identifier for the attribute value')
 
   describe 'simple template with text', () ->
 
@@ -109,23 +117,25 @@ describe 'haml', () ->
         '    \\%span\n' +
         '    %span %h1 %h1 %h1</script>')
 
-    it 'should render the correct html', () ->
-      html = haml.compileHaml('simple')()
-      expect(html).toEqual(
-        '\n' +
-        '<h1>\n' +
-        '  <div>\n' +
-        '    <p>\n' +
-        '      This is "some" text\n' +
-        '      This is "some" text\n' +
-        '    </p>\n' +
-        '    This is some <div> text\n' +
-        '    %span\n' +
-        '    <span>\n' +
-        '      %h1 %h1 %h1\n' +
-        '    </span>\n' +
-        '  </div>\n' +
-        '</h1>\n')
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'should render the correct html for ' + generator, () ->
+          html = haml.compileHaml(sourceId: 'simple', generator: generator)()
+          expect(html).toEqual(
+            '\n' +
+            '<h1>\n' +
+            '  <div>\n' +
+            '    <p>\n' +
+            '      This is "some" text\n' +
+            '      This is "some" text\n' +
+            '    </p>\n' +
+            '    This is some <div> text\n' +
+            '    %span\n' +
+            '    <span>\n' +
+            '      %h1 %h1 %h1\n' +
+            '    </span>\n' +
+            '  </div>\n' +
+            '</h1>\n')
 
     it 'should render the correct html with coffeescript', () ->
       html = haml.compileCoffeeHaml('simple')()
@@ -169,22 +179,24 @@ describe 'haml', () ->
         '    %div{id: [\'test\', 1], class: [@model.name, "class2"], for: "something"}\n' +
         '</script>')
 
-    it 'should render the correct html', () ->
-      html = haml.compileHaml('attributes')({ model: { name: 'class1' } })
-      expect(html).toEqual(
-        '\n' +
-        '<h1>\n' +
-        '  <div id="test">\n' +
-        '    <p id="test2" class="blah" selected="selected">\n' +
-        '      This is some text\n' +
-        '      This is some text\n' +
-        '    </p>\n' +
-        '    This is some div text\n' +
-        '    <label for="a-b-c"/>\n' +
-        '    <div id="test-1" class="class1 class2" for="something">\n' +
-        '    </div>\n' +
-        '  </div>\n' +
-        '</h1>\n')
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'should render the correct html for ' + generator, () ->
+          html = haml.compileHaml(sourceId: 'attributes', generator: generator)({ model: { name: 'class1' } })
+          expect(html).toEqual(
+            '\n' +
+            '<h1>\n' +
+            '  <div id="test">\n' +
+            '    <p id="test2" class="blah" selected="selected">\n' +
+            '      This is some text\n' +
+            '      This is some text\n' +
+            '    </p>\n' +
+            '    This is some div text\n' +
+            '    <label for="a-b-c"/>\n' +
+            '    <div id="test-1" class="class1 class2" for="something">\n' +
+            '    </div>\n' +
+            '  </div>\n' +
+            '</h1>\n')
 
     it 'with coffescript should render the correct html', () ->
       html = haml.compileCoffeeHaml('coffee-attributes').call({ model: { name: 'class1' } })
@@ -216,22 +228,24 @@ describe 'haml', () ->
         '    %a(href="#" data-key="MOD_DESC")/' +
         '</script>')
 
-    it 'should render the correct html', () ->
-      html = haml.compileHaml('attributes')({ model: { name: 'class1' } })
-      expect(html).toEqual(
-        '\n' +
-        '<h1>\n' +
-        '  <div id="test">\n' +
-        '    <p id="test2" class="blah" selected="selected">\n' +
-        '      This is some text\n' +
-        '      This is some text\n' +
-        '    </p>\n' +
-        '    This is some div text\n' +
-        '    <div id="test-1" class="class1 class2">\n' +
-        '    </div>\n' +
-        '    <a href="#" data-key="MOD_DESC"/>\n' +
-        '  </div>\n' +
-        '</h1>\n')
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'should render the correct html for ' + generator, () ->
+          html = haml.compileHaml(sourceId: 'attributes', generator: generator)({ model: { name: 'class1' } })
+          expect(html).toEqual(
+            '\n' +
+            '<h1>\n' +
+            '  <div id="test">\n' +
+            '    <p id="test2" class="blah" selected="selected">\n' +
+            '      This is some text\n' +
+            '      This is some text\n' +
+            '    </p>\n' +
+            '    This is some div text\n' +
+            '    <div id="test-1" class="class1 class2">\n' +
+            '    </div>\n' +
+            '    <a href="#" data-key="MOD_DESC"/>\n' +
+            '  </div>\n' +
+            '</h1>\n')
 
   describe 'template with id and class selectors', () ->
 
@@ -371,39 +385,41 @@ describe 'haml', () ->
         '    != evilScript \n' +
         '</script>')
 
-    it 'should render the correct html', () ->
-      html = haml.compileHaml('evaluation')({
-          errorTitle: "Error Title",
-          errorHeading: "Error Heading <div>div text</div>",
-          evilScript: '<script>alert("I\'m evil!");</script>'
-        })
-      expect(html).toEqual(
-        '\n' +
-        '<div class="box error">\n' +
-        '  <span>\n' +
-        '    Error Title\n' +
-        '  </span>\n' +
-        '  <div class="clear">\n' +
-        '    <span>\n' +
-        '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' +
-        '    </span>\n' +
-        '    Calculation: 7\n' +
-        '    hi,there,reader!\n' +
-        '    &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);&lt;/script&gt;\n' +
-        '    <span>\n' +
-        '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' +
-        '    </span>\n' +
-        '    Calculation: 7\n' +
-        '    hi,there,reader!\n' +
-        '    &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);&lt;/script&gt;\n' +
-        '    <span>\n' +
-        '      Error Heading <div>div text</div>\n' +
-        '    </span>\n' +
-        '    Calculation: 7\n' +
-        '    hi,there,reader!\n' +
-        '    <script>alert("I\'m evil!");</script>\n' +
-        '  </div>\n' +
-        '</div>\n')
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'should render the correct html for ' + generator, () ->
+          html = haml.compileHaml(sourceId: 'evaluation', generator: generator)({
+              errorTitle: "Error Title",
+              errorHeading: "Error Heading <div>div text</div>",
+              evilScript: '<script>alert("I\'m evil!");</script>'
+            })
+          expect(html).toEqual(
+            '\n' +
+            '<div class="box error">\n' +
+            '  <span>\n' +
+            '    Error Title\n' +
+            '  </span>\n' +
+            '  <div class="clear">\n' +
+            '    <span>\n' +
+            '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' +
+            '    </span>\n' +
+            '    Calculation: 7\n' +
+            '    hi,there,reader!\n' +
+            '    &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);&lt;/script&gt;\n' +
+            '    <span>\n' +
+            '      Error Heading &lt;div&gt;div text&lt;/div&gt;\n' +
+            '    </span>\n' +
+            '    Calculation: 7\n' +
+            '    hi,there,reader!\n' +
+            '    &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);&lt;/script&gt;\n' +
+            '    <span>\n' +
+            '      Error Heading <div>div text</div>\n' +
+            '    </span>\n' +
+            '    Calculation: 7\n' +
+            '    hi,there,reader!\n' +
+            '    <script>alert("I\'m evil!");</script>\n' +
+            '  </div>\n' +
+            '</div>\n')
 
   describe 'template with Coffee evaluation', () ->
 
@@ -492,63 +508,65 @@ describe 'haml', () ->
         '  %span{someattribute: foo}\n' +
         '</script>')
 
-    it 'should render the correct html using locally defined variables', () ->
-      html = haml.compileHaml('evaluation')()
-      expect(html).toEqual(
-        '\n<div class="main">\n' +
-        '  <span>\n' +
-        '    hello world\n' +
-        '  </span>\n' +
-        '</div>\n')
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'should render the correct html using locally defined variables for ' + generator, () ->
+          html = haml.compileHaml(sourceId: 'evaluation', generator: generator)()
+          expect(html).toEqual(
+            '\n<div class="main">\n' +
+            '  <span>\n' +
+            '    hello world\n' +
+            '  </span>\n' +
+            '</div>\n')
 
-    it 'should render the correct html when the template has loops', () ->
-      html = haml.compileHaml('evaluation-with-loops')()
-      expect(html).toEqual(
-        '\n<div class="main">\n' +
-        '    <span>\n' +
-        '      Option 1\n' +
-        '    </span>\n' +
-        '    <span>\n' +
-        '      Option 2\n' +
-        '    </span>\n' +
-        '    <span>\n' +
-        '      Option 3\n' +
-        '    </span>\n' +
-        '    <p>\n' +
-        '      0\n' +
-        '    </p>\n' +
-        '    <p>\n' +
-        '      1\n' +
-        '    </p>\n' +
-        '    <p>\n' +
-        '      2\n' +
-        '    </p>\n' +
-        '    <p>\n' +
-        '      3\n' +
-        '    </p>\n' +
-        '    <p>\n' +
-        '      4\n' +
-        '    </p>\n' +
-        '</div>\n')
+        it 'should render the correct html when the template has loops for ' + generator, () ->
+          html = haml.compileHaml('evaluation-with-loops', generator: generator)()
+          expect(html).toEqual(
+            '\n<div class="main">\n' +
+            '    <span>\n' +
+            '      Option 1\n' +
+            '    </span>\n' +
+            '    <span>\n' +
+            '      Option 2\n' +
+            '    </span>\n' +
+            '    <span>\n' +
+            '      Option 3\n' +
+            '    </span>\n' +
+            '    <p>\n' +
+            '      0\n' +
+            '    </p>\n' +
+            '    <p>\n' +
+            '      1\n' +
+            '    </p>\n' +
+            '    <p>\n' +
+            '      2\n' +
+            '    </p>\n' +
+            '    <p>\n' +
+            '      3\n' +
+            '    </p>\n' +
+            '    <p>\n' +
+            '      4\n' +
+            '    </p>\n' +
+            '</div>\n')
 
-    it 'should provide access to the context within inline javascript', () ->
-      model = { foo: "hello" }
-      html = haml.compileHaml('evaluation-using-context').call(null, {model: model})
-      expect(html).toEqual(
-        '\n<div class="main">\n' +
-        '  <span>\n' +
-        '    hello world\n' +
-        '  </span>\n' +
-        '</div>\n')
+        it 'should provide access to the context within inline javascript for ' + generator, () ->
+          model = { foo: "hello" }
+          html = haml.compileHaml(sourceId: 'evaluation-using-context', generator: generator).call(null, {model: model})
+          expect(html).toEqual(
+            '\n<div class="main">\n' +
+            '  <span>\n' +
+            '    hello world\n' +
+            '  </span>\n' +
+            '</div>\n')
 
-    it 'should be able to access variables declared as part of the haml', () ->
-      model = { foo: "hello" }
-      html = haml.compileHaml('attribute-hash-evaluation-using-outer-scope').call(null, {model: model})
-      expect(html).toEqual(
-        '\n<div class="main">\n' +
-        '  <span someattribute="hello world">\n' +
-        '  </span>\n' +
-        '</div>\n')
+        it 'should be able to access variables declared as part of the haml for ' + generator, () ->
+          model = { foo: "hello" }
+          html = haml.compileHaml(sourceId: 'attribute-hash-evaluation-using-outer-scope', generator: generator).call(null, {model: model})
+          expect(html).toEqual(
+            '\n<div class="main">\n' +
+            '  <span someattribute="hello world">\n' +
+            '  </span>\n' +
+            '</div>\n')
 
   describe 'template with Coffeescript code lines', () ->
 
@@ -692,35 +710,37 @@ describe 'haml', () ->
         '    %p= i\n' +
         '</script>')
 
-    it 'should render the correct html when the template has loops', () ->
-      html = haml.compileHaml('evaluation-with-loops')()
-      expect(html).toEqual(
-        '\n<div class="main">\n' +
-        '    <span>\n' +
-        '      Option 1\n' +
-        '    </span>\n' +
-        '    <span>\n' +
-        '      Option 2\n' +
-        '    </span>\n' +
-        '    <span>\n' +
-        '      Option 3\n' +
-        '    </span>\n' +
-        '    <p>\n' +
-        '      0\n' +
-        '    </p>\n' +
-        '    <p>\n' +
-        '      1\n' +
-        '    </p>\n' +
-        '    <p>\n' +
-        '      2\n' +
-        '    </p>\n' +
-        '    <p>\n' +
-        '      3\n' +
-        '    </p>\n' +
-        '    <p>\n' +
-        '      4\n' +
-        '    </p>\n' +
-        '</div>\n')
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'should render the correct html when the template has loops for ' + generator, () ->
+          html = haml.compileHaml(sourceId: 'evaluation-with-loops', generator: generator)()
+          expect(html).toEqual(
+            '\n<div class="main">\n' +
+            '    <span>\n' +
+            '      Option 1\n' +
+            '    </span>\n' +
+            '    <span>\n' +
+            '      Option 2\n' +
+            '    </span>\n' +
+            '    <span>\n' +
+            '      Option 3\n' +
+            '    </span>\n' +
+            '    <p>\n' +
+            '      0\n' +
+            '    </p>\n' +
+            '    <p>\n' +
+            '      1\n' +
+            '    </p>\n' +
+            '    <p>\n' +
+            '      2\n' +
+            '    </p>\n' +
+            '    <p>\n' +
+            '      3\n' +
+            '    </p>\n' +
+            '    <p>\n' +
+            '      4\n' +
+            '    </p>\n' +
+            '</div>\n')
 
   describe 'Escaping HTML', () ->
 
@@ -758,17 +778,19 @@ describe 'haml', () ->
         '</script>'
       )
 
-    it 'should the correct html', () ->
-      that = { fnOnThis: () -> return 'TEST' }
-      context = { fnOnThis: () -> return 'TEST2' }
-      html = haml.compileHaml('anonymous').call(that, context)
-      expect(html).toEqual(
-        '\n<div class="test">\n' +
-        '  TEST\n' +
-        '</div>\n' +
-        '<div class="test2">\n' +
-        '  TEST2\n' +
-        '</div>\n')
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'should the correct html for ' + generator, () ->
+          that = { fnOnThis: () -> return 'TEST' }
+          context = { fnOnThis: () -> return 'TEST2' }
+          html = haml.compileHaml(sourceId: 'anonymous', generator: generator).call(that, context)
+          expect(html).toEqual(
+            '\n<div class="test">\n' +
+            '  TEST\n' +
+            '</div>\n' +
+            '<div class="test2">\n' +
+            '  TEST2\n' +
+            '</div>\n')
 
   describe 'Issue #6 - Empty lines should be ignored', () ->
 
@@ -814,18 +836,20 @@ describe 'haml', () ->
         '.embedded-null= null\n' +
         '</script>')
 
-    it 'should render null values as a string', () ->
-      html = haml.compileHaml('null-js-values')({nullValue: null})
-      expect(html).toEqual(
-        '\n<div class="inline-null">\n' +
-        '  \n' +
-        '</div>\n' +
-        '<div class="null-evaluating">\n' +
-        '  \n' +
-        '</div>\n' +
-        '<div class="embedded-null">\n' +
-        '  \n' +
-        '</div>\n')
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'should render null values as a string for ' + generator, () ->
+          html = haml.compileHaml(sourceId: 'null-js-values', generator: generator)({nullValue: null})
+          expect(html).toEqual(
+            '\n<div class="inline-null">\n' +
+            '  \n' +
+            '</div>\n' +
+            '<div class="null-evaluating">\n' +
+            '  \n' +
+            '</div>\n' +
+            '<div class="embedded-null">\n' +
+            '  \n' +
+            '</div>\n')
 
   describe 'Whitespace Removal: > and <', () ->
 
@@ -1047,17 +1071,18 @@ describe 'haml', () ->
         '  %p This is short.\n' +
         '</script>')
 
-    it 'should render the correct html', () ->
-      html = haml.compileHaml('multiline')()
-      expect(html).toEqual(
-        '\n<whoo>\n' +
-        '  <hoo>\n' +
-        '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' +
-        '  </hoo>\n' +
-        '  <p>\n' +
-        '    This is short.\n' +
-        '  </p>\n' +
-        '</whoo>\n')
+    for generator in ['javascript', 'productionjavascript']
+      it 'should render the correct html for ' + generator, () ->
+        html = haml.compileHaml('multiline', generator: generator)()
+        expect(html).toEqual(
+          '\n<whoo>\n' +
+          '  <hoo>\n' +
+          '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' +
+          '  </hoo>\n' +
+          '  <p>\n' +
+          '    This is short.\n' +
+          '  </p>\n' +
+          '</whoo>\n')
 
     it 'with coffescript should render the correct html', () ->
       html = haml.compileCoffeeHaml('multiline')()
