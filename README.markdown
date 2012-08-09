@@ -161,7 +161,8 @@ function. The variables are then available using the `@name` notation.
 
 There is also a production javascript code generator (productionjavascript) which will produce slightly faster functions
 at the cost of feedback while evaluating expressions. The main idea would be to use the standard generator while developing
-and then switch to the production one when your code is released.
+and then switch to the production one when your code is released. The production version will run about 25% faster, depending
+on browser (see [http://jsperf.com/eval-cost-in-templates/3], safari 6 was 5 times faster)
 
 # Client-side HAML API
 
@@ -172,12 +173,12 @@ of a script element in the DOM. Otherwise, it accepts the following key/value pa
 * _sourceId_     - This contains the element ID in the dom which contains the haml source
 * _sourceUrl_    - This contains the URL where the template can be fetched from (requires jQuery)
 * _outputFormat_ - This determines what is returned, and can be one of the following values:
-    ** function - A javascript function (default)
-    ** string   - The javascript source code
+    - function - A javascript function (default)
+    - string   - The javascript source code
 * _generator_ - Which code generator to use, the following values are accepted:
-  ** javascript (default)
-  ** coffeescript
-  ** productionjavascript
+    - javascript (default)
+    - coffeescript
+    - productionjavascript
 
 One of either _source_, _sourceId_ or _sourceUrl_ **must** be provided. **Note**, also, that the _sourceUrl_ options
 requires jQuery 1.5.1+ as a dependency.
