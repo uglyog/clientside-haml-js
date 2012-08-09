@@ -249,7 +249,7 @@
     describe('template with Javascript evaluation', function() {
       var generator, _i, _len, _ref, _results;
       beforeEach(function() {
-        return setFixtures('<script type="text/template" id="evaluation">\n' + '.box.error\n' + '  %span\n' + '    = errorTitle\n' + '  .clear\n' + '    %span= errorHeading\n' + '    = var label = "Calculation: "; label + (1 + 2 * 3)\n' + '    = ["hi", "there", "reader!"]\n' + '    = evilScript \n' + '    %span&= errorHeading\n' + '    &= var label = "Calculation: "; label + (1 + 2 * 3)\n' + '    &= ["hi", "there", "reader!"]\n' + '    &= evilScript \n' + '    %span!= errorHeading\n' + '    != var label = "Calculation: "; label + (1 + 2 * 3)\n' + '    != ["hi", "there", "reader!"]\n' + '    != evilScript \n' + '</script>');
+        return setFixtures('<script type="text/template" id="evaluation">\n' + '.box.error\n' + '  %span\n' + '    = errorTitle\n' + '  .clear\n' + '    - var label = "Calculation: ";\n' + '    %span= errorHeading\n' + '    = label + (1 + 2 * 3)\n' + '    = ["hi", "there", "reader!"]\n' + '    = evilScript \n' + '    %span&= errorHeading\n' + '    &= label + (1 + 2 * 3)\n' + '    &= ["hi", "there", "reader!"]\n' + '    &= evilScript \n' + '    %span!= errorHeading\n' + '    != label + (1 + 2 * 3)\n' + '    != ["hi", "there", "reader!"]\n' + '    != evilScript \n' + '</script>');
       });
       _ref = ['javascript', 'productionjavascript'];
       _results = [];

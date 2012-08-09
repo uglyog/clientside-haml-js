@@ -371,16 +371,17 @@ describe 'haml', () ->
         '  %span\n' +
         '    = errorTitle\n' +
         '  .clear\n' +
+        '    - var label = "Calculation: ";\n' +
         '    %span= errorHeading\n' +
-        '    = var label = "Calculation: "; label + (1 + 2 * 3)\n' +
+        '    = label + (1 + 2 * 3)\n' +
         '    = ["hi", "there", "reader!"]\n' +
         '    = evilScript \n' +
         '    %span&= errorHeading\n' +
-        '    &= var label = "Calculation: "; label + (1 + 2 * 3)\n' +
+        '    &= label + (1 + 2 * 3)\n' +
         '    &= ["hi", "there", "reader!"]\n' +
         '    &= evilScript \n' +
         '    %span!= errorHeading\n' +
-        '    != var label = "Calculation: "; label + (1 + 2 * 3)\n' +
+        '    != label + (1 + 2 * 3)\n' +
         '    != ["hi", "there", "reader!"]\n' +
         '    != evilScript \n' +
         '</script>')
