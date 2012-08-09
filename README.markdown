@@ -159,6 +159,10 @@ See the examples below for more details on how to use this.
 In the case of the CoffeeScript version, the functions use the context passed in as the `this` pointer via the call
 function. The variables are then available using the `@name` notation.
 
+There is also a production javascript code generator (productionjavascript) which will produce slightly faster functions
+at the cost of feedback while evaluating expressions. The main idea would be to use the standard generator while developing
+and then switch to the production one when your code is released.
+
 # Client-side HAML API
 
 The `haml.compileHaml` takes a single parameter. As a string value (legacy form), it expects the string to be an ID
@@ -168,11 +172,12 @@ of a script element in the DOM. Otherwise, it accepts the following key/value pa
 * _sourceId_     - This contains the element ID in the dom which contains the haml source
 * _sourceUrl_    - This contains the URL where the template can be fetched from (requires jQuery)
 * _outputFormat_ - This determines what is returned, and can be one of the following values:
-** function - A javascript function (default)
-** string   - The javascript source code
+    ** function - A javascript function (default)
+    ** string   - The javascript source code
 * _generator_ - Which code generator to use, the following values are accepted:
-** javascript (default)
-** coffeescript
+  ** javascript (default)
+  ** coffeescript
+  ** productionjavascript
 
 One of either _source_, _sourceId_ or _sourceUrl_ **must** be provided. **Note**, also, that the _sourceUrl_ options
 requires jQuery 1.5.1+ as a dependency.
@@ -287,7 +292,7 @@ and the result escaped and added to the contents of the tag. So for the followin
             = errorTitle
           .clear
             %span= errorHeading
-            = var label = "Calculation: "; return label + (1 + 2 * 3)
+            = "Calculation: " + (1 + 2 * 3)
             = ["hi", "there", "reader!"]
             = evilScript
 ```

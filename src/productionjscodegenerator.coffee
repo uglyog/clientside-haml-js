@@ -9,7 +9,7 @@ class ProductionJsCodeGenerator extends JsCodeGenerator
   appendEmbeddedCode: (indentText, expression, escapeContents, perserveWhitespace, currentParsePoint) ->
     @outputBuffer.flush()
 
-    @outputBuffer.appendToOutputBuffer(indentText + '    value = function () { return ' + expression + '; }.call(this);\n')
+    @outputBuffer.appendToOutputBuffer(indentText + '    value = ' + expression + ';\n')
     @outputBuffer.appendToOutputBuffer(indentText + '    value = value === null ? "" : value;')
     if escapeContents
       @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.HamlRuntime.escapeHTML(String(value)));\n')
