@@ -15,6 +15,7 @@ Thanks to following people who have contributed: [translated](https://github.com
 [makevoid](https://github.com/makevoid)
 
 #Releases
+* Release 5   -  2012-08-09 - [https://github.com/uglyog/clientside-haml-js/tarball/release_5] [Release Notes](clientside-haml-js/blob/master/Release-5.markdown)
 * Release 4.5 -  2012-07-02 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_5] [Release Notes](clientside-haml-js/blob/master/Release-4.5.markdown)
 * Release 4.4 -  2012-05-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_4] [Release Notes](clientside-haml-js/blob/master/Release-4.4.markdown)
 * Release 4.3 -  2012-04-02 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_3] [Release Notes](clientside-haml-js/blob/master/Release-4.3.markdown)
@@ -162,7 +163,7 @@ function. The variables are then available using the `@name` notation.
 There is also a production javascript code generator (productionjavascript) which will produce slightly faster functions
 at the cost of feedback while evaluating expressions. The main idea would be to use the standard generator while developing
 and then switch to the production one when your code is released. The production version will run about 25% faster, depending
-on browser (see [http://jsperf.com/eval-cost-in-templates/3], safari 6 was 5 times faster)
+on browser (see http://jsperf.com/eval-cost-in-templates/3, safari 6 was 5 times faster)
 
 # Client-side HAML API
 
