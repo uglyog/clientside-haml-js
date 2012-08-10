@@ -160,7 +160,7 @@ See the examples below for more details on how to use this.
 In the case of the CoffeeScript version, the functions use the context passed in as the `this` pointer via the call
 function. The variables are then available using the `@name` notation.
 
-There is also a production javascript code generator (productionjavascript) which will produce slightly faster functions
+There is also a production javascript code generator (_productionjavascript_) which will produce slightly faster functions
 at the cost of feedback while evaluating expressions. The main idea would be to use the standard generator while developing
 and then switch to the production one when your code is released. The production version will run about 25% faster, depending
 on browser (see http://jsperf.com/eval-cost-in-templates/3, safari 6 was 5 times faster)

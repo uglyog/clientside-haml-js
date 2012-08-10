@@ -8,11 +8,13 @@ on browser (see http://jsperf.com/eval-cost-in-templates/3, safari 6 was 5 times
 The main downside to the new generator is that any errors that occur at runtime will not be linked back to the template source.
 I.e., with a template with a javascript error, the original code generator will generate a function that throws the following
 error:
+```
     Error evaluating attribute hash - SyntaxError: Unexpected token % at line 3 and character 16:
         %h3{%h3 %h4}
     ---------------^
-
+```
 while the new functions will throw:
+```
     Incorrect embedded code has resulted in an invalid Haml function - SyntaxError: Unexpected token %
     Generated Function:
       var html = [];
@@ -24,3 +26,4 @@ while the new functions will throw:
         html.push(">\n      <h4>\n        <h5>\n        </h5>\n      </h4>\n    </h3>\n  </h2>\n</h1>\n");
       }
       return html.join("");
+```
