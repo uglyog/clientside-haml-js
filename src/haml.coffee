@@ -303,7 +303,7 @@ root.haml =
         contents = tokeniser.skipToEOLorEOF()
       else
         contents = tokeniser.skipToEOLorEOF()
-        contents = contents.substring(1) if contents.match(/^\\%/)
+        contents = contents.substring(1) if contents.match(/^\\/)
         shouldInterpolate = true
 
       hasContents = contents.length > 0

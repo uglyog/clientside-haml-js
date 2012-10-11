@@ -283,3 +283,20 @@ describe 'haml issues', () ->
         {value: '3', text: 'text 3'}
       ]
       expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
+
+  describe 'Issue #29 - backslash when escaping ampersand character appears in DOM', () ->
+
+    it 'should not be excluding the bashslashed character', () ->
+
+      hamlSource =
+        '''
+          %p
+            \\&copy; Company 2012
+        '''
+      expected =
+        '''
+          <p>
+            &copy; Company 2012
+          </p>
+        '''
+      expect(_(haml.compileHaml(source: hamlSource)()).trim()).toEqual(expected)

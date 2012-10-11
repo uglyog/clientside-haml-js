@@ -859,7 +859,7 @@
         })).trim()).toEqual(expected);
       });
     });
-    return it('should be able to handle else statements with extra ifs', function() {
+    it('should be able to handle else statements with extra ifs', function() {
       var expected, hamlSource, options;
       hamlSource = '-for option in @options\n  - if option.value == @selected\n    = option.text\n    - if false\n      false\n    - else\n      true\n  - else\n    .unselected\n      = option.text';
       expected = 'text 1\n      true\n    <div class="unselected">\n      text 2\n    </div>\n    <div class="unselected">\n      text 3\n    </div>';
@@ -882,6 +882,16 @@
         options: options,
         selected: '1'
       })).trim()).toEqual(expected);
+    });
+    return describe('Issue #29 - backslash when escaping ampersand character appears in DOM', function() {
+      return it('should not be excluding the bashslashed character', function() {
+        var expected, hamlSource;
+        hamlSource = '%p\n  \\&copy; Company 2012';
+        expected = '<p>\n  &copy; Company 2012\n</p>';
+        return expect(_(haml.compileHaml({
+          source: hamlSource
+        })()).trim()).toEqual(expected);
+      });
     });
   });
 
