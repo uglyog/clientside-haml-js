@@ -35,7 +35,7 @@ class CoffeeCodeGenerator extends CodeGenerator
 
   appendCodeLine: (line, eol) ->
     @outputBuffer.flush()
-    @outputBuffer.appendToOutputBuffer(HamlRuntime.indentText(@indent - @prevCodeIndent)) if @prevCodeIndent? and @prevCodeIndent < @indent
+    @outputBuffer.appendToOutputBuffer(@calcCodeIndent()) if @prevCodeIndent? and @prevCodeIndent <= @indent
     @outputBuffer.appendToOutputBuffer((_.str || _).trim(line))
     @outputBuffer.appendToOutputBuffer(eol)
     @prevCodeIndent = @indent

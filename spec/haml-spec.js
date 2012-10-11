@@ -811,7 +811,7 @@
         })()).trim()).toEqual(expected);
       });
     });
-    return describe('Issue #27 - multiple levels of nesting confuses haml parser', function() {
+    describe('Issue #27 - multiple levels of nesting confuses haml parser', function() {
       return it('should indent the lines within logic blocks correctly', function() {
         var expected, hamlSource, players;
         hamlSource = '%ul{"class":"nav nav-tabs"}\n  - for player in @players\n    %li\n      %a{\'href\':"#player#{player.id}", "data-toggle":"tab"}\n        = player.get("name")';
@@ -830,6 +830,32 @@
           generator: 'coffeescript'
         }).call({
           players: players
+        })).trim()).toEqual(expected);
+      });
+    });
+    return describe('Issue #30 - if/else statements don\'t work for embedded coffeescript', function() {
+      return it('should be able to handle else statements', function() {
+        var expected, hamlSource, options;
+        hamlSource = '-for option in @options\n  - if option.value == @selected\n    = option.text\n  - else\n    .unselected\n      = option.text';
+        expected = 'text 1\n    <div class="unselected">\n      text 2\n    </div>\n    <div class="unselected">\n      text 3\n    </div>';
+        options = [
+          {
+            value: '1',
+            text: 'text 1'
+          }, {
+            value: '2',
+            text: 'text 2'
+          }, {
+            value: '3',
+            text: 'text 3'
+          }
+        ];
+        return expect(_(haml.compileHaml({
+          source: hamlSource,
+          generator: 'coffeescript'
+        }).call({
+          options: options,
+          selected: '1'
         })).trim()).toEqual(expected);
       });
     });

@@ -222,3 +222,64 @@ describe 'haml issues', () ->
         {id: 1, name: 'travis', get: (attr) -> @name}
       ]
       expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(players: players)).trim()).toEqual(expected)
+
+  describe 'Issue #30 - if/else statements don\'t work for embedded coffeescript', () ->
+
+    it 'should be able to handle else statements', () ->
+      hamlSource =
+        '''
+        -for option in @options
+          - if option.value == @selected
+            = option.text
+          - else
+            .unselected
+              = option.text
+        '''
+      expected =
+        '''
+        text 1
+            <div class="unselected">
+              text 2
+            </div>
+            <div class="unselected">
+              text 3
+            </div>
+        '''
+      options = [
+        {value: '1', text: 'text 1'}, 
+        {value: '2', text: 'text 2'}, 
+        {value: '3', text: 'text 3'}
+      ]
+      expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
+
+  # it 'should be able to handle else statements with extra ifs', () ->
+  #     hamlSource =
+  #       '''
+  #       -for option in @options
+  #         - if option.value == @selected
+  #           = option.text
+  #           - if false
+  #             false
+  #           - else
+  #             true
+  #         - else
+  #           .unselected
+  #             = option.text
+  #       '''
+  #     expected =
+  #       '''
+  #       text 1
+  #               false
+  #           <div class="unselected">
+  #             text 2
+  #           </div>
+  #           <div class="unselected">
+  #             text 3
+  #           </div>
+  #       '''
+  #     options = [
+  #       {value: '1', text: 'text 1'}, 
+  #       {value: '2', text: 'text 2'}, 
+  #       {value: '3', text: 'text 3'}
+  #     ]
+  #     expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
