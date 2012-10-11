@@ -833,7 +833,7 @@
         })).trim()).toEqual(expected);
       });
     });
-    return describe('Issue #30 - if/else statements don\'t work for embedded coffeescript', function() {
+    describe('Issue #30 - if/else statements don\'t work for embedded coffeescript', function() {
       return it('should be able to handle else statements', function() {
         var expected, hamlSource, options;
         hamlSource = '-for option in @options\n  - if option.value == @selected\n    = option.text\n  - else\n    .unselected\n      = option.text';
@@ -858,6 +858,30 @@
           selected: '1'
         })).trim()).toEqual(expected);
       });
+    });
+    return it('should be able to handle else statements with extra ifs', function() {
+      var expected, hamlSource, options;
+      hamlSource = '-for option in @options\n  - if option.value == @selected\n    = option.text\n    - if false\n      false\n    - else\n      true\n  - else\n    .unselected\n      = option.text';
+      expected = 'text 1\n      true\n    <div class="unselected">\n      text 2\n    </div>\n    <div class="unselected">\n      text 3\n    </div>';
+      options = [
+        {
+          value: '1',
+          text: 'text 1'
+        }, {
+          value: '2',
+          text: 'text 2'
+        }, {
+          value: '3',
+          text: 'text 3'
+        }
+      ];
+      return expect(_(haml.compileHaml({
+        source: hamlSource,
+        generator: 'coffeescript'
+      }).call({
+        options: options,
+        selected: '1'
+      })).trim()).toEqual(expected);
     });
   });
 

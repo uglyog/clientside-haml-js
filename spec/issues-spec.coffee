@@ -252,34 +252,34 @@ describe 'haml issues', () ->
       ]
       expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
 
-  # it 'should be able to handle else statements with extra ifs', () ->
-  #     hamlSource =
-  #       '''
-  #       -for option in @options
-  #         - if option.value == @selected
-  #           = option.text
-  #           - if false
-  #             false
-  #           - else
-  #             true
-  #         - else
-  #           .unselected
-  #             = option.text
-  #       '''
-  #     expected =
-  #       '''
-  #       text 1
-  #               false
-  #           <div class="unselected">
-  #             text 2
-  #           </div>
-  #           <div class="unselected">
-  #             text 3
-  #           </div>
-  #       '''
-  #     options = [
-  #       {value: '1', text: 'text 1'}, 
-  #       {value: '2', text: 'text 2'}, 
-  #       {value: '3', text: 'text 3'}
-  #     ]
-  #     expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
+  it 'should be able to handle else statements with extra ifs', () ->
+      hamlSource =
+        '''
+        -for option in @options
+          - if option.value == @selected
+            = option.text
+            - if false
+              false
+            - else
+              true
+          - else
+            .unselected
+              = option.text
+        '''
+      expected =
+        '''
+        text 1
+              true
+            <div class="unselected">
+              text 2
+            </div>
+            <div class="unselected">
+              text 3
+            </div>
+        '''
+      options = [
+        {value: '1', text: 'text 1'}, 
+        {value: '2', text: 'text 2'}, 
+        {value: '3', text: 'text 3'}
+      ]
+      expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
