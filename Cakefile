@@ -18,7 +18,8 @@ specFiles = [
   'spec/haml-spec.coffee',
   'spec/filters-spec.coffee',
   'spec/interpolation-spec.coffee',
-  'spec/haml-api-spec.coffee'
+  'spec/haml-api-spec.coffee',
+  'spec/issues-spec.coffee'
 ]
 
 task 'build', 'Build haml.js', ->

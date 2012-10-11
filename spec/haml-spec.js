@@ -420,72 +420,6 @@
         return expect(html).toEqual('<div class="main">\n' + '  <div>\n' + '      &lt;p&gt;\n' + '      &lt;/p&gt;\n' + '      &lt;span&gt;\n' + '        &lt;script&gt;alert(&quot;I&#39;m evil!&quot;);\n' + '      &lt;/span&gt;\n' + '  </div>\n' + '</div>\n');
       });
     });
-    describe('Issue #2 - Anonymous functions should pass through \'this\'', function() {
-      var generator, _i, _len, _ref, _results;
-      beforeEach(function() {
-        return setFixtures('<script type="text/template" id="anonymous">\n' + '.test = this.fnOnThis()\n' + '.test2 = fnOnThis()\n' + '</script>');
-      });
-      _ref = ['javascript', 'productionjavascript'];
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        generator = _ref[_i];
-        _results.push((function(generator) {
-          return it('should the correct html for ' + generator, function() {
-            var context, html, that;
-            that = {
-              fnOnThis: function() {
-                return 'TEST';
-              }
-            };
-            context = {
-              fnOnThis: function() {
-                return 'TEST2';
-              }
-            };
-            html = haml.compileHaml({
-              sourceId: 'anonymous',
-              generator: generator
-            }).call(that, context);
-            return expect(html).toEqual('\n<div class="test">\n' + '  TEST\n' + '</div>\n' + '<div class="test2">\n' + '  TEST2\n' + '</div>\n');
-          });
-        })(generator));
-      }
-      return _results;
-    });
-    describe('Issue #6 - Empty lines should be ignored', function() {
-      beforeEach(function() {
-        return setFixtures('<script type="text/template" id="empty-lines">\n' + '%div\n' + '  %div\n' + '    %div\n' + '    \n' + '    %div\n' + '  \n' + '    %div' + '\n' + '    %div' + '</script>');
-      });
-      return it('should render the correct html', function() {
-        var html;
-        html = haml.compileHaml('empty-lines')();
-        return expect(html).toEqual('\n<div>\n' + '  <div>\n' + '    <div>\n' + '    \n' + '    </div>\n' + '    <div>\n' + '  \n' + '    </div>\n' + '    <div>\n' + '    </div>\n' + '    <div>\n' + '    </div>\n' + '  </div>\n' + '</div>\n');
-      });
-    });
-    describe('Issue #14 - rendering null values', function() {
-      var generator, _i, _len, _ref, _results;
-      beforeEach(function() {
-        return setFixtures('<script type="text/template" id="null-js-values">\n' + '.inline-null\n' + '  = null;\n' + '.null-evaluating\n' + '  = nullValue;\n' + '.embedded-null= null\n' + '</script>');
-      });
-      _ref = ['javascript', 'productionjavascript'];
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        generator = _ref[_i];
-        _results.push((function(generator) {
-          return it('should render null values as a string for ' + generator, function() {
-            var html;
-            html = haml.compileHaml({
-              sourceId: 'null-js-values',
-              generator: generator
-            })({
-              nullValue: null
-            });
-            return expect(html).toEqual('\n<div class="inline-null">\n' + '  \n' + '</div>\n' + '<div class="null-evaluating">\n' + '  \n' + '</div>\n' + '<div class="embedded-null">\n' + '  \n' + '</div>\n');
-          });
-        })(generator));
-      }
-      return _results;
-    });
     describe('Whitespace Removal: > and <', function() {
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="whitespace-removal">\n' + '%blockquote<\n' + '  %div\n' + '    Foo!\n' + '%img\n' + '%img>\n' + '%img\n' + '%p<= "Foo\\nBar"\n' + '%img\n' + '%pre><\n' + '  foo\n' + '  bar\n' + '%img\n' + '</script>');
@@ -585,17 +519,7 @@
         return expect(html).toEqual('\n<?xml version=\'1.0\' encoding=\'utf-8\' ?>\n' + '<?xml version=\'1.0\' encoding=\'iso-8859-1\' ?>\n' + '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n' + '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">\n' + '<html>\n</html>\n');
       });
     });
-    describe('Issue 13 - comments', function() {
-      beforeEach(function() {
-        return setFixtures('<script type="text/template" id="comment-issue">\n' + '#div1\n' + '  -# if blahDiBlah\n' + '    #shouldNotRender\n' + '      .shouldAlsoNotRender\n' + '        You should not see me\n' + '  You should see me\n' + '-# #div2\n' + '  I\'m Invisible!\n' + '#div3\n' + '  You should see me\n' + '</script>');
-      });
-      return it('should render the correct html', function() {
-        var html;
-        html = haml.compileHaml('comment-issue')();
-        return expect(html).toEqual('\n<div id="div1">\n' + '  You should see me\n' + '</div>\n' + '<div id="div3">\n' + '  You should see me\n' + '</div>\n');
-      });
-    });
-    describe('Multiline code blocks', function() {
+    return describe('Multiline code blocks', function() {
       var generator, _i, _len, _ref;
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="multiline">\n' + '%whoo\n' + '  %hoo=                           |\n' + '    "I think this might get " +   |\n' + '    "pretty long so I should " +  |\n' + '    "probably make it " +         |\n' + '    "multiline so it doesn\'t " + |\n' + '    "look awful."                 |\n' + '  %p This is short.\n' + '</script>');
@@ -615,105 +539,6 @@
         var html;
         html = haml.compileCoffeeHaml('multiline')();
         return expect(html).toEqual('\n<whoo>\n' + '  <hoo>\n' + '    I think this might get pretty long so I should probably make it multiline so it doesn&#39;t look awful.\n' + '  </hoo>\n' + '  <p>\n' + '    This is short.\n' + '  </p>\n' + '</whoo>\n');
-      });
-    });
-    describe('Issue #21 - text node followed by tag node fails', function() {
-      var hex;
-      hex = function(str) {
-        return _((_.str || _).chars(str)).map(function(ch) {
-          return (_.str || _).pad(ch.charCodeAt(0).toString(16), 2, '0');
-        }).join('');
-      };
-      it('should no fail to generate a js function due to newlines', function() {
-        var html;
-        setFixtures('<script type="text/template" id="issue-21">\n%div\ntext\n%p 123\n</script>');
-        html = haml.compileHaml({
-          sourceId: 'issue-21'
-        })();
-        return expect(html).toEqual('\n<div>\n</div>\ntext\n<p>\n  123\n</p>\n');
-      });
-      it("should handle Unix line endings", function() {
-        var html, source;
-        source = "\u000A%div\u000Atext\u000A%p 123\u000A";
-        html = haml.compileHaml({
-          source: source
-        })();
-        return expect(html).toEqual("\n<div>\n</div>\ntext\n<p>\n  123\n</p>\n");
-      });
-      it("should handle Windows line endings", function() {
-        var html, source;
-        source = "\u000D\u000A%div\u000D\u000Atext\u000D\u000A%p 123\u000D\u000A";
-        html = haml.compileHaml({
-          source: source
-        })();
-        return expect(hex(html)).toEqual(hex("\r\n<div>\n</div>\ntext\r\n<p>\n  123\r\n</p>\n"));
-      });
-      return it("should handle endings in any order", function() {
-        var html, source;
-        source = "\u000D\u000A%div\u000A\u000Dtext\u000D%p 123\u000D\u000A";
-        html = haml.compileHaml({
-          source: source
-        })();
-        return expect(hex(html)).toEqual(hex("\r\n<div>\n</div>\n\rtext\r%p 123\r\n"));
-      });
-    });
-    describe('Issue #24 - inconsistent indent handling', function() {
-      it('should handle indentation modulo 2', function() {
-        var expected, html;
-        expected = '<table>\n  <tr>\n  </tr>\n</table>\n';
-        html = haml.compileHaml({
-          source: '%table\n\t%tr'
-        })();
-        expect(html).toEqual(expected);
-        html = haml.compileHaml({
-          source: '%table\n %tr'
-        })();
-        expect(html).toEqual(expected);
-        html = haml.compileHaml({
-          source: '%table\n  %tr'
-        })();
-        return expect(html).toEqual(expected);
-      });
-      return it('should count tabs as 2 characters', function() {
-        var expected, html;
-        expected = '<table>\n  <tr>\n    <td>\n    </td>\n  </tr>\n</table>\n';
-        html = haml.compileHaml({
-          source: '%table\n\t%tr\n\t\t%td'
-        })();
-        return expect(html).toEqual(expected);
-      });
-    });
-    describe('Issue #25 - Incorrect coffeescript indentation', function() {
-      return it('should indent the lines within logic blocks correctly', function() {
-        var expected, hamlSource;
-        hamlSource = '-if true\n  %a{href : \'#new\'} create new';
-        expected = '<a href="#new">\n    create new\n  </a>';
-        return expect(_(haml.compileHaml({
-          source: hamlSource,
-          generator: 'coffeescript'
-        })()).trim()).toEqual(expected);
-      });
-    });
-    return describe('Issue #27 - multiple levels of nesting confuses haml parser', function() {
-      return it('should indent the lines within logic blocks correctly', function() {
-        var expected, hamlSource, players;
-        hamlSource = '%ul{"class":"nav nav-tabs"}\n  - for player in @players\n    %li\n      %a{\'href\':"#player#{player.id}", "data-toggle":"tab"}\n        = player.get("name")';
-        expected = '<ul class="nav nav-tabs">\n    <li>\n      <a href="#player1" data-toggle="tab">\n        travis\n      </a>\n    </li>\n</ul>';
-        players = [
-          {
-            id: 1,
-            name: 'travis',
-            get: function(attr) {
-              return this.name;
-            }
-          }
-        ];
-        return expect(_(haml.compileHaml({
-          source: hamlSource,
-          generator: 'coffeescript'
-        }).call({
-          players: players
-        })).trim()).toEqual(expected);
       });
     });
   });
@@ -828,6 +653,184 @@
           generator: 'coffeescript',
           outputFormat: 'string'
         })).toEqual(coffeeSource);
+      });
+    });
+  });
+
+  describe('haml issues', function() {
+    describe('Issue #2 - Anonymous functions should pass through \'this\'', function() {
+      var generator, _i, _len, _ref, _results;
+      beforeEach(function() {
+        return setFixtures('<script type="text/template" id="anonymous">\n' + '.test = this.fnOnThis()\n' + '.test2 = fnOnThis()\n' + '</script>');
+      });
+      _ref = ['javascript', 'productionjavascript'];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _results.push((function(generator) {
+          return it('should the correct html for ' + generator, function() {
+            var context, html, that;
+            that = {
+              fnOnThis: function() {
+                return 'TEST';
+              }
+            };
+            context = {
+              fnOnThis: function() {
+                return 'TEST2';
+              }
+            };
+            html = haml.compileHaml({
+              sourceId: 'anonymous',
+              generator: generator
+            }).call(that, context);
+            return expect(html).toEqual('\n<div class="test">\n' + '  TEST\n' + '</div>\n' + '<div class="test2">\n' + '  TEST2\n' + '</div>\n');
+          });
+        })(generator));
+      }
+      return _results;
+    });
+    describe('Issue #6 - Empty lines should be ignored', function() {
+      beforeEach(function() {
+        return setFixtures('<script type="text/template" id="empty-lines">\n' + '%div\n' + '  %div\n' + '    %div\n' + '    \n' + '    %div\n' + '  \n' + '    %div' + '\n' + '    %div' + '</script>');
+      });
+      return it('should render the correct html', function() {
+        var html;
+        html = haml.compileHaml('empty-lines')();
+        return expect(html).toEqual('\n<div>\n' + '  <div>\n' + '    <div>\n' + '    \n' + '    </div>\n' + '    <div>\n' + '  \n' + '    </div>\n' + '    <div>\n' + '    </div>\n' + '    <div>\n' + '    </div>\n' + '  </div>\n' + '</div>\n');
+      });
+    });
+    describe('Issue #14 - rendering null values', function() {
+      var generator, _i, _len, _ref, _results;
+      beforeEach(function() {
+        return setFixtures('<script type="text/template" id="null-js-values">\n' + '.inline-null\n' + '  = null;\n' + '.null-evaluating\n' + '  = nullValue;\n' + '.embedded-null= null\n' + '</script>');
+      });
+      _ref = ['javascript', 'productionjavascript'];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        generator = _ref[_i];
+        _results.push((function(generator) {
+          return it('should render null values as a string for ' + generator, function() {
+            var html;
+            html = haml.compileHaml({
+              sourceId: 'null-js-values',
+              generator: generator
+            })({
+              nullValue: null
+            });
+            return expect(html).toEqual('\n<div class="inline-null">\n' + '  \n' + '</div>\n' + '<div class="null-evaluating">\n' + '  \n' + '</div>\n' + '<div class="embedded-null">\n' + '  \n' + '</div>\n');
+          });
+        })(generator));
+      }
+      return _results;
+    });
+    describe('Issue 13 - comments', function() {
+      beforeEach(function() {
+        return setFixtures('<script type="text/template" id="comment-issue">\n' + '#div1\n' + '  -# if blahDiBlah\n' + '    #shouldNotRender\n' + '      .shouldAlsoNotRender\n' + '        You should not see me\n' + '  You should see me\n' + '-# #div2\n' + '  I\'m Invisible!\n' + '#div3\n' + '  You should see me\n' + '</script>');
+      });
+      return it('should render the correct html', function() {
+        var html;
+        html = haml.compileHaml('comment-issue')();
+        return expect(html).toEqual('\n<div id="div1">\n' + '  You should see me\n' + '</div>\n' + '<div id="div3">\n' + '  You should see me\n' + '</div>\n');
+      });
+    });
+    describe('Issue #21 - text node followed by tag node fails', function() {
+      var hex;
+      hex = function(str) {
+        return _((_.str || _).chars(str)).map(function(ch) {
+          return (_.str || _).pad(ch.charCodeAt(0).toString(16), 2, '0');
+        }).join('');
+      };
+      it('should no fail to generate a js function due to newlines', function() {
+        var html;
+        setFixtures('<script type="text/template" id="issue-21">\n%div\ntext\n%p 123\n</script>');
+        html = haml.compileHaml({
+          sourceId: 'issue-21'
+        })();
+        return expect(html).toEqual('\n<div>\n</div>\ntext\n<p>\n  123\n</p>\n');
+      });
+      it("should handle Unix line endings", function() {
+        var html, source;
+        source = "\u000A%div\u000Atext\u000A%p 123\u000A";
+        html = haml.compileHaml({
+          source: source
+        })();
+        return expect(html).toEqual("\n<div>\n</div>\ntext\n<p>\n  123\n</p>\n");
+      });
+      it("should handle Windows line endings", function() {
+        var html, source;
+        source = "\u000D\u000A%div\u000D\u000Atext\u000D\u000A%p 123\u000D\u000A";
+        html = haml.compileHaml({
+          source: source
+        })();
+        return expect(hex(html)).toEqual(hex("\r\n<div>\n</div>\ntext\r\n<p>\n  123\r\n</p>\n"));
+      });
+      return it("should handle endings in any order", function() {
+        var html, source;
+        source = "\u000D\u000A%div\u000A\u000Dtext\u000D%p 123\u000D\u000A";
+        html = haml.compileHaml({
+          source: source
+        })();
+        return expect(hex(html)).toEqual(hex("\r\n<div>\n</div>\n\rtext\r%p 123\r\n"));
+      });
+    });
+    describe('Issue #24 - inconsistent indent handling', function() {
+      it('should handle indentation modulo 2', function() {
+        var expected, html;
+        expected = '<table>\n  <tr>\n  </tr>\n</table>\n';
+        html = haml.compileHaml({
+          source: '%table\n\t%tr'
+        })();
+        expect(html).toEqual(expected);
+        html = haml.compileHaml({
+          source: '%table\n %tr'
+        })();
+        expect(html).toEqual(expected);
+        html = haml.compileHaml({
+          source: '%table\n  %tr'
+        })();
+        return expect(html).toEqual(expected);
+      });
+      return it('should count tabs as 2 characters', function() {
+        var expected, html;
+        expected = '<table>\n  <tr>\n    <td>\n    </td>\n  </tr>\n</table>\n';
+        html = haml.compileHaml({
+          source: '%table\n\t%tr\n\t\t%td'
+        })();
+        return expect(html).toEqual(expected);
+      });
+    });
+    describe('Issue #25 - Incorrect coffeescript indentation', function() {
+      return it('should indent the lines within logic blocks correctly', function() {
+        var expected, hamlSource;
+        hamlSource = '-if true\n  %a{href : \'#new\'} create new';
+        expected = '<a href="#new">\n    create new\n  </a>';
+        return expect(_(haml.compileHaml({
+          source: hamlSource,
+          generator: 'coffeescript'
+        })()).trim()).toEqual(expected);
+      });
+    });
+    return describe('Issue #27 - multiple levels of nesting confuses haml parser', function() {
+      return it('should indent the lines within logic blocks correctly', function() {
+        var expected, hamlSource, players;
+        hamlSource = '%ul{"class":"nav nav-tabs"}\n  - for player in @players\n    %li\n      %a{\'href\':"#player#{player.id}", "data-toggle":"tab"}\n        = player.get("name")';
+        expected = '<ul class="nav nav-tabs">\n    <li>\n      <a href="#player1" data-toggle="tab">\n        travis\n      </a>\n    </li>\n</ul>';
+        players = [
+          {
+            id: 1,
+            name: 'travis',
+            get: function(attr) {
+              return this.name;
+            }
+          }
+        ];
+        return expect(_(haml.compileHaml({
+          source: hamlSource,
+          generator: 'coffeescript'
+        }).call({
+          players: players
+        })).trim()).toEqual(expected);
       });
     });
   });
