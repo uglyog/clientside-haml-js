@@ -883,7 +883,7 @@
         selected: '1'
       })).trim()).toEqual(expected);
     });
-    return describe('Issue #29 - backslash when escaping ampersand character appears in DOM', function() {
+    describe('Issue #29 - backslash when escaping ampersand character appears in DOM', function() {
       return it('should not be excluding the bashslashed character', function() {
         var expected, hamlSource;
         hamlSource = '%p\n  \\&copy; Company 2012';
@@ -891,6 +891,22 @@
         return expect(_(haml.compileHaml({
           source: hamlSource
         })()).trim()).toEqual(expected);
+      });
+    });
+    return describe('Issue #31 - new line in eval breaking generated function', function() {
+      return it('should not blow up', function() {
+        var data, expected, hamlSource;
+        hamlSource = '%div{class: \'hero-unit\'}\n  %h2= email.subject\n  %iframe{class: \'email-preview\', src: iframeSource}';
+        expected = '<div class="hero-unit">\n  <h2>\n    Issue #31\n  </h2>\n  <iframe class="email-preview" src="blahblahblah">\n  </iframe>\n</div>';
+        data = {
+          email: {
+            subject: 'Issue #31'
+          },
+          iframeSource: 'blahblahblah'
+        };
+        return expect(_(haml.compileHaml({
+          source: hamlSource
+        })(data)).trim()).toEqual(expected);
       });
     });
   });

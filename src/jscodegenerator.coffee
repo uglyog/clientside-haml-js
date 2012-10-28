@@ -14,7 +14,7 @@ class JsCodeGenerator extends CodeGenerator
 
     @outputBuffer.appendToOutputBuffer(indentText + 'try {\n')
     @outputBuffer.appendToOutputBuffer(indentText + '    var value = eval("' +
-      expression.replace(/"/g, '\\"').replace(/\\n/g, '\\\\n') + '");\n')
+      (_.str || _).trim(expression).replace(/"/g, '\\"').replace(/\\n/g, '\\\\n') + '");\n')
     @outputBuffer.appendToOutputBuffer(indentText + '    value = value === null ? "" : value;')
     if escapeContents
       @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.HamlRuntime.escapeHTML(String(value)));\n')

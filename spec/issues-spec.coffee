@@ -81,7 +81,7 @@ describe 'haml issues', () ->
             '<div class="embedded-null">\n' +
             '  \n' +
             '</div>\n')
-  
+
   describe 'Issue 13 - comments', () ->
 
     beforeEach () ->
@@ -107,7 +107,7 @@ describe 'haml issues', () ->
         '<div id="div3">\n' +
         '  You should see me\n' +
         '</div>\n')
-  
+
   describe 'Issue #21 - text node followed by tag node fails', () ->
 
     hex = (str) ->
@@ -246,8 +246,8 @@ describe 'haml issues', () ->
             </div>
         '''
       options = [
-        {value: '1', text: 'text 1'}, 
-        {value: '2', text: 'text 2'}, 
+        {value: '1', text: 'text 1'},
+        {value: '2', text: 'text 2'},
         {value: '3', text: 'text 3'}
       ]
       expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
@@ -278,8 +278,8 @@ describe 'haml issues', () ->
             </div>
         '''
       options = [
-        {value: '1', text: 'text 1'}, 
-        {value: '2', text: 'text 2'}, 
+        {value: '1', text: 'text 1'},
+        {value: '2', text: 'text 2'},
         {value: '3', text: 'text 3'}
       ]
       expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
@@ -300,3 +300,31 @@ describe 'haml issues', () ->
           </p>
         '''
       expect(_(haml.compileHaml(source: hamlSource)()).trim()).toEqual(expected)
+
+  describe 'Issue #31 - new line in eval breaking generated function', () ->
+
+    it 'should not blow up', () ->
+
+      hamlSource =
+        '''
+          %div{class: 'hero-unit'}
+            %h2= email.subject
+            %iframe{class: 'email-preview', src: iframeSource}
+        '''
+      expected =
+        '''
+          <div class="hero-unit">
+            <h2>
+              Issue #31
+            </h2>
+            <iframe class="email-preview" src="blahblahblah">
+            </iframe>
+          </div>
+        '''
+
+      data = {
+        email: {subject: 'Issue #31'},
+        iframeSource: 'blahblahblah'
+      }
+
+      expect(_(haml.compileHaml(source: hamlSource)(data)).trim()).toEqual(expected)
