@@ -41,7 +41,7 @@ Thanks to following people who have contributed: [translated](https://github.com
 * The HAML can either be passed in as a String, as in:
 
 ```javascript
-    var fn = haml.compileHaml({source: "%h1\n  %div\n    %p\n    %span'});
+    var fn = haml.compileHaml({source: "%h1\n  %div\n    %p\n    %span"});
     var html = fn();
 ```
 
