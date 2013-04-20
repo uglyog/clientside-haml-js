@@ -7,7 +7,7 @@
   <script type="text/javascript" src="lib/ext/jquery-1.7.1.js"></script>
   <script type="text/javascript" src="spec/jasmine.js"></script>
   <script type="text/javascript" src="spec/jasmine-html.js"></script>
-  <script type="text/javascript" src="spec/jasmine-jquery-1.2.0.js"></script>
+  <script type="text/javascript" src="spec/jasmine-jquery.js"></script>
 
   <!-- include source files here... -->
   <script type="text/javascript" src="lib/ext/underscore.js"></script>
@@ -18,13 +18,38 @@
 
   <!-- include spec files here... -->
   <script type="text/javascript" src="spec/haml-spec.js"></script>
+
+  <script type="text/javascript">
+    (function() {
+      var jasmineEnv = jasmine.getEnv();
+      jasmineEnv.updateInterval = 1000;
+
+      var htmlReporter = new jasmine.HtmlReporter();
+
+      jasmineEnv.addReporter(htmlReporter);
+
+      jasmineEnv.specFilter = function(spec) {
+        return htmlReporter.specFilter(spec);
+      };
+
+      var currentWindowOnload = window.onload;
+
+      window.onload = function() {
+        if (currentWindowOnload) {
+          currentWindowOnload();
+        }
+        execJasmine();
+      };
+
+      function execJasmine() {
+        jasmineEnv.execute();
+      }
+
+    })();
+  </script>
+
 </head>
+
 <body>
-
-<script type="text/javascript">
-  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-  jasmine.getEnv().execute();
-</script>
-
 </body>
 </html>
