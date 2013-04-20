@@ -1,6 +1,6 @@
-describe 'haml issues', () ->
+describe 'haml issues', ->
 
-  describe 'Issue #2 - Anonymous functions should pass through \'this\'', () ->
+  describe 'Issue #2 - Anonymous functions should pass through \'this\'', ->
 
     beforeEach () ->
       setFixtures('<script type="text/template" id="anonymous">\n' +
@@ -11,7 +11,7 @@ describe 'haml issues', () ->
 
     for generator in ['javascript', 'productionjavascript']
       do (generator) ->
-        it 'should the correct html for ' + generator, () ->
+        it 'should the correct html for ' + generator, ->
           that = { fnOnThis: () -> return 'TEST' }
           context = { fnOnThis: () -> return 'TEST2' }
           html = haml.compileHaml(sourceId: 'anonymous', generator: generator).call(that, context)
@@ -23,7 +23,7 @@ describe 'haml issues', () ->
             '  TEST2\n' +
             '</div>\n')
 
-  describe 'Issue #6 - Empty lines should be ignored', () ->
+  describe 'Issue #6 - Empty lines should be ignored', ->
 
     beforeEach () ->
       setFixtures('<script type="text/template" id="empty-lines">\n' +
@@ -38,7 +38,7 @@ describe 'haml issues', () ->
         '    %div' +
         '</script>')
 
-    it 'should render the correct html', () ->
+    it 'should render the correct html', ->
       html = haml.compileHaml('empty-lines')()
       expect(html).toEqual(
         '\n<div>\n' +
@@ -56,7 +56,7 @@ describe 'haml issues', () ->
         '  </div>\n' +
         '</div>\n')
 
-  describe 'Issue #14 - rendering null values', () ->
+  describe 'Issue #14 - rendering null values', ->
 
     beforeEach () ->
       setFixtures('<script type="text/template" id="null-js-values">\n' +
@@ -82,7 +82,7 @@ describe 'haml issues', () ->
             '  \n' +
             '</div>\n')
 
-  describe 'Issue 13 - comments', () ->
+  describe 'Issue 13 - comments', ->
 
     beforeEach () ->
       setFixtures('<script type="text/template" id="comment-issue">\n' +
@@ -108,12 +108,12 @@ describe 'haml issues', () ->
         '  You should see me\n' +
         '</div>\n')
 
-  describe 'Issue #21 - text node followed by tag node fails', () ->
+  describe 'Issue #21 - text node followed by tag node fails', ->
 
     hex = (str) ->
       _((_.str || _).chars(str)).map((ch) -> (_.str || _).pad(ch.charCodeAt(0).toString(16), 2, '0')).join('')
 
-    it 'should no fail to generate a js function due to newlines', () ->
+    it 'should no fail to generate a js function due to newlines', ->
 
       setFixtures(
         '''<script type="text/template" id="issue-21">
@@ -153,9 +153,9 @@ describe 'haml issues', () ->
       html = haml.compileHaml(source: source)()
       expect(hex(html)).toEqual(hex("\r\n<div>\n</div>\n\rtext\r%p 123\r\n"))
 
-  describe 'Issue #24 - inconsistent indent handling', () ->
+  describe 'Issue #24 - inconsistent indent handling', ->
 
-    it 'should handle indentation modulo 2', () ->
+    it 'should handle indentation modulo 2', ->
       expected = '''<table>
                    <tr>
                    </tr>
@@ -169,7 +169,7 @@ describe 'haml issues', () ->
       html = haml.compileHaml(source: '%table\n  %tr')()
       expect(html).toEqual(expected)
 
-    it 'should count tabs as 2 characters', () ->
+    it 'should count tabs as 2 characters', ->
       expected = '''<table>
                       <tr>
                         <td>
@@ -181,9 +181,9 @@ describe 'haml issues', () ->
       html = haml.compileHaml(source: '%table\n\t%tr\n\t\t%td')()
       expect(html).toEqual(expected)
 
-  describe 'Issue #25 - Incorrect coffeescript indentation', () ->
+  describe 'Issue #25 - Incorrect coffeescript indentation', ->
 
-    it 'should indent the lines within logic blocks correctly', () ->
+    it 'should indent the lines within logic blocks correctly', ->
       hamlSource =
         '''
            -if true
@@ -197,9 +197,9 @@ describe 'haml issues', () ->
         '''
       expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript')()).trim()).toEqual(expected)
 
-  describe 'Issue #27 - multiple levels of nesting confuses haml parser', () ->
+  describe 'Issue #27 - multiple levels of nesting confuses haml parser', ->
 
-    it 'should indent the lines within logic blocks correctly', () ->
+    it 'should indent the lines within logic blocks correctly', ->
       hamlSource =
         '''
            %ul{"class":"nav nav-tabs"}
@@ -223,7 +223,7 @@ describe 'haml issues', () ->
       ]
       expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(players: players)).trim()).toEqual(expected)
 
-  describe 'Issue #30 - if/else statements don\'t work for embedded coffeescript', () ->
+  describe 'Issue #30 - if/else statements don\'t work for embedded coffeescript', ->
 
     it 'should be able to handle else statements', () ->
       hamlSource =
@@ -252,7 +252,7 @@ describe 'haml issues', () ->
       ]
       expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
 
-  it 'should be able to handle else statements with extra ifs', () ->
+  it 'should be able to handle else statements with extra ifs', ->
       hamlSource =
         '''
         -for option in @options
@@ -284,9 +284,9 @@ describe 'haml issues', () ->
       ]
       expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
 
-  describe 'Issue #29 - backslash when escaping ampersand character appears in DOM', () ->
+  describe 'Issue #29 - backslash when escaping ampersand character appears in DOM', ->
 
-    it 'should not be excluding the bashslashed character', () ->
+    it 'should not be excluding the bashslashed character', ->
 
       hamlSource =
         '''
@@ -301,9 +301,9 @@ describe 'haml issues', () ->
         '''
       expect(_(haml.compileHaml(source: hamlSource)()).trim()).toEqual(expected)
 
-  describe 'Issue #31 - new line in eval breaking generated function', () ->
+  describe 'Issue #31 - new line in eval breaking generated function', ->
 
-    it 'should not blow up', () ->
+    it 'should not blow up', ->
 
       hamlSource =
         '''
@@ -328,3 +328,8 @@ describe 'haml issues', () ->
       }
 
       expect(_(haml.compileHaml(source: hamlSource)(data)).trim()).toEqual(expected)
+
+  describe 'Issue #34 - Haml does not format attributes which are 3 or more layers deep correctly', ->
+
+    it 'should handle nested hashes correctly', ->
+      expect(_(haml.compileHaml(source: '%a{data:{theme:{test:"A"}}}<')()).trim()).toEqual('<a data-theme-test="A"></a>')

@@ -956,7 +956,7 @@
         })()).trim()).toEqual(expected);
       });
     });
-    return describe('Issue #31 - new line in eval breaking generated function', function() {
+    describe('Issue #31 - new line in eval breaking generated function', function() {
       return it('should not blow up', function() {
         var data, expected, hamlSource;
 
@@ -971,6 +971,147 @@
         return expect(_(haml.compileHaml({
           source: hamlSource
         })(data)).trim()).toEqual(expected);
+      });
+    });
+    return describe('Issue #34 - Haml does not format attributes which are 3 or more layers deep correctly', function() {
+      return it('should handle nested hashes correctly', function() {
+        return expect(_(haml.compileHaml({
+          source: '%a{data:{theme:{test:"A"}}}<'
+        })()).trim()).toEqual('<a data-theme-test="A"></a>');
+      });
+    });
+  });
+
+  describe('haml runtime', function() {
+    describe('flattening hashes', function() {
+      describe('with no root key', function() {
+        describe('with non-hashes', function() {
+          return it('returns non-hash objects', function() {
+            var date;
+
+            expect(haml.HamlRuntime._flattenHash(null, null)).toEqual(null);
+            expect(haml.HamlRuntime._flattenHash(null, 'string')).toEqual('string');
+            expect(haml.HamlRuntime._flattenHash(null, true)).toEqual(true);
+            date = new Date();
+            expect(haml.HamlRuntime._flattenHash(null, date)).toEqual(date);
+            return expect(haml.HamlRuntime._flattenHash(null, [1, 2, 3, 4])).toEqual([1, 2, 3, 4]);
+          });
+        });
+        return describe('with hashes', function() {
+          return it('expands the values of the hash', function() {
+            return expect(haml.HamlRuntime._flattenHash(null, {
+              a: 'a',
+              b: true,
+              c: [1, 2, 3],
+              d: {
+                a: 'a',
+                b: 'b'
+              }
+            })).toEqual({
+              a: 'a',
+              b: true,
+              c: [1, 2, 3],
+              'd-a': 'a',
+              'd-b': 'b'
+            });
+          });
+        });
+      });
+      return describe('with a root key', function() {
+        describe('with non-hashes', function() {
+          return it('returns a hash with the key set to the passed object', function() {
+            var date;
+
+            expect(haml.HamlRuntime._flattenHash('a', null)).toEqual({
+              a: null
+            });
+            expect(haml.HamlRuntime._flattenHash('b', 'string')).toEqual({
+              b: 'string'
+            });
+            expect(haml.HamlRuntime._flattenHash('c', true)).toEqual({
+              c: true
+            });
+            date = new Date();
+            expect(haml.HamlRuntime._flattenHash('d', date)).toEqual({
+              d: date
+            });
+            return expect(haml.HamlRuntime._flattenHash('e', [1, 2, 3, 4])).toEqual({
+              e: [1, 2, 3, 4]
+            });
+          });
+        });
+        return describe('with hashes', function() {
+          return it('expands the values of the hash adding the root key to all keys', function() {
+            return expect(haml.HamlRuntime._flattenHash('t', {
+              a: 'a',
+              b: true,
+              c: [1, 2, 3],
+              d: {
+                a: 'a',
+                b: 'b'
+              }
+            })).toEqual({
+              't-a': 'a',
+              't-b': true,
+              't-c': [1, 2, 3],
+              't-d-a': 'a',
+              't-d-b': 'b'
+            });
+          });
+        });
+      });
+    });
+    return describe('detecting hashes', function() {
+      it('detects hashes', function() {
+        expect(haml.HamlRuntime._isHash({})).toBeTruthy();
+        return expect(haml.HamlRuntime._isHash({
+          'a': 'b'
+        })).toBeTruthy();
+      });
+      it('ignores arrays', function() {
+        expect(haml.HamlRuntime._isHash([])).toBeFalsy();
+        return expect(haml.HamlRuntime._isHash([1, 2, 3, 4])).toBeFalsy();
+      });
+      it('ignores null', function() {
+        return expect(haml.HamlRuntime._isHash(null)).toBeFalsy();
+      });
+      it('ignores strings', function() {
+        return expect(haml.HamlRuntime._isHash('')).toBeFalsy();
+      });
+      it('ignores numbers', function() {
+        return expect(haml.HamlRuntime._isHash(1)).toBeFalsy();
+      });
+      it('ignores functions', function() {
+        return expect(haml.HamlRuntime._isHash(function() {})).toBeFalsy();
+      });
+      it('ignores dates', function() {
+        return expect(haml.HamlRuntime._isHash(new Date())).toBeFalsy();
+      });
+      return it('ignores booleans', function() {
+        return expect(haml.HamlRuntime._isHash(true)).toBeFalsy();
+      });
+    });
+  });
+
+  describe('buffer', function() {
+    return describe('trimming whitespace', function() {
+      beforeEach(function() {
+        return this.buffer = new haml.Buffer(null);
+      });
+      it('trims the whitespace from the end of the string', function() {
+        this.buffer.append("some text to trim \t\n");
+        this.buffer.trimWhitespace();
+        return expect(this.buffer.buffer).toEqual("some text to trim");
+      });
+      it('trims down to the empty string', function() {
+        this.buffer.append("     \t\n  ");
+        this.buffer.trimWhitespace();
+        return expect(this.buffer.buffer).toEqual("");
+      });
+      return it('does not blow away single characters in the buffer', function() {
+        this.buffer.append(">");
+        this.buffer.trimWhitespace();
+        return expect(this.buffer.buffer).toEqual(">");
       });
     });
   });

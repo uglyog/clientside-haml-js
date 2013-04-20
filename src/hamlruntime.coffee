@@ -52,16 +52,15 @@ HamlRuntime =
     if classes.length > 0 and classes[0].length > 0
       attributes = @combineAttributes(attributes, 'class', classes)
 
-    if attrList
-      for own attr of attrList
-        attributes = @combineAttributes(attributes, attr, attrList[attr])
+    if attrList?
+      attributes = @combineAttributes(attributes, attr, value) for own attr, value of attrList
 
-    if objRefFn
+    if objRefFn?
       try
         object = objRefFn.call(context, context)
-        if object
+        if object?
           objectId = null
-          if object.id
+          if object.id?
             objectId = object.id
           else if object.get
             objectId = object.get('id')
@@ -75,17 +74,12 @@ HamlRuntime =
       catch e
         throw haml.HamlRuntime.templateError(lineNumber, characterNumber, currentLine, "Error evaluating object reference - #{e}")
 
-    if attrFunction
+    if attrFunction?
       try
         hash = attrFunction.call(context, context)
-        if hash
-          for own attr of hash
-            if attr == 'data'
-              dataAttributes = hash[attr]
-              for own dataAttr of dataAttributes
-                attributes = @combineAttributes(attributes, 'data-' + dataAttr, dataAttributes[dataAttr])
-            else
-              attributes = @combineAttributes(attributes, attr, hash[attr])
+        if hash?
+          hash = @_flattenHash(null, hash)
+          attributes = @combineAttributes(attributes, attr, value) for own attr, value of hash
       catch ex
         throw haml.HamlRuntime.templateError(lineNumber, characterNumber, currentLine, "Error evaluating attribute hash - #{ex}")
 
@@ -152,3 +146,28 @@ HamlRuntime =
         attributes ||= {}
         attributes[attrName] = attrValue
     attributes
+
+  ###
+    Flattens a deeply nested hash into a single hash by combining the keys with a minus
+  ###
+  _flattenHash: (rootKey, object) ->
+    result = {}
+    if @_isHash(object)
+      for own attr, value of object
+        keys = []
+        keys.push(rootKey) if rootKey?
+        keys.push(attr)
+        key = keys.join('-')
+        flattenedValue = @_flattenHash(key, value)
+        if @_isHash(flattenedValue)
+          result[newKey] = newValue for own newKey, newValue of flattenedValue
+        else
+          result[key] = flattenedValue
+    else if rootKey?
+      result[rootKey] = object
+    else
+      result = object
+    result
+
+  _isHash: (object) ->
+    object? and typeof object == 'object' and not (object instanceof Array or object instanceof Date)
