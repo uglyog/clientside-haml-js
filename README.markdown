@@ -15,6 +15,7 @@ Thanks to following people who have contributed: [translated](https://github.com
 [makevoid](https://github.com/makevoid)
 
 #Releases
+* Release 5.1 -  2012-10-11 - [https://github.com/uglyog/clientside-haml-js/tarball/release_5_1] [Release Notes](clientside-haml-js/blob/master/Release-5.1.markdown)
 * Release 5   -  2012-08-09 - [https://github.com/uglyog/clientside-haml-js/tarball/release_5] [Release Notes](clientside-haml-js/blob/master/Release-5.markdown)
 * Release 4.5 -  2012-07-02 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_5] [Release Notes](clientside-haml-js/blob/master/Release-4.5.markdown)
 * Release 4.4 -  2012-05-15 - [https://github.com/uglyog/clientside-haml-js/tarball/release_4_4] [Release Notes](clientside-haml-js/blob/master/Release-4.4.markdown)
