@@ -23,10 +23,10 @@ specFiles = [
 ]
 
 task 'build', 'Build haml.js', ->
-  exec "coffee -c -j lib/haml.js #{appFiles.join(' ')} ", (err, stdout, stderr) ->
+  exec "coffee -c -m -j lib/haml.js #{appFiles.join(' ')} ", (err, stdout, stderr) ->
     throw err if err
     console.log stdout + stderr
-  exec "coffee -c -j spec/haml-spec.js #{specFiles.join(' ')} ", (err, stdout, stderr) ->
+  exec "coffee -c -m -j spec/haml-spec.js #{specFiles.join(' ')} ", (err, stdout, stderr) ->
     throw err if err
     console.log stdout + stderr
   exec "uglifyjs -o lib/haml.min.js lib/haml.js", (err, stdout, stderr) ->
