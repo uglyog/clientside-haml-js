@@ -333,3 +333,4 @@ describe 'haml issues', ->
 
     it 'should handle nested hashes correctly', ->
       expect(_(haml.compileHaml(source: '%a{data:{theme:{test:"A"}}}<')()).trim()).toEqual('<a data-theme-test="A"></a>')
+      expect(_(haml.compileHaml(source: '.foo{data: {a: "b", c: {d: "e", f: "g"}}}<')()).trim()).toEqual('<div class="foo" data-a="b" data-c-d="e" data-c-f="g"></div>')

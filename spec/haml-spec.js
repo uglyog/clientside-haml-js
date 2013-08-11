@@ -975,9 +975,12 @@
     });
     return describe('Issue #34 - Haml does not format attributes which are 3 or more layers deep correctly', function() {
       return it('should handle nested hashes correctly', function() {
-        return expect(_(haml.compileHaml({
+        expect(_(haml.compileHaml({
           source: '%a{data:{theme:{test:"A"}}}<'
         })()).trim()).toEqual('<a data-theme-test="A"></a>');
+        return expect(_(haml.compileHaml({
+          source: '.foo{data: {a: "b", c: {d: "e", f: "g"}}}<'
+        })()).trim()).toEqual('<div class="foo" data-a="b" data-c-d="e" data-c-f="g"></div>');
       });
     });
   });
