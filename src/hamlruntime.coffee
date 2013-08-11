@@ -45,7 +45,8 @@ HamlRuntime =
   ###
     Generates the attributes for the element by combining all the various sources together
   ###
-  generateElementAttributes: (context, id, classes, objRefFn, attrList, attrFunction, lineNumber, characterNumber, currentLine) ->
+  generateElementAttributes: (context, id, classes, objRefFn, attrList, attrFunction, lineNumber,
+                              characterNumber, currentLine, handleError = @_raiseError) ->
     attributes = {}
 
     attributes = @combineAttributes(attributes, 'id', id)
@@ -72,7 +73,7 @@ HamlRuntime =
             className = object.get('class')
           attributes = @combineAttributes(attributes, 'class', className)
       catch e
-        throw haml.HamlRuntime.templateError(lineNumber, characterNumber, currentLine, "Error evaluating object reference - #{e}")
+        handleError haml.HamlRuntime.templateError(lineNumber, characterNumber, currentLine, "Error evaluating object reference - #{e}")
 
     if attrFunction?
       try
@@ -81,7 +82,7 @@ HamlRuntime =
           hash = @_flattenHash(null, hash)
           attributes = @combineAttributes(attributes, attr, value) for own attr, value of hash
       catch ex
-        throw haml.HamlRuntime.templateError(lineNumber, characterNumber, currentLine, "Error evaluating attribute hash - #{ex}")
+        handleError haml.HamlRuntime.templateError(lineNumber, characterNumber, currentLine, "Error evaluating attribute hash - #{ex}")
 
     html = ''
     if attributes
@@ -171,3 +172,8 @@ HamlRuntime =
 
   _isHash: (object) ->
     object? and typeof object == 'object' and not (object instanceof Array or object instanceof Date)
+
+  _logError: (message) -> console?.log(message)
+
+  _raiseError: (message) -> throw new Error(message)
+

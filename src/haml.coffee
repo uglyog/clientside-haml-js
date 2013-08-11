@@ -19,6 +19,7 @@ root.haml =
                          javascript (default)
                          coffeescript
                          productionjavascript
+        tolerateErrors - switch the compiler into fault tolerant mode (defaults to false)
 
     Returns a javascript function
   ###
@@ -27,9 +28,9 @@ root.haml =
       @_compileHamlTemplate options, new haml.JsCodeGenerator()
     else
       codeGenerator = switch options.generator
-        when 'coffeescript' then new haml.CoffeeCodeGenerator()
-        when 'productionjavascript' then new haml.ProductionJsCodeGenerator()
-        else new haml.JsCodeGenerator()
+        when 'coffeescript' then new haml.CoffeeCodeGenerator(options)
+        when 'productionjavascript' then new haml.ProductionJsCodeGenerator(options)
+        else new haml.JsCodeGenerator(options)
 
       if options.source?
         tokinser = new haml.Tokeniser(template: options.source)
@@ -39,7 +40,7 @@ root.haml =
         tokinser = new haml.Tokeniser(templateUrl: options.sourceUrl)
       else
         throw "No template source specified for compileHaml. You need to provide a source, sourceId or sourceUrl option"
-      result = @_compileHamlToJs(tokinser, codeGenerator)
+      result = @_compileHamlToJs(tokinser, codeGenerator, options)
       if options.outputFormat isnt 'string'
         codeGenerator.generateJsFunction(result)
       else
@@ -91,7 +92,7 @@ root.haml =
     haml.cache[templateId] = fn
     fn
 
-  _compileHamlToJs: (tokeniser, generator) ->
+  _compileHamlToJs: (tokeniser, generator, options = {}) ->
     generator.elementStack = []
 
     generator.initOutput()

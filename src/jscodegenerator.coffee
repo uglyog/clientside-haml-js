@@ -3,7 +3,7 @@
 ###
 class JsCodeGenerator extends CodeGenerator
 
-  constructor: () ->
+  constructor: (@options) ->
     @outputBuffer = new haml.Buffer(this)
 
   ###
@@ -24,7 +24,7 @@ class JsCodeGenerator extends CodeGenerator
       @outputBuffer.appendToOutputBuffer(indentText + '    html.push(String(value));\n')
 
     @outputBuffer.appendToOutputBuffer(indentText + '} catch (e) {\n');
-    @outputBuffer.appendToOutputBuffer(indentText + '  throw new Error(haml.HamlRuntime.templateError(' +
+    @outputBuffer.appendToOutputBuffer(indentText + '  handleError(haml.HamlRuntime.templateError(' +
       currentParsePoint.lineNumber + ', ' + currentParsePoint.characterNumber + ', "' +
       @escapeCode(currentParsePoint.currentLine) + '",\n')
     @outputBuffer.appendToOutputBuffer(indentText + '    "Error evaluating expression - " + e));\n')
@@ -34,8 +34,18 @@ class JsCodeGenerator extends CodeGenerator
     Initilising the output buffer with any variables or code
   ###
   initOutput: () ->
-    @outputBuffer.appendToOutputBuffer('  var html = [];\n' +
-      '  var hashFunction = null, hashObject = null, objRef = null, objRefFn = null;\n  with (context || {}) {\n')
+    if @options?.tolerateFaults
+      @outputBuffer.appendToOutputBuffer('  var handleError = haml.HamlRuntime._logError;')
+    else
+      @outputBuffer.appendToOutputBuffer('  var handleError = haml.HamlRuntime._raiseError;')
+
+    @outputBuffer.appendToOutputBuffer(
+      '''
+          var html = [];
+          var hashFunction = null, hashObject = null, objRef = null, objRefFn = null;
+          with (context || {}) {
+      '''
+    )
 
   ###
     Flush and close the output buffer and return the contents

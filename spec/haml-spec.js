@@ -1119,6 +1119,32 @@
     });
   });
 
+  describe('code generators', function() {
+    describe('with fault tolerance off', function() {
+      return describe('javascript generate', function() {
+        return it('will raise an exception on error', function() {
+          return expect(function() {
+            return haml.compileHaml({
+              source: '.test= null.toString()'
+            })();
+          }).toThrow();
+        });
+      });
+    });
+    return describe('with fault tolerance on', function() {
+      return describe('javascript generate', function() {
+        return it('will not raise an exception on error', function() {
+          return expect(function() {
+            return haml.compileHaml({
+              source: '.test= null.toString()',
+              tolerateFaults: true
+            })();
+          }).not.toThrow();
+        });
+      });
+    });
+  });
+
 }).call(this);
 
 /*

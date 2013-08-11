@@ -3,7 +3,7 @@
 ###
 class CoffeeCodeGenerator extends CodeGenerator
 
-  constructor: () ->
+  constructor: (@options) ->
     @outputBuffer = new haml.Buffer(this)
 
   appendEmbeddedCode: (indentText, expression, escapeContents, perserveWhitespace, currentParsePoint) ->
