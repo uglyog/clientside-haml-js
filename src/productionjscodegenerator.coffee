@@ -26,8 +26,12 @@ class ProductionJsCodeGenerator extends JsCodeGenerator
     if attributeHash.length > 0
       attributeHash = @replaceReservedWordsInHash(attributeHash)
       @outputBuffer.appendToOutputBuffer('    hashFunction = function () { return ' + attributeHash + '; };\n')
+    else
+      @outputBuffer.appendToOutputBuffer('    hashFunction = null;\n')
     if objectRef.length > 0
       @outputBuffer.appendToOutputBuffer('    objRefFn = function () { return ' + objectRef + '; };\n')
+    else
+      @outputBuffer.appendToOutputBuffer('    objRefFn = null;\n')
 
     @outputBuffer.appendToOutputBuffer('    html.push(haml.HamlRuntime.generateElementAttributes(context, "' +
       id + '", ["' +

@@ -98,9 +98,13 @@ class JsCodeGenerator extends CodeGenerator
       attributeHash = @replaceReservedWordsInHash(attributeHash)
       @outputBuffer.appendToOutputBuffer('    hashFunction = function () { return eval("hashObject = ' +
         attributeHash.replace(/"/g, '\\"').replace(/\n/g, '\\n') + '"); };\n')
+    else
+      @outputBuffer.appendToOutputBuffer('    hashFunction = null;\n')
     if objectRef.length > 0
       @outputBuffer.appendToOutputBuffer('    objRefFn = function () { return eval("objRef = ' +
         objectRef.replace(/"/g, '\\"') + '"); };\n')
+    else
+      @outputBuffer.appendToOutputBuffer('    objRefFn = null;\n');
 
     @outputBuffer.appendToOutputBuffer('    html.push(haml.HamlRuntime.generateElementAttributes(context, "' +
       id + '", ["' +

@@ -59,9 +59,13 @@ class CoffeeCodeGenerator extends CodeGenerator
       attributeHash = @replaceReservedWordsInHash(attributeHash)
       @outputBuffer.appendToOutputBuffer(indent + "hashFunction = () -> s = CoffeeScript.compile('" +
         attributeHash.replace(/'/g, "\\'").replace(/\n/g, '\\n') + "', bare: true); eval 'hashObject = ' + s\n")
+    else
+      @outputBuffer.appendToOutputBuffer(indent + "hashFunction = null\n");
     if objectRef.length > 0
       @outputBuffer.appendToOutputBuffer(indent + "objRefFn = () -> s = CoffeeScript.compile('" +
         objectRef.replace(/'/g, "\\'") + "', bare: true); eval 'objRef = ' + s\n")
+    else
+      @outputBuffer.appendToOutputBuffer(indent + "objRefFn = null\n")
 
     @outputBuffer.appendToOutputBuffer(indent + "html.push(haml.HamlRuntime.generateElementAttributes(this, '" +
       id + "', ['" +

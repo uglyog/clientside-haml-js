@@ -973,7 +973,7 @@
         })(data)).trim()).toEqual(expected);
       });
     });
-    return describe('Issue #34 - Haml does not format attributes which are 3 or more layers deep correctly', function() {
+    describe('Issue #34 - Haml does not format attributes which are 3 or more layers deep correctly', function() {
       return it('should handle nested hashes correctly', function() {
         expect(_(haml.compileHaml({
           source: '%a{data:{theme:{test:"A"}}}<'
@@ -981,6 +981,24 @@
         return expect(_(haml.compileHaml({
           source: '.foo{data: {a: "b", c: {d: "e", f: "g"}}}<'
         })()).trim()).toEqual('<div class="foo" data-a="b" data-c-d="e" data-c-f="g"></div>');
+      });
+    });
+    return describe('Issue #37 - Unexpected behavior', function() {
+      return it('should render correctly', function() {
+        var data, expected, hamlSource;
+
+        hamlSource = '.content Hello World!\n\n%div{class:"hi"}\n  = hello\n\n%span[obj1]\n  wtf?';
+        expected = '<div class="content">\nHello World!\n\n</div>\n<div class="hi">\n  I&#39;m a variable!\n\n</div>\n<span id="object-1" class="test">\n  wtf?\n</span>';
+        data = {
+          hello: "I'm a variable!",
+          obj1: {
+            id: "object-1",
+            "class": "test"
+          }
+        };
+        return expect(_(haml.compileHaml({
+          source: hamlSource
+        })(data)).trim()).toEqual(expected);
       });
     });
   });

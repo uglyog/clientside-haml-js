@@ -334,3 +334,39 @@ describe 'haml issues', ->
     it 'should handle nested hashes correctly', ->
       expect(_(haml.compileHaml(source: '%a{data:{theme:{test:"A"}}}<')()).trim()).toEqual('<a data-theme-test="A"></a>')
       expect(_(haml.compileHaml(source: '.foo{data: {a: "b", c: {d: "e", f: "g"}}}<')()).trim()).toEqual('<div class="foo" data-a="b" data-c-d="e" data-c-f="g"></div>')
+
+
+  describe 'Issue #37 - Unexpected behavior', ->
+
+    it 'should render correctly', ->
+
+      hamlSource =
+        '''
+          .content Hello World!
+
+          %div{class:"hi"}
+            = hello
+
+          %span[obj1]
+            wtf?
+        '''
+      expected =
+        '''
+        <div class="content">
+        Hello World!
+
+        </div>
+        <div class="hi">
+          I&#39;m a variable!
+
+        </div>
+        <span id="object-1" class="test">
+          wtf?
+        </span>
+        '''
+
+      data =
+        hello: "I'm a variable!"
+        obj1: {id: "object-1", class: "test"}
+
+      expect(_(haml.compileHaml(source: hamlSource)(data)).trim()).toEqual(expected)
