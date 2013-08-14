@@ -455,7 +455,7 @@ root.haml =
       i = 0
       whitespace = tokeniser.token.tokenString
       while i < whitespace.length
-        if whitespace.charCodeAt(i) == 9 and i % 2 == 0
+        if whitespace.charCodeAt(i) == 9
           indent += 2
         else
           indent++

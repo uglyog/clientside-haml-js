@@ -983,7 +983,7 @@
         })()).trim()).toEqual('<div class="foo" data-a="b" data-c-d="e" data-c-f="g"></div>');
       });
     });
-    return describe('Issue #37 - Unexpected behavior', function() {
+    describe('Issue #37 - Unexpected behavior', function() {
       return it('should render correctly', function() {
         var data, expected, hamlSource;
 
@@ -999,6 +999,17 @@
         return expect(_(haml.compileHaml({
           source: hamlSource
         })(data)).trim()).toEqual(expected);
+      });
+    });
+    return describe('Issue #38 - Whitespace not calculated correctly when only using tabs for indentation', function() {
+      return it('should calculate indentation with tabs correctly', function() {
+        var expected, hamlSource;
+
+        hamlSource = ".page\n\t.row\n\t\t%section\n\t\t\t%h5 header\n\t\t\t%p\n\t\t\t\t%span foobar";
+        expected = '<div class="page">\n  <div class="row">\n    <section>\n      <h5>\n        header\n      </h5>\n      <p>\n        <span>\n          foobar\n        </span>\n      </p>\n    </section>\n  </div>\n</div>';
+        return expect(_(haml.compileHaml({
+          source: hamlSource
+        })()).trim()).toEqual(expected);
       });
     });
   });

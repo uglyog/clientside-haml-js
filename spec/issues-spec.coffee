@@ -370,3 +370,28 @@ describe 'haml issues', ->
         obj1: {id: "object-1", class: "test"}
 
       expect(_(haml.compileHaml(source: hamlSource)(data)).trim()).toEqual(expected)
+
+  describe 'Issue #38 - Whitespace not calculated correctly when only using tabs for indentation', ->
+
+    it 'should calculate indentation with tabs correctly', ->
+
+      hamlSource = ".page\n\t.row\n\t\t%section\n\t\t\t%h5 header\n\t\t\t%p\n\t\t\t\t%span foobar"
+      expected =
+        '''
+        <div class="page">
+          <div class="row">
+            <section>
+              <h5>
+                header
+              </h5>
+              <p>
+                <span>
+                  foobar
+                </span>
+              </p>
+            </section>
+          </div>
+        </div>
+        '''
+
+      expect(_(haml.compileHaml(source: hamlSource)()).trim()).toEqual(expected)
