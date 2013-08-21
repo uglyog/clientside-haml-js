@@ -655,7 +655,7 @@
 
       hamlFixture = '%h1\n' + '  %div\n' + '    %p This is "some" text\n' + '      This is #{"some"} text\n' + '    This is some <div> text\n' + '    \\%span\n' + '    %span %h1 %h1 %h1\n';
       result = '<h1>\n  <div>\n    <p>\n      This is "some" text\n      This is some text\n    </p>\n    This is some <div> text\n    %span\n    <span>\n      %h1 %h1 %h1\n    </span>\n  </div>\n</h1>\n';
-      coffeeSource = 'function (context) {\nhtml = []\nhtml.push(\'<h1>\\n  <div>\\n    <p>\\n      This is \\"some\\" text\\n\')\nhtml.push("      This is #{"some"} text")\nhtml.push(\'\\n    </p>\\n    This is some <div> text\\n    %span\\n    <span>\\n      %h1 %h1 %h1\\n    </span>\\n  </div>\\n</h1>\\n\')\nreturn html.join("")\n}\n';
+      coffeeSource = 'function (context) {\nhandleError = haml.HamlRuntime._raiseError\nhtml = []\nhtml.push(\'<h1>\\n  <div>\\n    <p>\\n      This is \\"some\\" text\\n\')\nhtml.push("      This is #{"some"} text")\nhtml.push(\'\\n    </p>\\n    This is some <div> text\\n    %span\\n    <span>\\n      %h1 %h1 %h1\\n    </span>\\n  </div>\\n</h1>\\n\')\nreturn html.join("")\n}\n';
       beforeEach(function() {
         return setFixtures('<script type="text/template" id="simple">\n' + hamlFixture + '</script>');
       });

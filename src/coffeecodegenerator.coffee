@@ -21,12 +21,16 @@ class CoffeeCodeGenerator extends CodeGenerator
       @outputBuffer.appendToOutputBuffer(indent + "  html.push(String(value))\n")
 
     @outputBuffer.appendToOutputBuffer(indent + "catch e \n");
-    @outputBuffer.appendToOutputBuffer(indent + "  throw new Error(haml.HamlRuntime.templateError(" +
+    @outputBuffer.appendToOutputBuffer(indent + "  handleError new Error(haml.HamlRuntime.templateError(" +
         currentParsePoint.lineNumber + ", " + currentParsePoint.characterNumber + ", '" +
         @escapeCode(currentParsePoint.currentLine) + "',\n")
     @outputBuffer.appendToOutputBuffer(indent + "    'Error evaluating expression - ' + e))\n")
 
   initOutput: () ->
+    if @options?.tolerateFaults
+      @outputBuffer.appendToOutputBuffer('handleError = haml.HamlRuntime._logError\n')
+    else
+      @outputBuffer.appendToOutputBuffer('handleError = haml.HamlRuntime._raiseError\n')
     @outputBuffer.appendToOutputBuffer('html = []\n')
 
   closeAndReturnOutput: () ->

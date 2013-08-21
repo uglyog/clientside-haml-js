@@ -29,6 +29,7 @@ describe 'haml apis', () ->
       '''
 
     coffeeSource =  '''function (context) {
+                    handleError = haml.HamlRuntime._raiseError
                     html = []
                     html.push('<h1>\\n  <div>\\n    <p>\\n      This is \\"some\\" text\\n')
                     html.push("      This is #{"some"} text")
