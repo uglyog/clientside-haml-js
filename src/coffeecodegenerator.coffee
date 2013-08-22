@@ -76,7 +76,7 @@ class CoffeeCodeGenerator extends CodeGenerator
       classes.join("','") + "'], objRefFn ? null, " +
       JSON.stringify(attributeList) + ", hashFunction ? null, " +
       currentParsePoint.lineNumber + ", " + currentParsePoint.characterNumber + ", '" +
-      @escapeCode(currentParsePoint.currentLine) + "'))\n")
+      @escapeCode(currentParsePoint.currentLine) + "', handleError))\n")
 
   replaceReservedWordsInHash: (hash) ->
     resultHash = hash

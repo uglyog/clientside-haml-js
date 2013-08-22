@@ -111,7 +111,7 @@ class JsCodeGenerator extends CodeGenerator
       classes.join('","') + '"], objRefFn, ' +
       JSON.stringify(attributeList) + ', hashFunction, ' +
       currentParsePoint.lineNumber + ', ' + currentParsePoint.characterNumber + ', "' +
-      @escapeCode(currentParsePoint.currentLine) + '"));\n')
+      @escapeCode(currentParsePoint.currentLine) + '", handleError));\n')
 
   ###
     Clean any reserved words in the given hash

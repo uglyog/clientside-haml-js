@@ -1174,6 +1174,84 @@
     });
   });
 
+  describe('error handling', function() {
+    describe('with an js runtime error', function() {
+      beforeEach(function() {
+        return this.haml = '.value>< = null.toString()';
+      });
+      it('raises an exception in normal mode', function() {
+        var _this = this;
+
+        return expect(function() {
+          return haml.compileHaml({
+            source: _this.haml
+          })();
+        }).toThrow();
+      });
+      return it('does not raise an exception in fault tolerant mode', function() {
+        var _this = this;
+
+        expect(function() {
+          return _this.result = haml.compileHaml({
+            source: _this.haml,
+            tolerateFaults: true
+          })();
+        }).not.toThrow();
+        return expect(this.result).toBe('<div class="value"></div>');
+      });
+    });
+    describe('with an error in the attribute hash', function() {
+      beforeEach(function() {
+        return this.haml = '.value{this is not a hash}><';
+      });
+      it('raises an exception in normal mode', function() {
+        var _this = this;
+
+        return expect(function() {
+          return haml.compileHaml({
+            source: _this.haml
+          })();
+        }).toThrow();
+      });
+      return it('does not raise an exception in fault tolerant mode', function() {
+        var _this = this;
+
+        expect(function() {
+          return _this.result = haml.compileHaml({
+            source: _this.haml,
+            tolerateFaults: true
+          })();
+        }).not.toThrow();
+        return expect(this.result).toBe('<div class="value"></div>');
+      });
+    });
+    return describe('with an unknown filter', function() {
+      beforeEach(function() {
+        return this.haml = '.p><\n  :unknown\n    this is not the filter you where looking for\n  test';
+      });
+      it('raises an exception in normal mode', function() {
+        var _this = this;
+
+        return expect(function() {
+          return haml.compileHaml({
+            source: _this.haml
+          })();
+        }).toThrow();
+      });
+      return it('does not raise an exception in fault tolerant mode', function() {
+        var _this = this;
+
+        expect(function() {
+          return _this.result = haml.compileHaml({
+            source: _this.haml,
+            tolerateFaults: true
+          })();
+        }).not.toThrow();
+        return expect(this.result).toBe('<div class="p">test</div>');
+      });
+    });
+  });
+
 }).call(this);
 
 /*

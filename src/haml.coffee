@@ -127,7 +127,7 @@ root.haml =
         else if tokeniser.token.amp
           @_escapedLine(tokeniser, indent, generator.elementStack, generator)
         else if tokeniser.token.filter
-          @_filter(tokeniser, indent, generator)
+          @_filter(tokeniser, indent, generator, options)
         else
           @_templateLine(tokeniser, generator.elementStack, indent, generator)
       else
@@ -163,10 +163,12 @@ root.haml =
       generator.outputBuffer.append(@_newline(tokeniser))
       tokeniser.getNextToken()
 
-  _filter: (tokeniser, indent, generator) ->
+  _filter: (tokeniser, indent, generator, options) ->
     if tokeniser.token.filter
       filter = tokeniser.token.tokenString
-      throw tokeniser.parseError("Filter '#{filter}' not registered. Filter functions need to be added to 'haml.filters'.") unless haml.filters[filter]
+      unless haml.filters[filter]
+        @_handleError(options, indent, tokeniser, tokeniser.parseError("Filter '#{filter}' not registered. Filter functions need to be added to 'haml.filters'."))
+        return
       tokeniser.skipToEOLorEOF()
       tokeniser.getNextToken()
       i = haml._whitespace(tokeniser)
@@ -502,6 +504,23 @@ root.haml =
       tokeniser.token.matched.substring(1)
     else
       "\n"
+
+  _handleError: (options, indent, tokeniser, error) ->
+    if options?.tolerateFaults
+      console.log(error)
+      @_skipToNextLineWithIndent(tokeniser, indent)
+    else
+      throw error
+
+  _skipToNextLineWithIndent: (tokeniser, indent) ->
+    tokeniser.skipToEOLorEOF()
+    tokeniser.getNextToken()
+    lineIndent = @_whitespace(tokeniser)
+    while lineIndent > indent
+      tokeniser.skipToEOLorEOF()
+      tokeniser.getNextToken()
+      lineIndent = @_whitespace(tokeniser)
+    tokeniser.pushBackToken()
 
 root.haml.Tokeniser = Tokeniser
 root.haml.Buffer = Buffer
