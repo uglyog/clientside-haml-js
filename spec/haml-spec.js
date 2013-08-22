@@ -1225,7 +1225,7 @@
         return expect(this.result).toBe('<div class="value"></div>');
       });
     });
-    return describe('with an unknown filter', function() {
+    describe('with an unknown filter', function() {
       beforeEach(function() {
         return this.haml = '.p><\n  :unknown\n    this is not the filter you where looking for\n  test';
       });
@@ -1248,6 +1248,84 @@
           })();
         }).not.toThrow();
         return expect(this.result).toBe('<div class="p">test</div>');
+      });
+    });
+    describe('with an self-closing tag with content', function() {
+      beforeEach(function() {
+        return this.haml = '.p/ test';
+      });
+      it('raises an exception in normal mode', function() {
+        var _this = this;
+
+        return expect(function() {
+          return haml.compileHaml({
+            source: _this.haml
+          })();
+        }).toThrow();
+      });
+      return it('does not raise an exception in fault tolerant mode', function() {
+        var _this = this;
+
+        expect(function() {
+          return _this.result = haml.compileHaml({
+            source: _this.haml,
+            tolerateFaults: true
+          })();
+        }).not.toThrow();
+        return expect(this.result).toBe('<div class="p"/>\ntest\n');
+      });
+    });
+    describe('with no closing attribute list', function() {
+      beforeEach(function() {
+        return this.haml = '.p(a="b"';
+      });
+      it('raises an exception in normal mode', function() {
+        var _this = this;
+
+        return expect(function() {
+          return haml.compileHaml({
+            source: _this.haml
+          })();
+        }).toThrow();
+      });
+      return it('does not raise an exception in fault tolerant mode', function() {
+        var _this = this;
+
+        expect(function() {
+          return _this.result = haml.compileHaml({
+            source: _this.haml,
+            tolerateFaults: true
+          })();
+        }).not.toThrow();
+        return expect(this.result).toBe('<div class="p" a="b">\n</div>\n');
+      });
+    });
+    return describe('with an invalid attribute list', function() {
+      beforeEach(function() {
+        return this.haml = '.p(a="b" =)';
+      });
+      it('raises an exception in normal mode', function() {
+        var _this = this;
+
+        return expect(function() {
+          return haml.compileHaml({
+            source: _this.haml
+          })();
+        }).toThrow();
+      });
+      return it('does not raise an exception in fault tolerant mode', function() {
+        var _this = this;
+
+        expect(function() {
+          return _this.result = haml.compileHaml({
+            source: _this.haml,
+            tolerateFaults: true
+          })();
+        }).not.toThrow();
+        return expect(_(haml.compileHaml({
+          source: this.haml,
+          tolerateFaults: true
+        })()).trim()).toEqual('<div class="p" a="b">\n  \n</div>');
       });
     });
   });

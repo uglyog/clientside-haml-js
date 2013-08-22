@@ -129,7 +129,7 @@ root.haml =
         else if tokeniser.token.filter
           @_filter(tokeniser, indent, generator, options)
         else
-          @_templateLine(tokeniser, generator.elementStack, indent, generator)
+          @_templateLine(tokeniser, generator.elementStack, indent, generator, options)
       else
         generator.outputBuffer.append(tokeniser.token.matched)
         tokeniser.getNextToken()
@@ -167,7 +167,7 @@ root.haml =
     if tokeniser.token.filter
       filter = tokeniser.token.tokenString
       unless haml.filters[filter]
-        @_handleError(options, indent, tokeniser, tokeniser.parseError("Filter '#{filter}' not registered. Filter functions need to be added to 'haml.filters'."))
+        @_handleError(options, skipTo: indent, tokeniser, tokeniser.parseError("Filter '#{filter}' not registered. Filter functions need to be added to 'haml.filters'."))
         return
       tokeniser.skipToEOLorEOF()
       tokeniser.getNextToken()
@@ -258,14 +258,14 @@ root.haml =
         elementStack[indent] = block: true
 
   # TEMPLATELINE -> ([ELEMENT][IDSELECTOR][CLASSSELECTORS][ATTRIBUTES] [SLASH|CONTENTS])|(!CONTENTS) (EOL|EOF)
-  _templateLine: (tokeniser, elementStack, indent, generator) ->
+  _templateLine: (tokeniser, elementStack, indent, generator, options) ->
     @_closeElements(indent, elementStack, tokeniser, generator) unless tokeniser.token.eol
 
     identifier = @_element(tokeniser)
     id = @_idSelector(tokeniser)
     classes = @_classSelector(tokeniser)
     objectRef = @_objectReference(tokeniser)
-    attrList = @_attributeList(tokeniser)
+    attrList = @_attributeList(tokeniser, options)
 
     currentParsePoint = tokeniser.currentParsePoint()
     attributesHash = @_attributeHash(tokeniser)
@@ -322,8 +322,8 @@ root.haml =
       @_eolOrEof(tokeniser)
 
     if tagOptions.selfClosingTag and hasContents
-      throw haml.HamlRuntime.templateError(currentParsePoint.lineNumber, currentParsePoint.characterNumber,
-              currentParsePoint.currentLine, "A self-closing tag can not have any contents")
+      @_handleError(options, null, tokeniser, haml.HamlRuntime.templateError(currentParsePoint.lineNumber, currentParsePoint.characterNumber,
+              currentParsePoint.currentLine, "A self-closing tag can not have any contents"))
 
   _attributeHash: (tokeniser) ->
     attr = ''
@@ -340,7 +340,7 @@ root.haml =
     attr
 
   # ATTRIBUTES -> ( ATTRIBUTE* )
-  _attributeList: (tokeniser) ->
+  _attributeList: (tokeniser, options) ->
     attrList = {}
     if tokeniser.token.openBracket
       tokeniser.getNextToken()
@@ -349,12 +349,12 @@ root.haml =
         if attr
           attrList[attr.name] = attr.value
         else
-          tokeniser.getNextToken()
-        if tokeniser.token.ws or tokeniser.token.eol
-          tokeniser.getNextToken()
-        else if !tokeniser.token.closeBracket and !tokeniser.token.identifier
-          throw tokeniser.parseError("Expecting either an attribute name to continue the attibutes or a closing " +
-            "bracket to end")
+          if tokeniser.token.ws or tokeniser.token.eol
+            tokeniser.getNextToken()
+          else if !tokeniser.token.closeBracket and !tokeniser.token.identifier
+            @_handleError(options, null, tokeniser, tokeniser.parseError("Expecting either an attribute name to continue the attibutes or a closing " +
+              "bracket to end"))
+            return attrList
       tokeniser.getNextToken()
     attrList
 
@@ -505,10 +505,10 @@ root.haml =
     else
       "\n"
 
-  _handleError: (options, indent, tokeniser, error) ->
+  _handleError: (options, action, tokeniser, error) ->
     if options?.tolerateFaults
       console.log(error)
-      @_skipToNextLineWithIndent(tokeniser, indent)
+      @_skipToNextLineWithIndent(tokeniser, action.skipTo) if action?.skipTo
     else
       throw error
 

@@ -30,18 +30,57 @@ describe 'error handling', ->
 
   describe 'with an unknown filter', ->
 
-      beforeEach ->
-        @haml = '''
-                .p><
-                  :unknown
-                    this is not the filter you where looking for
-                  test
-                '''
+    beforeEach ->
+      @haml = '''
+              .p><
+                :unknown
+                  this is not the filter you where looking for
+                test
+              '''
 
-      it 'raises an exception in normal mode', ->
-        expect(=> haml.compileHaml(source: @haml)()).toThrow()
+    it 'raises an exception in normal mode', ->
+      expect(=> haml.compileHaml(source: @haml)()).toThrow()
 
-      it 'does not raise an exception in fault tolerant mode', ->
-        expect(=> @result = haml.compileHaml(source: @haml, tolerateFaults: true)()).not.toThrow()
-        expect(@result).toBe('<div class="p">test</div>')
+    it 'does not raise an exception in fault tolerant mode', ->
+      expect(=> @result = haml.compileHaml(source: @haml, tolerateFaults: true)()).not.toThrow()
+      expect(@result).toBe('<div class="p">test</div>')
 
+  describe 'with an self-closing tag with content', ->
+
+    beforeEach ->
+      @haml = '''
+              .p/ test
+              '''
+
+    it 'raises an exception in normal mode', ->
+      expect(=> haml.compileHaml(source: @haml)()).toThrow()
+
+    it 'does not raise an exception in fault tolerant mode', ->
+      expect(=> @result = haml.compileHaml(source: @haml, tolerateFaults: true)()).not.toThrow()
+      expect(@result).toBe('<div class="p"/>\ntest\n')
+
+  describe 'with no closing attribute list', ->
+
+    beforeEach ->
+      @haml = '''
+              .p(a="b"
+              '''
+
+    it 'raises an exception in normal mode', ->
+      expect(=> haml.compileHaml(source: @haml)()).toThrow()
+
+    it 'does not raise an exception in fault tolerant mode', ->
+      expect(=> @result = haml.compileHaml(source: @haml, tolerateFaults: true)()).not.toThrow()
+      expect(@result).toBe('<div class="p" a="b">\n</div>\n')
+
+  describe 'with an invalid attribute list', ->
+
+    beforeEach ->
+      @haml = '.p(a="b" =)'
+
+    it 'raises an exception in normal mode', ->
+      expect(=> haml.compileHaml(source: @haml)()).toThrow()
+
+    it 'does not raise an exception in fault tolerant mode', ->
+      expect(=> @result = haml.compileHaml(source: @haml, tolerateFaults: true)()).not.toThrow()
+      expect(_(haml.compileHaml(source: @haml, tolerateFaults: true)()).trim()).toEqual('<div class="p" a="b">\n  \n</div>')
