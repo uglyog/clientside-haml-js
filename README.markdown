@@ -183,6 +183,8 @@ of a script element in the DOM. Otherwise, it accepts the following key/value pa
     - javascript (default)
     - coffeescript
     - productionjavascript
+* _tolerateFaults_ - The default behaviour when encountering errors is to raise an exception and stop parsing. With this
+option set to true, errors will be logged to the console and the parser will attempt to continue parsing.
 
 One of either _source_, _sourceId_ or _sourceUrl_ **must** be provided. **Note**, also, that the _sourceUrl_ options
 requires jQuery 1.5.1+ as a dependency.
@@ -495,7 +497,7 @@ The following filter blocks are supported:
 * **css** - wraps the filter block in a style and cdata tag
 * **cdata** - wraps the filter block in a CDATA tag
 * **preserve** - preserved blocks of text aren't indented, and newlines within tags are replaced with the HTML escape code for newlines
-* **escape** - renders the text in the block with html escaped
+* **escaped** - renders the text in the block with html escaped
 
 Additional filters can be added by adding an entry to `haml.filters` that maps the filter name to a filter function.
 See filters.coffee for examples of filter functions. \#{} Interpolated code blocks are also supported within filter blocks.
@@ -530,17 +532,14 @@ results in
 ```html
       <body>
         <script type="text/javascript">
-        //<![CDATA[
-        $(document).ready(function() {
-          alert("Hi there!");
-        });
-        //]]>
+          //<![CDATA[
+            $(document).ready(function() {
+              alert("Hi there!");
+            });
+          //]]>
         </script>
         <p>
-      Foo
-      <pre>Bar&#x000A;Baz</pre>
-      <a>Test&#x000A;Test&#x000A;</a>
-      Other
+          Foo&#x000A; <pre>Bar\nBaz</pre>&#x000A; <a>Test&#x000A; Test&#x000A; </a>&#x000A; Other
           Foo
           &lt;pre&gt;&#39;Bar&#39;
       Baz&lt;/pre&gt;
