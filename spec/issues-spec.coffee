@@ -195,7 +195,7 @@ describe 'haml issues', ->
                create new
              </a>
         '''
-      expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript')()).trim()).toEqual(expected)
+      expect(_.str.trim(haml.compileHaml(source: hamlSource, generator: 'coffeescript')())).toEqual(expected)
 
   describe 'Issue #27 - multiple levels of nesting confuses haml parser', ->
 
@@ -221,7 +221,7 @@ describe 'haml issues', ->
       players = [
         {id: 1, name: 'travis', get: (attr) -> @name}
       ]
-      expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(players: players)).trim()).toEqual(expected)
+      expect(_.str.trim(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(players: players))).toEqual(expected)
 
   describe 'Issue #30 - if/else statements don\'t work for embedded coffeescript', ->
 
@@ -250,7 +250,7 @@ describe 'haml issues', ->
         {value: '2', text: 'text 2'},
         {value: '3', text: 'text 3'}
       ]
-      expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
+      expect(_.str.trim(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1'))).toEqual(expected)
 
   it 'should be able to handle else statements with extra ifs', ->
       hamlSource =
@@ -282,7 +282,7 @@ describe 'haml issues', ->
         {value: '2', text: 'text 2'},
         {value: '3', text: 'text 3'}
       ]
-      expect(_(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1')).trim()).toEqual(expected)
+      expect(_.str.trim(haml.compileHaml(source: hamlSource, generator: 'coffeescript').call(options: options, selected: '1'))).toEqual(expected)
 
   describe 'Issue #29 - backslash when escaping ampersand character appears in DOM', ->
 
@@ -299,7 +299,7 @@ describe 'haml issues', ->
             &copy; Company 2012
           </p>
         '''
-      expect(_(haml.compileHaml(source: hamlSource)()).trim()).toEqual(expected)
+      expect(_.str.trim(haml.compileHaml(source: hamlSource)())).toEqual(expected)
 
   describe 'Issue #31 - new line in eval breaking generated function', ->
 
@@ -327,13 +327,13 @@ describe 'haml issues', ->
         iframeSource: 'blahblahblah'
       }
 
-      expect(_(haml.compileHaml(source: hamlSource)(data)).trim()).toEqual(expected)
+      expect(_.str.trim(haml.compileHaml(source: hamlSource)(data))).toEqual(expected)
 
   describe 'Issue #34 - Haml does not format attributes which are 3 or more layers deep correctly', ->
 
     it 'should handle nested hashes correctly', ->
-      expect(_(haml.compileHaml(source: '%a{data:{theme:{test:"A"}}}<')()).trim()).toEqual('<a data-theme-test="A"></a>')
-      expect(_(haml.compileHaml(source: '.foo{data: {a: "b", c: {d: "e", f: "g"}}}<')()).trim()).toEqual('<div class="foo" data-a="b" data-c-d="e" data-c-f="g"></div>')
+      expect(_.str.trim(haml.compileHaml(source: '%a{data:{theme:{test:"A"}}}<')())).toEqual('<a data-theme-test="A"></a>')
+      expect(_.str.trim(haml.compileHaml(source: '.foo{data: {a: "b", c: {d: "e", f: "g"}}}<')())).toEqual('<div class="foo" data-a="b" data-c-d="e" data-c-f="g"></div>')
 
 
   describe 'Issue #37 - Unexpected behavior', ->
@@ -369,7 +369,7 @@ describe 'haml issues', ->
         hello: "I'm a variable!"
         obj1: {id: "object-1", class: "test"}
 
-      expect(_(haml.compileHaml(source: hamlSource)(data)).trim()).toEqual(expected)
+      expect(_.str.trim(haml.compileHaml(source: hamlSource)(data))).toEqual(expected)
 
   describe 'Issue #38 - Whitespace not calculated correctly when only using tabs for indentation', ->
 
@@ -394,4 +394,4 @@ describe 'haml issues', ->
         </div>
         '''
 
-      expect(_(haml.compileHaml(source: hamlSource)()).trim()).toEqual(expected)
+      expect(_.str.trim(haml.compileHaml(source: hamlSource)())).toEqual(expected)

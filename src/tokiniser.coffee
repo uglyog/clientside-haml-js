@@ -149,7 +149,12 @@ class Tokeniser
       @matchSingleCharToken('>', { gt: true, token: 'GT' })
       @matchSingleCharToken('~', { tilde: true, token: 'TILDE' })
 
-      @token = { unknown: true, token: 'UNKNOWN' } if @token == null
+      if @token == null
+        @token =
+          unknown: true
+          token: 'UNKNOWN'
+          matched: @buffer.charAt(@bufferIndex)
+        @advanceCharsInBuffer(1)
 
     @token
 
@@ -206,7 +211,7 @@ class Tokeniser
   skipToEOLorEOF: ->
     text = ''
     unless @token.eof or @token.eol
-      text += @token.matched unless @token.unknown
+      text += @token.matched if @token.matched?
       @currentLineMatcher.lastIndex = @bufferIndex
       line = @currentLineMatcher.exec(@buffer)
       if line and line.index == @bufferIndex
@@ -274,7 +279,7 @@ class Tokeniser
     Pushes back the current token onto the front of the input buffer
   ###
   pushBackToken: ->
-    if !@token.unknown and !@token.eof
+    if !@token.eof
       @bufferIndex -= @token.matched.length
       @token = @prevToken
 
@@ -330,7 +335,7 @@ class Tokeniser
       0
 
   ###
-    Calculate the indent leven of the provided whitespace
+    Calculate the indent level of the provided whitespace
   ###
   calculateIndent: (whitespace) ->
     indent = 0

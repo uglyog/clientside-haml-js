@@ -83,7 +83,7 @@ describe 'error handling', ->
 
     it 'does not raise an exception in fault tolerant mode', ->
       expect(=> @result = haml.compileHaml(source: @haml, tolerateFaults: true)()).not.toThrow()
-      expect(_(haml.compileHaml(source: @haml, tolerateFaults: true)()).trim()).toEqual('<div class="p" a="b">\n  \n</div>')
+      expect(_.str.trim(haml.compileHaml(source: @haml, tolerateFaults: true)())).toEqual('<div class="p" a="b">\n  \n</div>')
 
   describe 'with a missing closing bracket', ->
 
@@ -102,7 +102,7 @@ describe 'error handling', ->
 
     it 'does not raise an exception in fault tolerant mode', ->
       expect(=> @result = haml.compileHaml(source: @haml, tolerateFaults: true)()).not.toThrow()
-      expect(_(haml.compileHaml(source: @haml, tolerateFaults: true)()).trim()).toEqual(
+      expect(_.str.trim(haml.compileHaml(source: @haml, tolerateFaults: true)())).toEqual(
         '''<div class="p" a="b">
            .o Something not seen
            </div>
@@ -132,7 +132,7 @@ describe 'error handling', ->
 
     xit 'does not raise an exception in fault tolerant mode', ->
       expect(=> @result = haml.compileHaml(source: @haml, tolerateFaults: true)()).not.toThrow()
-      expect(_(haml.compileHaml(source: @haml, tolerateFaults: true)()).trim()).toEqual(
+      expect(_.str.trim(haml.compileHaml(source: @haml, tolerateFaults: true)())).toEqual(
         '''<div class="p" a="b">
            .o Something not seen
            </div>

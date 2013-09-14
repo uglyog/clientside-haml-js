@@ -172,16 +172,18 @@ root.haml =
       unless haml.filters[filter]
         @_handleError(options, skipTo: indent, tokeniser, tokeniser.parseError("Filter '#{filter}' not registered. Filter functions need to be added to 'haml.filters'."))
         return
+
       tokeniser.skipToEOLorEOF()
       tokeniser.getNextToken()
       i = haml._whitespace(tokeniser)
       filterBlock = []
       while (!tokeniser.token.eof and i > indent)
+        tokeniser.pushBackToken()
         line = tokeniser.skipToEOLorEOF()
-        filterBlock.push(haml.HamlRuntime.indentText(i - indent - 1) + line)
+        filterBlock.push(HamlRuntime.trim(line, 2 * indent))
         tokeniser.getNextToken()
         i = haml._whitespace(tokeniser)
-      haml.filters[filter](filterBlock, generator, haml.HamlRuntime.indentText(indent), tokeniser.currentParsePoint())
+      haml.filters[filter](filterBlock, generator, indent, tokeniser.currentParsePoint())
       tokeniser.pushBackToken()
 
   _commentLine: (tokeniser, indent, elementStack, generator) ->

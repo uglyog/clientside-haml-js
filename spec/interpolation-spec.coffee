@@ -48,7 +48,7 @@ describe 'interpolated text', () ->
               Test
               </a>
               Other
-            :escape
+            :escaped
               Foo
               #{"<pre>'Bar'\\nBaz</pre>"}
               <a>Test
@@ -61,17 +61,14 @@ describe 'interpolated text', () ->
       '''
       <body>
         <script type="text/javascript">
-        //<![CDATA[
-        $(document).ready(function() {
-          alert("Hi there!");
-        });
-        //]]>
+          //<![CDATA[
+            $(document).ready(function() {
+              alert("Hi there!");
+            });
+          //]]>
         </script>
         <p>
-      Foo
-      <pre>Bar&#x000A;Baz</pre>
-      <a>Test&#x000A;Test&#x000A;</a>
-      Other
+          Foo&#x000A; <pre>Bar\nBaz</pre>&#x000A; <a>Test&#x000A; Test&#x000A; </a>&#x000A; Other
           Foo
           &lt;pre&gt;&#39;Bar&#39;
       Baz&lt;/pre&gt;
@@ -122,7 +119,7 @@ describe 'interpolated text', () ->
               Test
               </a>
               Other
-            :escape
+            :escaped
               Foo
               #{"<pre>'Bar'\\nBaz</pre>"}
               <a>Test
@@ -135,17 +132,14 @@ describe 'interpolated text', () ->
       '''
       <body>
         <script type="text/javascript">
-        //<![CDATA[
-        $(document).ready(function() {
-          alert("Hi there!");
-        });
-        //]]>
+          //<![CDATA[
+            $(document).ready(function() {
+              alert("Hi there!");
+            });
+          //]]>
         </script>
         <p>
-      Foo
-      <pre>Bar&#x000A;Baz</pre>
-      <a>Test&#x000A;Test&#x000A;</a>
-      Other
+          Foo&#x000A; <pre>Bar\nBaz</pre>&#x000A; <a>Test&#x000A; Test&#x000A; </a>&#x000A; Other
           Foo
           &lt;pre&gt;&#39;Bar&#39;
       Baz&lt;/pre&gt;

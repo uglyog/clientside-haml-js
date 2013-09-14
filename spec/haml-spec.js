@@ -602,19 +602,37 @@
       }).toThrow('Filter \'unknown\' not registered. Filter functions need to be added to \'haml.filters\'. at line 2 and character 10:\n  :unknown\n---------^');
     });
     it('generates javascript filter blocks correctly', function() {
-      return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  // blah di blah di blah\n  function () {\n    return \'blah\';\n  }\n  //]]>\n  </script>\n</body>\n');
+      return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <script type="text/javascript">\n    //<![CDATA[\n      // blah di blah di blah\n      function () {\n        return \'blah\';\n      }\n    //]]>\n  </script>\n</body>\n');
     });
     it('generates css filter blocks correctly', function() {
-      return expect(haml.compileStringToJs('%head\n  :css\n    /* blah di blah di blah */\n    .body {\n      color: red;\n    }')()).toEqual('<head>\n  <style type="text/css">\n  /*<![CDATA[*/\n  /* blah di blah di blah */\n  .body {\n    color: red;\n  }\n  /*]]>*/\n  </style>\n</head>\n');
+      return expect(haml.compileStringToJs('%head\n  :css\n    /* blah di blah di blah */\n    .body {\n      color: red;\n    }')()).toEqual('<head>\n  <style type="text/css">\n    /*<![CDATA[*/\n      /* blah di blah di blah */\n      .body {\n        color: red;\n      }\n    /*]]>*/\n  </style>\n</head>\n');
     });
     it('generates CDATA filter blocks correctly', function() {
-      return expect(haml.compileStringToJs('%body\n  :cdata\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <![CDATA[\n  // blah di blah di blah\n  function () {\n    return \'blah\';\n  }\n  ]]>\n</body>\n');
+      return expect(haml.compileStringToJs('%body\n  :cdata\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }')()).toEqual('<body>\n  <![CDATA[\n    // blah di blah di blah\n    function () {\n      return \'blah\';\n    }\n  ]]>\n</body>\n');
     });
     it('generates preserve filter blocks correctly', function() {
-      return expect(haml.compileStringToJs('%p\n  :preserve\n    Foo\n    <pre>Bar\n    Baz</pre>\n    <a>Test\n    Test\n    </a>\n    Other')()).toEqual('<p>\nFoo\n<pre>Bar&#x000A;Baz</pre>\n<a>Test&#x000A;Test&#x000A;</a>\nOther\n</p>\n');
+      return expect(haml.compileStringToJs('%p\n  :preserve\n    Foo\n    <pre>Bar\n    Baz</pre>\n    <a>Test\n    Test\n    </a>\n    Other')()).toEqual('<p>\n  Foo&#x000A; <pre>Bar&#x000A; Baz</pre>&#x000A; <a>Test&#x000A; Test&#x000A; </a>&#x000A; Other\n</p>\n');
     });
-    return it('generates escape filter blocks correctly', function() {
-      return expect(haml.compileStringToJs('%p\n  :escape\n    Foo\n    <pre>\'Bar\'\n    Baz</pre>\n    <a>Test\n    Test\n    </a>\n    Other&')()).toEqual('<p>\n  Foo\n  &lt;pre&gt;&#39;Bar&#39;\n  Baz&lt;/pre&gt;\n  &lt;a&gt;Test\n  Test\n  &lt;/a&gt;\n  Other&amp;\n</p>\n');
+    it('generates escape filter blocks correctly', function() {
+      return expect(haml.compileStringToJs('%p\n  :escaped\n    Foo\n    <pre>\'Bar\'\n    Baz</pre>\n    <a>Test\n    Test\n    </a>\n    Other&')()).toEqual('<p>\n  Foo\n  &lt;pre&gt;&#39;Bar&#39;\n  Baz&lt;/pre&gt;\n  &lt;a&gt;Test\n  Test\n  &lt;/a&gt;\n  Other&amp;\n</p>\n');
+    });
+    it('handles large blocks of text with escaped interpolate markers correctly', function() {
+      var expected, hamlSource;
+
+      hamlSource = '%h1 Why would I use it?\n.contents\n  %div\n    Sinatra webapp\n    %pre(class="brush: ruby")\n      :plain\n        post \'/contract_proposals\' do\n          begin\n            contract_attributes = JSON.parse(request.body.read)[\'contract\']\n            contract = ContractFactory.contract_from contract_attributes\n\n            if contract.valid?\n              contract.generate_pdf(File.join(settings.public_folder, PDF_SUBDIR))\n              logger.info %{action=contract_created_from_condor, account_manager="\\#{contract.account_manager.name}", agent_code=\\#{contract.agency.agent_code}}\n              return [201, contract.to_json(request.base_url)]\n            else\n              logger.error %{action=create_contract_proposal_failure, error_message="\\#{contract.validation_errors}"}\n              logger.error contract_attributes.to_json\n              return [400, {errors: contract.validation_errors}.to_json]\n            end\n          rescue Exception => e\n            request.body.rewind\n            logger.error %{action=create_contract_proposal_failure, error_message="\\#{e}"}\n            logger.error request.body.read\n            logger.error e\n            return [400, "Sorry, but I couldn\'t generate your contract proposal!"]\n          end\n        end\n\n        options \'/contract_proposals\' do\n          headers[\'Access-Control-Allow-Methods\'] = \'POST, OPTIONS\'\n          headers[\'Access-Control-Allow-Headers\'] = \'X-Requested-With, Content-Type\'\n        end';
+      expected = '<h1>\n  Why would I use it?\n</h1>\n<div class="contents">\n  <div>\n    Sinatra webapp\n    <pre class="brush: ruby">\n      post \'/contract_proposals\' do\n        begin\n          contract_attributes = JSON.parse(request.body.read)[\'contract\']\n          contract = ContractFactory.contract_from contract_attributes\n\n\n            if contract.valid?\n              contract.generate_pdf(File.join(settings.public_folder, PDF_SUBDIR))\n              logger.info %{action=contract_created_from_condor, account_manager="#{contract.account_manager.name}", agent_code=#{contract.agency.agent_code}}\n              return [201, contract.to_json(request.base_url)]\n            else\n              logger.error %{action=create_contract_proposal_failure, error_message="#{contract.validation_errors}"}\n              logger.error contract_attributes.to_json\n              return [400, {errors: contract.validation_errors}.to_json]\n            end\n          rescue Exception => e\n            request.body.rewind\n            logger.error %{action=create_contract_proposal_failure, error_message="#{e}"}\n            logger.error request.body.read\n            logger.error e\n            return [400, "Sorry, but I couldn\'t generate your contract proposal!"]\n          end\n        end\n\n        options \'/contract_proposals\' do\n          headers[\'Access-Control-Allow-Methods\'] = \'POST, OPTIONS\'\n          headers[\'Access-Control-Allow-Headers\'] = \'X-Requested-With, Content-Type\'\n        end\n    </pre>\n  </div>\n</div>';
+      return expect(_.str.trim(haml.compileHaml({
+        source: hamlSource
+      })())).toEqual(expected);
+    });
+    return it('handles large blocks of text correctly', function() {
+      var expected, hamlSource;
+
+      hamlSource = '%h1 Why would I use it?\n.contents\n  %div\n    Webmachine Resource\n    %pre\n      :escaped\n         def options\n           {\n             \'Access-Control-Allow-Methods\' => \'POST, OPTIONS\',\n             \'Access-Control-Allow-Headers\' => \'X-Requested-With, Content-Type\'\n           }\n         end\n          \n         def finish_request\n           response.headers[\'Access-Control-Allow-Origin\'] = \'*\'\n         end\n          \n         def allowed_methods\n           [\'GET\', \'HEAD\', \'POST\', \'OPTIONS\']\n         end\n          \n         def malformed_request?\n           puts "malformed_request?"\n           body = request.body.to_s\n           if body.nil?\n             false\n           else\n             begin\n               contract_attributes = JSON.parse(request.body.to_s)[\'contract\']\n               @contract = ContractFactory.contract_from contract_attributes\n               !@contract.valid?\n             rescue => e\n               true\n             end\n         end\n      %div';
+      expected = '<h1>\n  Why would I use it?\n</h1>\n<div class="contents">\n  <div>\n    Webmachine Resource\n    <pre>\n       def options\n         {\n           &#39;Access-Control-Allow-Methods&#39; =&gt; &#39;POST, OPTIONS&#39;,\n           &#39;Access-Control-Allow-Headers&#39; =&gt; &#39;X-Requested-With, Content-Type&#39;\n         }\n       end\n        \n       def finish_request\n         response.headers[&#39;Access-Control-Allow-Origin&#39;] = &#39;*&#39;\n       end\n        \n       def allowed_methods\n         [&#39;GET&#39;, &#39;HEAD&#39;, &#39;POST&#39;, &#39;OPTIONS&#39;]\n       end\n        \n       def malformed_request?\n         puts &quot;malformed_request?&quot;\n         body = request.body.to_s\n         if body.nil?\n           false\n         else\n           begin\n             contract_attributes = JSON.parse(request.body.to_s)[&#39;contract&#39;]\n             @contract = ContractFactory.contract_from contract_attributes\n             !@contract.valid?\n           rescue =&gt; e\n             true\n           end\n       end\n      <div>\n      </div>\n    </pre>\n  </div>\n</div>';
+      return expect(_.str.trim(haml.compileHaml({
+        source: hamlSource
+      })())).toEqual(expected);
     });
   });
 
@@ -633,9 +651,9 @@
       })).toEqual('<p>\n  Look at \\\\yon lack of backslash: #{foo}\n  And yon presence thereof: \\{foo}\n</p>\n');
     });
     it('generates filter blocks correctly', function() {
-      return expect(haml.compileStringToJs('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{message}");\n    });\n  %p\n    :preserve\n      Foo\n      #{"<pre>Bar\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other\n    :escape\n      Foo\n      #{"<pre>\'Bar\'\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other&')({
+      return expect(haml.compileStringToJs('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{message}");\n    });\n  %p\n    :preserve\n      Foo\n      #{"<pre>Bar\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other\n    :escaped\n      Foo\n      #{"<pre>\'Bar\'\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other&')({
         message: 'Hi there!'
-      })).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  $(document).ready(function() {\n    alert("Hi there!");\n  });\n  //]]>\n  </script>\n  <p>\nFoo\n<pre>Bar&#x000A;Baz</pre>\n<a>Test&#x000A;Test&#x000A;</a>\nOther\n    Foo\n    &lt;pre&gt;&#39;Bar&#39;\nBaz&lt;/pre&gt;\n    &lt;a&gt;Test\n    Test\n    &lt;/a&gt;\n    Other&amp;\n  </p>\n</body>\n');
+      })).toEqual('<body>\n  <script type="text/javascript">\n    //<![CDATA[\n      $(document).ready(function() {\n        alert("Hi there!");\n      });\n    //]]>\n  </script>\n  <p>\n    Foo&#x000A; <pre>Bar\nBaz</pre>&#x000A; <a>Test&#x000A; Test&#x000A; </a>&#x000A; Other\n    Foo\n    &lt;pre&gt;&#39;Bar&#39;\nBaz&lt;/pre&gt;\n    &lt;a&gt;Test\n    Test\n    &lt;/a&gt;\n    Other&amp;\n  </p>\n</body>\n');
     });
     it('should support interpolation in coffeescript', function() {
       return expect(haml.compileCoffeeHamlFromString('- h = (word) -> word.toLowerCase()\n%p\n  Look at \\\\#{h @word } lack of backslash: \\#{foo}\n  And yon presence thereof: \\{foo}').call({
@@ -643,9 +661,9 @@
       })).toEqual('<p>\n  Look at \\\\yon lack of backslash: #{foo}\n  And yon presence thereof: \\{foo}\n</p>\n');
     });
     return it('generates filter blocks correctly with embedded coffeescript', function() {
-      return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{@message}");\n    });\n  %p\n    :preserve\n      Foo\n      #{"<pre>Bar\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other\n    :escape\n      Foo\n      #{"<pre>\'Bar\'\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other&').call({
+      return expect(haml.compileCoffeeHamlFromString('%body\n  :javascript\n    $(document).ready(function() {\n      alert("#{@message}");\n    });\n  %p\n    :preserve\n      Foo\n      #{"<pre>Bar\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other\n    :escaped\n      Foo\n      #{"<pre>\'Bar\'\\nBaz</pre>"}\n      <a>Test\n      Test\n      </a>\n      Other&').call({
         message: 'Hi there!'
-      })).toEqual('<body>\n  <script type="text/javascript">\n  //<![CDATA[\n  $(document).ready(function() {\n    alert("Hi there!");\n  });\n  //]]>\n  </script>\n  <p>\nFoo\n<pre>Bar&#x000A;Baz</pre>\n<a>Test&#x000A;Test&#x000A;</a>\nOther\n    Foo\n    &lt;pre&gt;&#39;Bar&#39;\nBaz&lt;/pre&gt;\n    &lt;a&gt;Test\n    Test\n    &lt;/a&gt;\n    Other&amp;\n  </p>\n</body>\n');
+      })).toEqual('<body>\n  <script type="text/javascript">\n    //<![CDATA[\n      $(document).ready(function() {\n        alert("Hi there!");\n      });\n    //]]>\n  </script>\n  <p>\n    Foo&#x000A; <pre>Bar\nBaz</pre>&#x000A; <a>Test&#x000A; Test&#x000A; </a>&#x000A; Other\n    Foo\n    &lt;pre&gt;&#39;Bar&#39;\nBaz&lt;/pre&gt;\n    &lt;a&gt;Test\n    Test\n    &lt;/a&gt;\n    Other&amp;\n  </p>\n</body>\n');
     });
   });
 
@@ -864,10 +882,10 @@
 
         hamlSource = '-if true\n  %a{href : \'#new\'} create new';
         expected = '<a href="#new">\n    create new\n  </a>';
-        return expect(_(haml.compileHaml({
+        return expect(_.str.trim(haml.compileHaml({
           source: hamlSource,
           generator: 'coffeescript'
-        })()).trim()).toEqual(expected);
+        })())).toEqual(expected);
       });
     });
     describe('Issue #27 - multiple levels of nesting confuses haml parser', function() {
@@ -885,12 +903,12 @@
             }
           }
         ];
-        return expect(_(haml.compileHaml({
+        return expect(_.str.trim(haml.compileHaml({
           source: hamlSource,
           generator: 'coffeescript'
         }).call({
           players: players
-        })).trim()).toEqual(expected);
+        }))).toEqual(expected);
       });
     });
     describe('Issue #30 - if/else statements don\'t work for embedded coffeescript', function() {
@@ -911,13 +929,13 @@
             text: 'text 3'
           }
         ];
-        return expect(_(haml.compileHaml({
+        return expect(_.str.trim(haml.compileHaml({
           source: hamlSource,
           generator: 'coffeescript'
         }).call({
           options: options,
           selected: '1'
-        })).trim()).toEqual(expected);
+        }))).toEqual(expected);
       });
     });
     it('should be able to handle else statements with extra ifs', function() {
@@ -937,13 +955,13 @@
           text: 'text 3'
         }
       ];
-      return expect(_(haml.compileHaml({
+      return expect(_.str.trim(haml.compileHaml({
         source: hamlSource,
         generator: 'coffeescript'
       }).call({
         options: options,
         selected: '1'
-      })).trim()).toEqual(expected);
+      }))).toEqual(expected);
     });
     describe('Issue #29 - backslash when escaping ampersand character appears in DOM', function() {
       return it('should not be excluding the bashslashed character', function() {
@@ -951,9 +969,9 @@
 
         hamlSource = '%p\n  \\&copy; Company 2012';
         expected = '<p>\n  &copy; Company 2012\n</p>';
-        return expect(_(haml.compileHaml({
+        return expect(_.str.trim(haml.compileHaml({
           source: hamlSource
-        })()).trim()).toEqual(expected);
+        })())).toEqual(expected);
       });
     });
     describe('Issue #31 - new line in eval breaking generated function', function() {
@@ -968,19 +986,19 @@
           },
           iframeSource: 'blahblahblah'
         };
-        return expect(_(haml.compileHaml({
+        return expect(_.str.trim(haml.compileHaml({
           source: hamlSource
-        })(data)).trim()).toEqual(expected);
+        })(data))).toEqual(expected);
       });
     });
     describe('Issue #34 - Haml does not format attributes which are 3 or more layers deep correctly', function() {
       return it('should handle nested hashes correctly', function() {
-        expect(_(haml.compileHaml({
+        expect(_.str.trim(haml.compileHaml({
           source: '%a{data:{theme:{test:"A"}}}<'
-        })()).trim()).toEqual('<a data-theme-test="A"></a>');
-        return expect(_(haml.compileHaml({
+        })())).toEqual('<a data-theme-test="A"></a>');
+        return expect(_.str.trim(haml.compileHaml({
           source: '.foo{data: {a: "b", c: {d: "e", f: "g"}}}<'
-        })()).trim()).toEqual('<div class="foo" data-a="b" data-c-d="e" data-c-f="g"></div>');
+        })())).toEqual('<div class="foo" data-a="b" data-c-d="e" data-c-f="g"></div>');
       });
     });
     describe('Issue #37 - Unexpected behavior', function() {
@@ -996,9 +1014,9 @@
             "class": "test"
           }
         };
-        return expect(_(haml.compileHaml({
+        return expect(_.str.trim(haml.compileHaml({
           source: hamlSource
-        })(data)).trim()).toEqual(expected);
+        })(data))).toEqual(expected);
       });
     });
     return describe('Issue #38 - Whitespace not calculated correctly when only using tabs for indentation', function() {
@@ -1007,9 +1025,9 @@
 
         hamlSource = ".page\n\t.row\n\t\t%section\n\t\t\t%h5 header\n\t\t\t%p\n\t\t\t\t%span foobar";
         expected = '<div class="page">\n  <div class="row">\n    <section>\n      <h5>\n        header\n      </h5>\n      <p>\n        <span>\n          foobar\n        </span>\n      </p>\n    </section>\n  </div>\n</div>';
-        return expect(_(haml.compileHaml({
+        return expect(_.str.trim(haml.compileHaml({
           source: hamlSource
-        })()).trim()).toEqual(expected);
+        })())).toEqual(expected);
       });
     });
   });
@@ -1322,10 +1340,10 @@
             tolerateFaults: true
           })();
         }).not.toThrow();
-        return expect(_(haml.compileHaml({
+        return expect(_.str.trim(haml.compileHaml({
           source: this.haml,
           tolerateFaults: true
-        })()).trim()).toEqual('<div class="p" a="b">\n  \n</div>');
+        })())).toEqual('<div class="p" a="b">\n  \n</div>');
       });
     });
     describe('with a missing closing bracket', function() {
@@ -1350,10 +1368,10 @@
             tolerateFaults: true
           })();
         }).not.toThrow();
-        return expect(_(haml.compileHaml({
+        return expect(_.str.trim(haml.compileHaml({
           source: this.haml,
           tolerateFaults: true
-        })()).trim()).toEqual('<div class="p" a="b">\n.o Something not seen\n</div>\n<div class="r" a="b">\n  You should see me\n</div>\n<div class="q">\n  You should see me\n</div>');
+        })())).toEqual('<div class="p" a="b">\n.o Something not seen\n</div>\n<div class="r" a="b">\n  You should see me\n</div>\n<div class="q">\n  You should see me\n</div>');
       });
     });
     return describe('with a missing closing brace', function() {
@@ -1378,10 +1396,10 @@
             tolerateFaults: true
           })();
         }).not.toThrow();
-        return expect(_(haml.compileHaml({
+        return expect(_.str.trim(haml.compileHaml({
           source: this.haml,
           tolerateFaults: true
-        })()).trim()).toEqual('<div class="p" a="b">\n.o Something not seen\n</div>\n<div class="r" a="b">\n  You should see me\n</div>\n<div class="q">\n  You should see me\n</div>');
+        })())).toEqual('<div class="p" a="b">\n.o Something not seen\n</div>\n<div class="r" a="b">\n  You should see me\n</div>\n<div class="q">\n  You should see me\n</div>');
       });
     });
   });
