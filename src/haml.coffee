@@ -108,28 +108,31 @@ root.haml =
     tokeniser.getNextToken()
     while !tokeniser.token.eof
       if !tokeniser.token.eol
-        indent = @_whitespace(tokeniser)
-        generator.setIndent(indent)
-        if tokeniser.token.eol
-          generator.outputBuffer.append(HamlRuntime.indentText(indent) + tokeniser.token.matched)
-          tokeniser.getNextToken()
-        else if tokeniser.token.doctype
-          @_doctype(tokeniser, indent, generator)
-        else if tokeniser.token.exclamation
-          @_ignoredLine(tokeniser, indent, generator.elementStack, generator)
-        else if tokeniser.token.equal or tokeniser.token.escapeHtml or tokeniser.token.unescapeHtml or
-        tokeniser.token.tilde
-          @_embeddedJs(tokeniser, indent, generator.elementStack, innerWhitespace: true, generator)
-        else if tokeniser.token.minus
-          @_jsLine(tokeniser, indent, generator.elementStack, generator)
-        else if tokeniser.token.comment or tokeniser.token.slash
-          @_commentLine(tokeniser, indent, generator.elementStack, generator)
-        else if tokeniser.token.amp
-          @_escapedLine(tokeniser, indent, generator.elementStack, generator)
-        else if tokeniser.token.filter
-          @_filter(tokeniser, indent, generator, options)
-        else
-          @_templateLine(tokeniser, generator.elementStack, indent, generator, options)
+        try
+          indent = @_whitespace(tokeniser)
+          generator.setIndent(indent)
+          if tokeniser.token.eol
+            generator.outputBuffer.append(HamlRuntime.indentText(indent) + tokeniser.token.matched)
+            tokeniser.getNextToken()
+          else if tokeniser.token.doctype
+            @_doctype(tokeniser, indent, generator)
+          else if tokeniser.token.exclamation
+            @_ignoredLine(tokeniser, indent, generator.elementStack, generator)
+          else if tokeniser.token.equal or tokeniser.token.escapeHtml or tokeniser.token.unescapeHtml or
+          tokeniser.token.tilde
+            @_embeddedJs(tokeniser, indent, generator.elementStack, innerWhitespace: true, generator)
+          else if tokeniser.token.minus
+            @_jsLine(tokeniser, indent, generator.elementStack, generator)
+          else if tokeniser.token.comment or tokeniser.token.slash
+            @_commentLine(tokeniser, indent, generator.elementStack, generator)
+          else if tokeniser.token.amp
+            @_escapedLine(tokeniser, indent, generator.elementStack, generator)
+          else if tokeniser.token.filter
+            @_filter(tokeniser, indent, generator, options)
+          else
+            @_templateLine(tokeniser, generator.elementStack, indent, generator, options)
+        catch e
+          @_handleError(options, skipTo: true, tokeniser, e)
       else
         generator.outputBuffer.append(tokeniser.token.matched)
         tokeniser.getNextToken()
