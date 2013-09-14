@@ -1300,7 +1300,7 @@
         return expect(this.result).toBe('<div class="p" a="b">\n</div>\n');
       });
     });
-    return describe('with an invalid attribute list', function() {
+    describe('with an invalid attribute list', function() {
       beforeEach(function() {
         return this.haml = '.p(a="b" =)';
       });
@@ -1326,6 +1326,62 @@
           source: this.haml,
           tolerateFaults: true
         })()).trim()).toEqual('<div class="p" a="b">\n  \n</div>');
+      });
+    });
+    describe('with a missing closing bracket', function() {
+      beforeEach(function() {
+        return this.haml = '.p(a="b"\n  .o Something not seen\n.r(a="b")\n  You should see me\n.q\n  You should see me';
+      });
+      it('raises an exception in normal mode', function() {
+        var _this = this;
+
+        return expect(function() {
+          return haml.compileHaml({
+            source: _this.haml
+          })();
+        }).toThrow();
+      });
+      return it('does not raise an exception in fault tolerant mode', function() {
+        var _this = this;
+
+        expect(function() {
+          return _this.result = haml.compileHaml({
+            source: _this.haml,
+            tolerateFaults: true
+          })();
+        }).not.toThrow();
+        return expect(_(haml.compileHaml({
+          source: this.haml,
+          tolerateFaults: true
+        })()).trim()).toEqual('<div class="p" a="b">\n.o Something not seen\n</div>\n<div class="r" a="b">\n  You should see me\n</div>\n<div class="q">\n  You should see me\n</div>');
+      });
+    });
+    return describe('with a missing closing brace', function() {
+      beforeEach(function() {
+        return this.haml = '.p{a: "b"\n  .o Something not seen\n.r{a: "b"}\n  You should see me\n.q\n  You should see me';
+      });
+      xit('raises an exception in normal mode', function() {
+        var _this = this;
+
+        return expect(function() {
+          return haml.compileHaml({
+            source: _this.haml
+          })();
+        }).toThrow();
+      });
+      return xit('does not raise an exception in fault tolerant mode', function() {
+        var _this = this;
+
+        expect(function() {
+          return _this.result = haml.compileHaml({
+            source: _this.haml,
+            tolerateFaults: true
+          })();
+        }).not.toThrow();
+        return expect(_(haml.compileHaml({
+          source: this.haml,
+          tolerateFaults: true
+        })()).trim()).toEqual('<div class="p" a="b">\n.o Something not seen\n</div>\n<div class="r" a="b">\n  You should see me\n</div>\n<div class="q">\n  You should see me\n</div>');
       });
     });
   });

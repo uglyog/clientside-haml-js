@@ -135,29 +135,8 @@ class Tokeniser
         matched.substring(1, matched.length - 1)
       )
 
-      if !@token
-        if @buffer and @buffer.charAt(@bufferIndex) == '{'
-          i = @bufferIndex + 1
-          characterNumberStart = @characterNumber
-          lineNumberStart = @lineNumber
-          braceCount = 1
-          while i < @buffer.length and (braceCount > 1 or @buffer.charAt(i) isnt '}')
-            if @buffer.charAt(i) == '{'
-              braceCount++
-            else if @buffer.charAt(i) == '}'
-              braceCount--
-            i++
-          if i == @buffer.length
-            @characterNumber = characterNumberStart + 1
-            @lineNumber = lineNumberStart
-            throw @parseError('Error parsing attribute hash - Did not find a terminating "}"')
-          else
-            @token =
-              attributeHash: true
-              token: 'ATTRHASH'
-              tokenString: @buffer.substring(@bufferIndex, i + 1)
-              matched: @buffer.substring(@bufferIndex, i + 1)
-            @advanceCharsInBuffer(i - @bufferIndex + 1)
+      if !@token and @buffer and @buffer.charAt(@bufferIndex) == '{'
+        @matchJavascriptHash()
 
       @matchSingleCharToken('(', { openBracket: true, token: 'OPENBRACKET' })
       @matchSingleCharToken(')', { closeBracket: true, token: 'CLOSEBRACKET' })
@@ -224,7 +203,7 @@ class Tokeniser
   ###
     Skips to the end of the line and returns the string that was skipped
   ###
-  skipToEOLorEOF: () ->
+  skipToEOLorEOF: ->
     text = ''
     unless @token.eof or @token.eol
       text += @token.matched unless @token.unknown
@@ -246,7 +225,7 @@ class Tokeniser
   ###
     Parses a multiline code block and returns the parsed text
   ###
-  parseMultiLine: () ->
+  parseMultiLine: ->
     text = ''
     while @token.continueLine
       @currentLineMatcher.lastIndex = @bufferIndex
@@ -284,7 +263,7 @@ class Tokeniser
   ###
     Returns the current line and character counters
   ###
-  currentParsePoint: () ->
+  currentParsePoint: ->
     {
       lineNumber: @lineNumber,
       characterNumber: @characterNumber,
@@ -294,7 +273,7 @@ class Tokeniser
   ###
     Pushes back the current token onto the front of the input buffer
   ###
-  pushBackToken: () ->
+  pushBackToken: ->
     if !@token.unknown and !@token.eof
       @bufferIndex -= @token.matched.length
       @token = @prevToken
@@ -302,5 +281,64 @@ class Tokeniser
   ###
     Is the current token an end of line or end of input buffer
   ###
-  isEolOrEof: () ->
+  isEolOrEof: ->
     @token.eol or @token.eof
+
+  ###
+    Match a Javascript Hash {...}
+  ###
+  matchJavascriptHash: ->
+    currentIndent = @calculateCurrentIndent()
+    i = @bufferIndex + 1
+    characterNumberStart = @characterNumber
+    lineNumberStart = @lineNumber
+    braceCount = 1
+    while i < @buffer.length and (braceCount > 1 or @buffer.charAt(i) isnt '}')
+      ch = @buffer.charAt(i)
+      chCode = @buffer.charCodeAt(i)
+      if ch == '{'
+        braceCount++
+        i++
+      else if ch == '}'
+        braceCount--
+        i++
+      else if chCode == 10 or chCode == 13
+        i++
+      else
+        i++
+    if i == @buffer.length
+      @characterNumber = characterNumberStart + 1
+      @lineNumber = lineNumberStart
+      throw @parseError('Error parsing attribute hash - Did not find a terminating "}"')
+    else
+      @token =
+        attributeHash: true
+        token: 'ATTRHASH'
+        tokenString: @buffer.substring(@bufferIndex, i + 1)
+        matched: @buffer.substring(@bufferIndex, i + 1)
+      @advanceCharsInBuffer(i - @bufferIndex + 1)
+
+  ###
+    Calculate the indent value of the current line
+  ###
+  calculateCurrentIndent: ->
+    @tokenMatchers.whitespace.lastIndex = 0
+    result = @tokenMatchers.whitespace.exec(@currentLine)
+    if result?.index == 0
+      @calculateIndent(result[0])
+    else
+      0
+
+  ###
+    Calculate the indent leven of the provided whitespace
+  ###
+  calculateIndent: (whitespace) ->
+    indent = 0
+    i = 0
+    while i < whitespace.length
+      if whitespace.charCodeAt(i) == 9
+        indent += 2
+      else
+        indent++
+      i++
+    Math.floor((indent + 1) / 2)

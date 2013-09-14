@@ -457,15 +457,7 @@ root.haml =
   _whitespace: (tokeniser) ->
     indent = 0
     if tokeniser.token.ws
-      i = 0
-      whitespace = tokeniser.token.tokenString
-      while i < whitespace.length
-        if whitespace.charCodeAt(i) == 9
-          indent += 2
-        else
-          indent++
-        i++
-      indent = Math.floor((indent + 1) / 2)
+      indent = tokeniser.calculateIndent(tokeniser.token.tokenString)
       tokeniser.getNextToken()
     indent
 
