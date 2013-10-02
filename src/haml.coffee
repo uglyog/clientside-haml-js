@@ -1,7 +1,7 @@
 ###
   Main haml compiler implemtation
 ###
-root.haml =
+haml =
 
   ###
     Compiles the haml provided in the parameters to a Javascipt function
@@ -519,10 +519,15 @@ root.haml =
       lineIndent = @_whitespace(tokeniser)
     tokeniser.pushBackToken()
 
-root.haml.Tokeniser = Tokeniser
-root.haml.Buffer = Buffer
-root.haml.JsCodeGenerator = JsCodeGenerator
-root.haml.ProductionJsCodeGenerator = ProductionJsCodeGenerator
-root.haml.CoffeeCodeGenerator = CoffeeCodeGenerator
-root.haml.HamlRuntime = HamlRuntime
-root.haml.filters = filters
+haml.Tokeniser = Tokeniser
+haml.Buffer = Buffer
+haml.JsCodeGenerator = JsCodeGenerator
+haml.ProductionJsCodeGenerator = ProductionJsCodeGenerator
+haml.CoffeeCodeGenerator = CoffeeCodeGenerator
+haml.HamlRuntime = HamlRuntime
+haml.filters = filters
+
+if module?.exports?
+  module.exports = haml
+else
+  root.haml = haml
