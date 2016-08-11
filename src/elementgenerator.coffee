@@ -35,9 +35,8 @@ class ElementGenerator extends CodeGenerator
   ###
   closeAndReturnOutput: () ->
     @outputBuffer.flush()
-    console.log('2', @outputBuffer.output())
-    ret = @outputBuffer.output() + '  }\n  return parents[0]; '
-    console.log(ret)
+    ret = @outputBuffer.output() + '  }\n  return elm; '
+    #console.log(ret)
     ret
 
 
@@ -68,13 +67,14 @@ class ElementGenerator extends CodeGenerator
 
     @_indent(indent)
     @outputBuffer.append('if (parents.peek()) parents.peek().appendChild(elm);\n')
+    elementStack[indent] = { element: element }
 
   closeElement: (indent, elementStack, tokeniser, generator) ->
-    console.log('CLOSE')
-    @_indent(indent)
-    @outputBuffer.append('parents.pop();\n')
-    elementStack[indent] = null
-    generator.mark()
+    if elementStack[indent+1] && elementStack[indent+1].element
+      @_indent(indent)
+      @outputBuffer.append('elm = parents.pop();\n')
+      elementStack[indent+1] = null
+      generator.mark()
 
   ###
     Append a line with embedded javascript code
@@ -85,13 +85,15 @@ class ElementGenerator extends CodeGenerator
     @outputBuffer.appendToOutputBuffer(indentText + 'try {\n')
     @outputBuffer.appendToOutputBuffer(indentText + '    var value = eval("' +
       (_.str || _).trim(expression).replace(/"/g, '\\"').replace(/\\n/g, '\\\\n') + '");\n')
-    @outputBuffer.appendToOutputBuffer(indentText + '    value = value === null ? "" : value;')
-    if escapeContents
-      @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.HamlRuntime.escapeHTML(String(value)));\n')
-    else if perserveWhitespace
-      @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.HamlRuntime.perserveWhitespace(String(value)));\n')
-    else
-      @outputBuffer.appendToOutputBuffer(indentText + '    html.push(String(value));\n')
+    @outputBuffer.appendToOutputBuffer(indentText + '    elm.appendChild( (typeof value === "string") ? document.createTextNode(value) : value);\n')
+
+    if false
+      if escapeContents
+        @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.HamlRuntime.escapeHTML(String(value)));\n')
+      else if perserveWhitespace
+        @outputBuffer.appendToOutputBuffer(indentText + '    html.push(haml.HamlRuntime.perserveWhitespace(String(value)));\n')
+      else
+        @outputBuffer.appendToOutputBuffer(indentText + '    html.push(String(value));\n')
 
     @outputBuffer.appendToOutputBuffer(indentText + '} catch (e) {\n');
     @outputBuffer.appendToOutputBuffer(indentText + '  handleError(haml.HamlRuntime.templateError(' +
@@ -202,7 +204,6 @@ class ElementGenerator extends CodeGenerator
     Append the text contents to the buffer, expanding any embedded code
   ###
   appendTextContents: (text, shouldInterpolate, currentParsePoint, options = {}) ->
-    console.log(options, text)
     if shouldInterpolate and text.match(/#{[^}]*}/)
       @interpolateString(text, currentParsePoint, options)
     else
@@ -232,7 +233,6 @@ class ElementGenerator extends CodeGenerator
     process text based on escape and preserve flags
   ###
   processText: (text, options) ->
-    console.log(options, text)
     if options?.escapeHTML
       t = haml.HamlRuntime.escapeHTML(text)
     else if options?.perserveWhitespace
