@@ -64,3 +64,27 @@ describe 'element generator', () ->
     @node = document.createElement('div')
     @node.appendChild(src({ visible: false }))
     expect(@node.innerHTML).toEqual(exp)
+
+  it 'should work for dynamic types', () ->
+    txt = '''
+      %button{type: "button"}
+    '''
+    exp = '''<button type="button"></button>'''
+
+    src = haml.compileHaml(source: txt, generator: 'elementgenerator')
+    @node.appendChild(src())
+    expect(@node.innerHTML).toEqual(exp)
+
+  it 'should work for tree struct', () ->
+    txt = '''
+      %button{type: "button"}
+        .btn-label
+          = label
+        .icon
+          %i.glyphicon-chevron-right{'aria-hidden': "true"}
+    '''
+    exp = '''<button type="button"><div class="btn-label">fuu</div><div class="icon"><i class="glyphicon-chevron-right" aria-hidden="true"></i></div></button>'''
+
+    src = haml.compileHaml(source: txt, generator: 'elementgenerator')
+    @node.appendChild(src({ label: 'fuu' }))
+    expect(@node.innerHTML).toEqual(exp)

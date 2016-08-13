@@ -49,31 +49,32 @@ class ElementGenerator extends CodeGenerator
     tagOuterWhitespace = !tagOptions or tagOptions.outerWhitespace
     @outputBuffer.trimWhitespace() unless tagOuterWhitespace
 
-    @_indent(indent)
-    @outputBuffer.append('if (elm) parents.push(elm);\n')
 
     @_indent(indent)
     @outputBuffer.append('elm = document.createElement("' + element + '");\n')
+    @_indent(indent)
+    @outputBuffer.append('if (parents.peek()) parents.peek().appendChild(elm);\n')
+    @_indent(indent)
+    @outputBuffer.append('parents.push(elm);\n')
     if id
       @_indent(indent)
       @outputBuffer.append('elm.setAttribute("id", "' + id + '");\n')
     if classes && classes.length > 0
       @_indent(indent)
       @outputBuffer.append('elm.setAttribute("class", "' + classes.join(' ') + '");\n')
-    for own ak, av of attributeHash
-      if av
-        @_indent(indent)
-        @outputBuffer.append('elm.setAttribute("' + ak + '", "' + av + '");\n')
+    if attributeHash.length > 0
+      @_indent(indent)
+      @outputBuffer.append('hashFunction = eval("(' + attributeHash.replace(/"/g, '\\"').replace(/\n/g, '\\n') + ')");')
+      @_indent(indent)
+      @outputBuffer.append('for(var index in hashFunction) { if (hashFunction.hasOwnProperty(index)) { elm.setAttribute(index, hashFunction[index]);}}\n')
 
-    @_indent(indent)
-    @outputBuffer.append('if (parents.peek()) parents.peek().appendChild(elm);\n')
     elementStack[indent] = { element: element }
 
   closeElement: (indent, elementStack, tokeniser, generator) ->
-    if elementStack[indent+1] && elementStack[indent+1].element
+    if elementStack[indent] && elementStack[indent].element
       @_indent(indent)
       @outputBuffer.append('elm = parents.pop();\n')
-      elementStack[indent+1] = null
+      elementStack[indent] = null
       generator.mark()
 
   ###
