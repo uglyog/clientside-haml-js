@@ -198,6 +198,11 @@ describe 'haml', () ->
             '  </div>\n' +
             '</h1>\n')
 
+        it "#{generator} supports empty attributes", ->
+          template = "%span(empty-attribute)"
+          html = haml.compileHaml(source: template)()
+          expect(html).toEqual('<span empty-attribute="">' + '\n' + '</span>' + '\n')
+
     it 'with coffescript should render the correct html', () ->
       html = haml.compileCoffeeHaml('coffee-attributes').call({ model: { name: 'class1' } })
       expect(html).toEqual(

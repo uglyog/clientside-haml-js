@@ -164,7 +164,7 @@
       });
       ref = ['javascript', 'productionjavascript'];
       fn = function(generator) {
-        return it('should render the correct html for ' + generator, function() {
+        it('should render the correct html for ' + generator, function() {
           var html;
           html = haml.compileHaml({
             sourceId: 'attributes',
@@ -175,6 +175,14 @@
             }
           });
           return expect(html).toEqual('\n' + '<h1>\n' + '  <div id="test">\n' + '    <p id="test2" class="blah" selected="selected">\n' + '      This is some text\n' + '      This is some text\n' + '    </p>\n' + '    This is some div text\n' + '    <label for="a-b-c"/>\n' + '    <div id="test-1" class="class1 class2" for="something">\n' + '    </div>\n' + '  </div>\n' + '</h1>\n');
+        });
+        return it(generator + " supports empty attributes", function() {
+          var html, template;
+          template = "%span(empty-attribute)";
+          html = haml.compileHaml({
+            source: template
+          })();
+          return expect(html).toEqual('<span empty-attribute="">' + '\n' + '</span>' + '\n');
         });
       };
       for (i = 0, len = ref.length; i < len; i++) {
