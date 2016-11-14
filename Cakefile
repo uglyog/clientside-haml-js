@@ -10,6 +10,7 @@ appFiles  = [
   'src/jscodegenerator.coffee',
   'src/productionjscodegenerator.coffee',
   'src/coffeecodegenerator.coffee',
+  'src/elementgenerator.coffee',
   'src/filters.coffee',
   'src/haml.coffee'
 ]
@@ -24,6 +25,7 @@ specFiles = [
   'spec/buffer-spec.coffee',
   'spec/code-generation-spec.coffee',
   'spec/error-handling-spec.coffee'
+  'spec/element-generation-spec.coffee'
 ]
 
 task 'build', 'Build haml.js', ->
