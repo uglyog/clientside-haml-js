@@ -4,7 +4,8 @@
   "description": "The clientside-haml-js is a compiler written in CoffeeScript that compiles text templates in HAML format into Javascript functions that generate HTML.",
   "main": "index.js",
   "scripts": {
-    "build": "./node_modules/cake/bin/cake build"
+    "build": "./node_modules/cake/bin/cake build",
+    "test": "./node_modules/karma/bin/karma start"
   },
   "repository": {
     "type": "git",
@@ -17,14 +18,18 @@
   },
   "homepage": "https://github.com/uglyog/clientside-haml-js",
   "devDependencies": {
-    "coffee-script": "^1.11.1",
+    "coffee-script": "1.6.2",
     "cake": "^0.1.1",
-    "uglifyjs": "^2.4.10"
+    "uglifyjs": "^2.4.10",
+    "karma": "~0.10.1",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-coffee-preprocessor": "~0.1.0",
+    "karma-jasmine": "~0.1.0"
   },
   "dependencies": {
-    "jquery": "^3.1.1",
-    "underscore": "^1.8.3",
-    "underscore.string": "^3.3.4",
+    "jquery": "^1.8",
+    "underscore": "1.1.6",
+    "underscore.string": "^2.3.0",
     "json": "^9.0.4"
   }
 }
