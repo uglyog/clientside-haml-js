@@ -360,7 +360,7 @@ haml =
           if tokeniser.token.ws or tokeniser.token.eol
             tokeniser.getNextToken()
           else if !tokeniser.token.closeBracket and !tokeniser.token.identifier
-            @_handleError(options, null, tokeniser, tokeniser.parseError("Expecting either an attribute name to continue the attibutes or a closing " +
+            @_handleError(options, null, tokeniser, tokeniser.parseError("Expecting either an attribute name to continue the attributes or a closing " +
               "bracket to end"))
             return attrList
       tokeniser.getNextToken()
@@ -374,7 +374,9 @@ haml =
       name = tokeniser.token.tokenString
       tokeniser.getNextToken()
       haml._whitespace(tokeniser)
-      throw tokeniser.parseError("Expected '=' after attribute name") unless tokeniser.token.equal
+
+      return { name: name, value: '' } unless tokeniser.token.equal
+
       tokeniser.getNextToken();
       haml._whitespace(tokeniser)
       if !tokeniser.token.string and !tokeniser.token.identifier
