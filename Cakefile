@@ -38,4 +38,3 @@ task 'build', 'Build haml.js', ->
   exec "uglifyjs -o lib/haml.min.js lib/haml.js", (err, stdout, stderr) ->
     throw err if err
     console.log stdout + stderr
-    

@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "cake": "^0.1.1",
+    "coffee": "^3.3.0",
+    "coffee-script": "^1.11.1",
+    "uglifyjs": "^2.4.10"
+  }
+}
