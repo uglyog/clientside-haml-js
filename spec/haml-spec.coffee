@@ -220,6 +220,36 @@ describe 'haml', () ->
         '  </div>\n' +
         '</h1>\n')
 
+  describe 'template with content starting with {', () ->
+    beforeEach () ->
+      setFixtures('<script type="text/template" id="attributes">\n' +
+        '%div\n' +
+        '  %div\n' +
+        '    {: reversed smiley with a beard\n' +
+        '  %div\n' +
+        '    {{ maybeAngularValue }}\n' +
+        '  %div\n' +
+        '    {o}\n' +
+      '</script>\n')
+
+    for generator in ['javascript', 'productionjavascript']
+      do (generator) ->
+        it 'renders the { as text for ' + generator, () ->
+          html = haml.compileHaml(sourceId: 'attributes', generator: generator)({ model: { name: 'class1' } })
+          expect(html).toEqual(
+            '\n' +
+            '<div>\n' +
+            '  <div>\n' +
+            '    {: reversed smiley with a beard\n' +
+            '  </div>\n' +
+            '  <div>\n' +
+            '    {{ maybeAngularValue }}\n' +
+            '  </div>\n' +
+            '  <div>\n' +
+            '    {o}\n' +
+            '  </div>\n' +
+            '</div>\n')
+
   describe 'template with () attributes', () ->
 
     beforeEach () ->
