@@ -272,6 +272,10 @@ haml =
     identifier = @_element(tokeniser)
     id = @_idSelector(tokeniser)
     classes = @_classSelector(tokeniser)
+
+    # check to see if the id had been added after all classes
+    id = @_idSelector(tokeniser) unless id
+
     objectRef = @_objectReference(tokeniser)
     attrList = @_attributeList(tokeniser, options)
 

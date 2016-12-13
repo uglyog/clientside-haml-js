@@ -292,6 +292,8 @@ describe 'haml', () ->
         '      This is some text\n' +
         '    This is some div text\n' +
         '    .class1.class2/\n' +
+        ' .test2.test3#test2\n' +
+        '   More text\n' +
         '</script>')
 
     it 'should render the correct html', () ->
@@ -306,6 +308,9 @@ describe 'haml', () ->
         '    </p>\n' +
         '    This is some div text\n' +
         '    <div class="class1 class2"/>\n' +
+        '  </div>\n' +
+        '  <div id="test2" class="test2 test3">\n' +
+        '    More text\n' +
         '  </div>\n' +
         '</h1>\n')
 
