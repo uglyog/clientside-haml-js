@@ -135,7 +135,7 @@ class Tokeniser
         matched.substring(1, matched.length - 1)
       )
 
-      if !@token and @buffer and @buffer.charAt(@bufferIndex) == '{'
+      if !@token and @buffer and @buffer.charAt(@bufferIndex) == '{' and !@prevToken.ws
         @matchJavascriptHash()
 
       @matchSingleCharToken('(', { openBracket: true, token: 'OPENBRACKET' })

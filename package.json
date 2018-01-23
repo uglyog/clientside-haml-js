@@ -18,13 +18,13 @@
   },
   "homepage": "https://github.com/uglyog/clientside-haml-js",
   "devDependencies": {
-    "coffee-script": "1.6.2",
     "cake": "^0.1.1",
-    "uglifyjs": "^2.4.10",
+    "coffee-script": "1.11.1",
     "karma": "~0.10.1",
     "karma-chrome-launcher": "~0.1.0",
     "karma-coffee-preprocessor": "~0.1.0",
-    "karma-jasmine": "~0.1.0"
+    "karma-jasmine": "~0.1.0",
+    "uglifyjs": "^2.4.10"
   },
   "dependencies": {
     "jquery": "^1.8",
