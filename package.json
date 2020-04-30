@@ -27,7 +27,7 @@
     "uglifyjs": "^2.4.10"
   },
   "dependencies": {
-    "jquery": "~> 3.0.0",
+    "jquery": "~> 3.5.0",
     "underscore": "1.1.6",
     "underscore.string": "^2.3.0",
     "json": "^9.0.4"
