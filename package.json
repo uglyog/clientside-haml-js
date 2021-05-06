@@ -30,6 +30,6 @@
     "jquery": "~> 3.0.0",
     "underscore": "1.1.6",
     "underscore.string": "^2.3.0",
-    "json": "^9.0.4"
+    "json": "^10.0.0"
   }
 }
